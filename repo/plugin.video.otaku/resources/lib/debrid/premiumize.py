@@ -18,8 +18,6 @@ class Premiumize:
         token = token.json()
         expiry = token['expires_in']
         token_ttl = token['expires_in']
-        poll_again = True
-        success = False
         control.copy2clip(token['user_code'])
         control.progressDialog.create(
             control.ADDON_NAME,
@@ -29,6 +27,8 @@ class Premiumize:
         )
         control.progressDialog.update(0)
 
+        poll_again = True
+        success = False
         while poll_again and not token_ttl <= 0 and not control.progressDialog.iscanceled():
             poll_again, success = self.poll_token(token['device_code'])
             progress_percent = 100 - int((float((expiry - token_ttl) / expiry) * 100))
@@ -41,16 +41,22 @@ class Premiumize:
             control.ok_dialog(control.ADDON_NAME, 'Premiumize ' + control.lang(30023))
 
     def poll_token(self, device_code):
+        poll_again = True
         data = {'client_id': self.client_id, 'code': device_code, 'grant_type': 'device_code'}
-        token = requests.post('https://www.premiumize.me/token', data=data)
-        token = token.json()
-        control.setSetting('premiumize.token', token['access_token'])
-        self.headers['Authorization'] = 'Bearer {}'.format(token['access_token'])
-
-        account_info = self.account_info()
-        control.setSetting('premiumize.username', account_info['customer_id'])
-
-        return False, True
+        r = requests.post('https://www.premiumize.me/token', data=data)
+        token = r.json()
+        if r.ok:
+            control.setSetting('premiumize.token', token['access_token'])
+            self.headers['Authorization'] = 'Bearer {}'.format(token['access_token'])
+            account_info = self.account_info()
+            control.setSetting('premiumize.username', account_info['customer_id'])
+            poll_again = False
+        else:
+            if token.get('error') == 'access_denied':
+                poll_again = False
+            if token.get('error') == 'slow_down':
+                xbmc.sleep(1000)
+        return poll_again, r.ok
 
     def get_url(self, url):
         if self.headers['Authorization'] == 'Bearer ':

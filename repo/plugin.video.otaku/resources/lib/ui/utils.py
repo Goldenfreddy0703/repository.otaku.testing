@@ -3,7 +3,7 @@ import os
 from resources.lib.ui import control
 
 
-def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=None, poster=None, cast=None, landscape=None, banner=None, clearart=None, clearlogo=None):
+def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=None, poster=None, landscape=None, banner=None, clearart=None, clearlogo=None):
     if image and '/' not in image:
         genre_image = os.path.join(control.OTAKU_GENRE_PATH, image)
         art_image = os.path.join(control.OTAKU_ICONS_PATH, image)
@@ -22,7 +22,6 @@ def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=N
         'name': name,
         'url': url,
         'info': info,
-        'cast': cast,
         'image': {
                 'poster': poster,
                 'icon': image,

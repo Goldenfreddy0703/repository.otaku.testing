@@ -330,7 +330,7 @@ def EDIT_SEARCH_ITEM(payload, params):
         if len(payload_list) == 2 and payload_list[0]:
             search_item, page = payload_list
             query = control.keyboard(control.lang(30905), search_item)
-            if query != search_item:
+            if query and query != search_item:
                 database.remove_search(table='show', value=search_item)
                 database.addSearchHistory(query, 'show')
             return

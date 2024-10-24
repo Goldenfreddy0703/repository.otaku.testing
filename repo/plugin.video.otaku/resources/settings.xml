@@ -2229,7 +2229,7 @@
                     <level>3</level>
                     <data>RunPlugin(plugin://plugin.video.otaku/import_settings?setting=true)</data>
                     <control type="button" format="action">
-                        <close>false</close>
+                        <close>true</close>
                     </control>
                 </setting>
                 <setting id="export_settings" type="action" label="30329" help="">

@@ -1,3 +1,8 @@
+Changelog v5.1.3 (2024-10-22):
+- Fixed Small Bug with Search
+- Fixed Premiumize Login
+- Fixed Bug with Artwork
+
 Changelog v5.1.2 (2024-10-22):
 - Fixed Clearlogos
 
