@@ -39,8 +39,7 @@ class SIMKLAPI:
 
         try:
             info['aired'] = res['date'][:10]
-
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
         try:
