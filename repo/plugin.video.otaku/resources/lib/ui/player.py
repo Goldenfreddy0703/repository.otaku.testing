@@ -1,9 +1,10 @@
 import xbmc
 import xbmcgui
+import pickle
 import service
 
-from resources.lib.ui import control
-from resources.lib.indexers import aniskip
+from resources.lib.ui import control, database
+from resources.lib.indexers import aniskip, anime_skip
 
 playList = control.playList
 player = xbmc.Player
@@ -49,6 +50,7 @@ class WatchlistPlayer(player):
         # process skip times
         self.process_hianime()
         self.process_aniskip()
+        self.process_animeskip()
 
         self.keepAlive()
 
@@ -226,6 +228,38 @@ class WatchlistPlayer(player):
                 skip_times = skipoutro_aniskip_res['results'][0]['interval']
                 self.skipoutro_start = int(skip_times['startTime']) + self.skipoutro_offset
                 self.skipoutro_end = int(skip_times['endTime']) + self.skipoutro_offset
+                self.skipoutro_aniskip = True
+
+    def process_animeskip(self):
+        show_meta = database.get_show_meta(self.mal_id)
+        anilist_id = pickle.loads(show_meta['meta_ids'])['anilist_id']
+
+        if self.skipintro_aniskip_enable or self.skipoutro_aniskip_enable:
+            skip_times = anime_skip.get_time_stamps(anime_skip.get_episode_ids(str(anilist_id), int(self.episode)))
+            intro_start = None
+            intro_end = None
+            outro_start = None
+            outro_end = None
+            if skip_times:
+                for skip in skip_times:
+                    if self.skipintro_aniskip_enable:
+                        if intro_start is None and skip['type']['name'] in ['Intro', 'New Intro', 'Branding']:
+                            intro_start = int(skip['at'])
+                        elif intro_end is None and intro_start is not None and skip['type']['name'] in ['Canon']:
+                            intro_end = int(skip['at'])
+                    if self.skipoutro_aniskip_enable:
+                        if outro_start is None and skip['type']['name'] in ['Credits', 'New Credits']:
+                            outro_start = int(skip['at'])
+                        elif outro_end is None and outro_start is not None and skip['type']['name'] in ['Canon', 'Preview']:
+                            outro_end = int(skip['at'])
+
+            if intro_start is not None and intro_end is not None:
+                self.skipintro_start = intro_start + self.skipintro_offset
+                self.skipintro_end = intro_end + self.skipintro_offset
+                self.skipintro_aniskip = True
+            if outro_start is not None and outro_end is not None:
+                self.skipoutro_start = int(outro_start) + self.skipoutro_offset
+                self.skipoutro_end = int(outro_end) + self.skipoutro_offset
                 self.skipoutro_aniskip = True
 
     def process_hianime(self):

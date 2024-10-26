@@ -702,11 +702,11 @@ msgid "Duration of how long the Dialog will appear"
 msgstr ""
 
 msgctxt "#30396"
-msgid "Enable Aniskip"
+msgid "Enable Smart Skip"
 msgstr ""
 
 msgctxt "#30397"
-msgid "Offset for Aniskip (seconds)"
+msgid "Offset for Smart Skip (seconds)"
 msgstr ""
 
 ######Debrid######

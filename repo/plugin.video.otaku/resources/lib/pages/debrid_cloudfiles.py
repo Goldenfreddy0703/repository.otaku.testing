@@ -32,7 +32,7 @@ class Sources(BrowserBase):
     def rd_cloud_inspection(self, query, episode):
         api = real_debrid.RealDebrid()
         torrents = api.list_torrents()
-        filenames = [re.sub(r'\[.*?]\s*', '', i['filename']) for i in torrents]
+        filenames = [re.sub(r'\[.*?]\s*', '', i['filename'].replace(',', '')) for i in torrents]
         filenames_query = ','.join(filenames)
         r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
         resp = r.json()

@@ -17,7 +17,7 @@ class Sources(BrowserBase):
                 if source_utils.is_file_ext_valid(file):
                     filenames.append(str(os.path.join(root, file).replace(PATH, '')))
 
-        clean_filenames = [re.sub(r'\[.*?]\s*', '', os.path.basename(i)) for i in filenames]
+        clean_filenames = [re.sub(r'\[.*?]\s*', '', os.path.basename(i).replace(',', '')) for i in filenames]
         filenames_query = ','.join(clean_filenames)
         r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
         resp = r.json()

@@ -20,12 +20,19 @@
 # t0 = time.perf_counter_ns()
 
 import pickle
+import service
 
 from resources.lib import OtakuBrowser
 from resources.lib.ui import control, database, utils
 from resources.lib.ui.router import Route, router_process
 from resources.lib.WatchlistIntegration import add_watchlist
 from resources.lib.OtakuBrowser import BROWSER
+
+
+if control.ADDON_VERSION != control.getSetting('version'):
+    if int(control.getSetting('showchangelog')) == 0:
+        service.getChangeLog()
+    control.setSetting('version', control.ADDON_VERSION)
 
 
 def add_last_watched(items):

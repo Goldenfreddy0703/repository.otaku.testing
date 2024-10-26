@@ -41,7 +41,7 @@ def refresh_apis():
 
 def update_mappings_db():
     control.log("### Updating Mappings")
-    url = 'https://github.com/Goldenfreddy0703/Otaku/raw/main/script.otaku.mappings/resources/data/anime_mappings.db'
+    url = 'https://github.com/Goldenfreddy0703/Otaku-Mappings/raw/refs/heads/main/anime_mappings.db'
     r = requests.get(url)
     with open(os.path.join(control.dataPath, 'mappings.db'), 'wb') as file:
         file.write(r.content)
@@ -126,14 +126,10 @@ def version_check():
     control.log(f'### Kodi Version: {control.kodi_version}')
 
     if control.getSetting('otaku.version') != control.ADDON_VERSION:
-        showchangelog = control.getSetting("general.showchangelog")
-        if showchangelog == "Yes":
-            getChangeLog
         reuselang = control.getSetting('reuselanguageinvoker.status')
         toggle_reuselanguageinvoker(reuselang)
         control.setSetting('otaku.version', control.ADDON_VERSION)
         control.log(f"### {reuselang} Re-uselanguageinvoker")
-
 
 if __name__ == "__main__":
     control.log('##################  RUNNING MAINTENANCE  ######################')
