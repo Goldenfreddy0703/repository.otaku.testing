@@ -229,6 +229,11 @@ class KitsuWLF(WatchlistFlavorBase):
         }
 
         if next_up_meta:
+            # Ensure mal_id and next_up are integers
+            mal_id = int(mal_id)
+            next_up = int(next_up)
+            
+            # Format the string with integers
             base['url'] = 'play/%d/%d/' % (mal_id, next_up)
             return utils.parse_view(base, False, True, dub)
 

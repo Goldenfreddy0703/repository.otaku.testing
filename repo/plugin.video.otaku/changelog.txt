@@ -1,3 +1,7 @@
+Changelog v5.1.6 (2024-10-29):
+- Fixed Kitsu's Next Up
+- Fixed a small bug with Specials
+
 Changelog v5.1.5 (2024-10-26):
 - Added Anime Skip for skip times
 - Fixed Changelog Issue

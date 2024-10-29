@@ -27,7 +27,7 @@ def search_history(search_array):
 def get_episodeList(mal_id, pass_idx):
     show = database.get_show(mal_id)
     kodi_meta = pickle.loads(show['kodi_meta'])
-    if kodi_meta['format'] in ['MOVIE', 'ONA', 'SPECIAL', 'Movie', 'Special'] and kodi_meta['episodes'] == 1:
+    if kodi_meta['format'] in ['MOVIE', 'ONA', 'SPECIAL', 'Movie', 'Special', 'TV Special'] and kodi_meta['episodes'] == 1:
         title = kodi_meta['title_userPreferred'] or kodi_meta['name']
         info = {
             "title": title,
