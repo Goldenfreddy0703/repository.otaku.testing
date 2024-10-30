@@ -5,6 +5,7 @@ import service
 
 from resources.lib.ui import control, database
 from resources.lib.indexers import aniskip, anime_skip
+from resources.lib import WatchlistIntegration
 
 playList = control.playList
 player = xbmc.Player
@@ -94,7 +95,16 @@ class WatchlistPlayer(player):
                 self._watchlist_update(self.mal_id, self.episode)
                 self.updated = True
                 if playList.size() == 0 or playList.getposition() == (playList.size() - 1):
-                    service.sync_watchlist(True)
+                    # Retrieve the status from kodi_meta
+                    show = database.get_show(self.mal_id)
+                    if show:
+                        kodi_meta = pickle.loads(show['kodi_meta'])
+                        status = kodi_meta.get('status')
+                        if status in ['Finished Airing', 'FINISHED']:
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
+                            xbmc.sleep(3000)
+                            service.sync_watchlist(True)
                 break
             xbmc.sleep(5000)
 

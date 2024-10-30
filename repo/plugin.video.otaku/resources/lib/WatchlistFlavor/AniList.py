@@ -50,11 +50,11 @@ class AniListWLF(WatchlistFlavorBase):
 
     def watchlist(self):
         statuses = [
-            ("Next Up", "CURRENT?next_up=true", 'nextup.png'),
-            ("Current", "CURRENT", 'watching.png'),
+            ("Next Up", "CURRENT?next_up=true", 'next_up.png'),
+            ("Current", "CURRENT", 'currently_watching.png'),
             ("Rewatching", "REPEATING", 'rewatching.png'),
-            ("Plan to Watch", "PLANNING", 'plantowatch.png'),
-            ("Paused", "PAUSED", 'onhold.png'),
+            ("Plan to Watch", "PLANNING", 'want_to_watch.png'),
+            ("Paused", "PAUSED", 'on_hold.png'),
             ("Completed", "COMPLETED", 'completed.png'),
             ("Dropped", "DROPPED", 'dropped.png')
         ]

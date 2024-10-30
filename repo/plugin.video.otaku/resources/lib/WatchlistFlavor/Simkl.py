@@ -73,14 +73,14 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
 
     def watchlist(self):
         statuses = [
-            ("Next Up", "watching?next_up=true", 'nextup.png'),
-            ("Currently Watching", "watching", 'watching.png'),
+            ("Next Up", "watching?next_up=true", 'next_up.png'),
+            ("Currently Watching", "watching", 'currently_watching.png'),
             ("Completed", "completed", 'completed.png'),
-            ("On Hold", "hold", 'onhold.png'),
-            # ("Dropped", "notinteresting"),
+            ("On Hold", "hold", 'on_hold.png'),
+            # ("Dropped", "notinteresting", 'on_hold.png'),
             ("Dropped", "dropped", 'dropped.png'),
-            ("Plan to Watch", "plantowatch", 'plantowatch.png'),
-            ("All Anime", "ALL", 'allanime.png')
+            ("Plan to Watch", "plantowatch", 'want_to_watch.png'),
+            ("All Anime", "ALL", 'all_anime.png')
         ]
         return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]
 

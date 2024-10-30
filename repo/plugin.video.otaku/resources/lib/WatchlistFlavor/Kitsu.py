@@ -87,11 +87,11 @@ class KitsuWLF(WatchlistFlavorBase):
 
     def watchlist(self):
         statuses = [
-            ("Next Up", "current?next_up=true", 'nextup.png'),
-            ("Current", "current", 'watching.png'),
-            ("Want to Watch", "planned", 'plantowatch.png'),
+            ("Next Up", "current?next_up=true", 'next_up.png'),
+            ("Current", "current", 'currently_watching.png'),
+            ("Want to Watch", "planned", 'want_to_watch.png'),
             ("Completed", "completed", 'completed.png'),
-            ("On Hold", "on_hold", 'onhold.png'),
+            ("On Hold", "on_hold", 'on_hold.png'),
             ("Dropped", "dropped", 'dropped.png')
         ]
         return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]

@@ -80,13 +80,13 @@ class MyAnimeListWLF(WatchlistFlavorBase):
 
     def watchlist(self):
         statuses = [
-            ("Next Up", "watching?next_up=true", 'nextup.png'),
-            ("Currently Watching", "watching", 'watching.png'),
+            ("Next Up", "watching?next_up=true", 'next_up.png'),
+            ("Currently Watching", "watching", 'currently_watching.png'),
             ("Completed", "completed", 'completed.png'),
-            ("On Hold", "on_hold", 'onhold.png'),
+            ("On Hold", "on_hold", 'on_hold.png'),
             ("Dropped", "dropped", 'dropped.png'),
-            ("Plan to Watch", "plan_to_watch", 'plantowatch.png'),
-            ("All Anime", "", 'allanime.png')
+            ("Plan to Watch", "plan_to_watch", 'want_to_watch.png'),
+            ("All Anime", "", 'all_anime.png')
         ]
         return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]
 
