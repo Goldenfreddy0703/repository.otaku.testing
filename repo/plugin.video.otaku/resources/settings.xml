@@ -562,6 +562,14 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="provider.nyaaalt" type="boolean" label="30414" help="" parent="provider.nyaa">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="provider.nyaa">true</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="provider.animetosho" type="boolean" label="30401" help="">
                     <level>0</level>
                     <default>true</default>
@@ -571,6 +579,24 @@
 
             <!-- Embeds -->
             <group id="2" label="30333" help="">
+                <setting id="provider.animix" type="boolean" label="30405" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="provider.animixalt" type="boolean" label="30413" help="" parent="provider.animix">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="provider.animix">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="provider.animepahe" type="boolean" label="30404" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="provider.hianime" type="boolean" label="30402" help="">
                     <level>0</level>
                     <default>true</default>
@@ -588,6 +614,14 @@
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="provider.gogoalt" type="boolean" label="30412" help="" parent="provider.gogo">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="provider.gogo">true</dependency>
+                    </dependencies>
                 </setting>
             </group>
         </category>
@@ -2197,9 +2231,42 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="clear_slected_fanart" type="action" label="30018" help="">
+                <setting id="clear_selected_fanart" type="action" label="30018" help="">
                     <level>2</level>
-                    <data>RunPlugin(plugin://plugin.video.otaku/clear_slected_fanart?setting=true)</data>
+                    <data>RunPlugin(plugin://plugin.video.otaku/clear_selected_fanart?setting=true)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+            </group>
+
+            <!-- InputStream Adaptive -->
+            <group id="2" label="30597" help="">
+                <setting id="inputstreamadaptive.enabled" type="boolean" label="30598" help="">
+                    <level>3</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="inputstreamadaptive.settings" type="action" label="30599" help="" parent="inputstreamadaptive.enabled">
+                    <level>3</level>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="inputstreamadaptive.enabled" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <data>RunPlugin(plugin://plugin.video.otaku/inputstreamadaptive?setting=true)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="inputstreamhelper" type="action" label="30600" help="" parent="inputstreamadaptive.enabled">
+                    <level>3</level>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="inputstreamadaptive.enabled" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <data>RunPlugin(plugin://plugin.video.otaku/inputstreamhelper?setting=true)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
@@ -2207,7 +2274,7 @@
             </group>
 
             <!-- Language Invoker -->
-            <group id="2" label="30324" help="">
+            <group id="3" label="30324" help="">
                 <setting id="reuselanguageinvoker.toggle" type="action" label="30325" help="">
                     <level>3</level>
                     <data>RunPlugin(plugin://plugin.video.otaku/toggleLanguageInvoker?setting=true)</data>
@@ -2224,7 +2291,7 @@
             </group>
 
             <!-- Import/Export -->
-            <group id="3" label="30327" help="">
+            <group id="4" label="30327" help="">
                 <setting id="import_settings" type="action" label="30328" help="">
                     <level>3</level>
                     <data>RunPlugin(plugin://plugin.video.otaku/import_settings?setting=true)</data>

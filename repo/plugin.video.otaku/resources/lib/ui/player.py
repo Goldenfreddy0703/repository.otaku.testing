@@ -50,8 +50,10 @@ class WatchlistPlayer(player):
 
         # process skip times
         self.process_hianime()
-        self.process_aniskip()
-        self.process_animeskip()
+        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+            self.process_aniskip()
+        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+            self.process_animeskip()
 
         self.keepAlive()
 
@@ -117,8 +119,7 @@ class WatchlistPlayer(player):
         if not self.isPlayingVideo():
             return
 
-        current_ = playList.getposition()
-        self.vtag = playList[current_].getVideoInfoTag()
+        self.vtag = self.getVideoInfoTag()
         self.media_type = self.vtag.getMediaType()
         control.setSetting('addon.last_watched', self.mal_id)
 

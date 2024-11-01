@@ -25,6 +25,7 @@ ADDON_VERSION = addonInfo('version')
 ADDON_ICON = addonInfo('icon')
 OTAKU_FANART = addonInfo('fanart')
 ADDON_PATH = ADDON.getAddonInfo('path')
+pathExists = xbmcvfs.exists
 dataPath = xbmcvfs.translatePath(addonInfo('profile'))
 kodi_version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
 
@@ -129,6 +130,10 @@ def refresh():
     return execute('Container.Refresh')
 
 
+def getSetting(key):
+    return ADDON.getSetting(key)
+
+
 def getBool(key):
     return settings.getBool(key)
 
@@ -136,16 +141,25 @@ def getBool(key):
 def getInt(key):
     return settings.getInt(key)
 
+
 def getString(key):
     return settings.getString(key)
 
 
-def getSetting(key):
-    return ADDON.getSetting(key)
-
-
 def setSetting(settingid, value):
     return ADDON.setSetting(settingid, value)
+
+
+def setBool(settingid, value):
+    return settings.setBool(settingid, value)
+
+
+def setInt(settingid, value):
+    return settings.setInt(settingid, value)
+
+
+def setString(settingid, value):
+    return settings.setString(settingid, value)
 
 
 def lang(x):

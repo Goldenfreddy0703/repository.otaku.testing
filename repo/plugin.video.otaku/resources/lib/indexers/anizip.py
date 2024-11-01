@@ -114,7 +114,7 @@ class ANIZIPAPI:
         if not (eps_watched := kodi_meta.get('eps_watched')) and control.settingids.watchlist_data:
             from resources.lib.WatchlistFlavor import WatchlistFlavor
             flavor = WatchlistFlavor.get_update_flavor()
-            if flavor:
+            if flavor and flavor.flavor_name in WatchlistFlavor.get_enabled_watchlist_list():
                 data = flavor.get_watchlist_anime_entry(mal_id)
                 if data.get('eps_watched'):
                     eps_watched = kodi_meta['eps_watched'] = data['eps_watched']

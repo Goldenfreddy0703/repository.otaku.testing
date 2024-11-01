@@ -70,11 +70,13 @@ class WatchlistFlavorBase:
 
     def _get_mapping_id(self, mal_id, flavor):
         show = database.get_show(mal_id)
-        mapping_id = show[flavor] if show and show.get(flavor) else self._get_flavor_id(mal_id, flavor)
+        mapping_id = show[flavor] if show and show.get(flavor) else self.get_flavor_id_vercel(mal_id, flavor)
+        if not mapping_id:
+            mapping_id = self.get_flavor_id_findmyanime(mal_id, flavor)
         return mapping_id
 
     @staticmethod
-    def _get_flavor_id(mal_id, flavor):
+    def get_flavor_id_vercel(mal_id, flavor):
         params = {
             'type': "mal",
             "id": mal_id
@@ -82,5 +84,32 @@ class WatchlistFlavorBase:
         r = requests.get('https://armkai.vercel.app/api/search', params=params)
         res = r.json()
         flavor_id = res.get(flavor[:-3])
+        database.add_mapping_id(mal_id, flavor, flavor_id)
+        return flavor_id
+
+    @staticmethod
+    def get_flavor_id_findmyanime(mal_id, flavor):
+        if flavor == 'anilist_id':
+            mapping = 'Anilist'
+        elif flavor == 'mal_id':
+            mapping = 'MyAnimeList'
+        elif flavor == 'kitsu_id':
+            mapping = 'Kitsu'
+        else:
+            mapping = None
+        params = {
+            'id': mal_id,
+            'providor': 'MyAnimeList'
+        }
+        r = requests.get('https://find-my-anime.dtimur.de/api', params=params)
+        flavor_id = r.json()[0]['providerMapping'][mapping]
+        database.add_mapping_id(mal_id, flavor, flavor_id)
+        return flavor_id
+
+    @staticmethod
+    def get_flavor_id_simkl(mal_id, flavor):
+        from resources.lib.indexers.simkl import SIMKLAPI
+        ids = SIMKLAPI().get_mapping_ids(mal_id, flavor)
+        flavor_id = ids[flavor]
         database.add_mapping_id(mal_id, flavor, flavor_id)
         return flavor_id

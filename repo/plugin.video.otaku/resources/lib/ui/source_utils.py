@@ -77,6 +77,8 @@ def getInfo(release_title):
         info.append('WMA')
     if any(i in release_title for i in ['dub', 'dubbed']):
         info.append('DUB')
+    if any(i in release_title for i in ['sub', 'subbed']):
+        info.append('SUB')
     if any(i in release_title for i in ['dual-audio', 'dual audio']):
         info.append('DUAL-AUDIO')
 
@@ -129,6 +131,7 @@ def get_cache_check_reg(episode):
     #     season = str(info.getSeason()).zfill(2)
     # else:
     #     season = ''
+    episode = str(episode)
     season = ''
     # if control.getSetting('regex.question') == 'true':
     #     reg_string = r'''(?ix)                              # Ignore case (i), and use verbose regex (x)
@@ -238,3 +241,7 @@ def user_select(files, dict_key):
     else:
         file = [files[idx]]
     return file
+
+def get_embedhost(url):
+    s = re.search(r'(?://|\.)([^\.]+)\.', url)
+    return s.group(1)

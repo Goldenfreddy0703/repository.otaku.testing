@@ -107,13 +107,13 @@ def toggle_reuselanguageinvoker(forced_state=None):
     for i in range(len(file_lines)):
         line_string = file_lines[i]
         if "reuselanguageinvoker" in file_lines[i]:
-            if "false" in line_string or forced_state == 'Enabled':
-                file_lines[i] = file_lines[i].replace("false", "true")
-                control.setSetting("reuselanguageinvoker.status", "Enabled")
-                _store_and_reload(file_lines)
-            elif "true" in line_string or forced_state == 'Disabled':
+            if forced_state == 'Disabled' or ("true" in line_string and forced_state is None):
                 file_lines[i] = file_lines[i].replace("true", "false")
                 control.setSetting("reuselanguageinvoker.status", "Disabled")
+                _store_and_reload(file_lines)
+            elif forced_state == 'Enabled' or ("false" in line_string and forced_state is None):
+                file_lines[i] = file_lines[i].replace("false", "true")
+                control.setSetting("reuselanguageinvoker.status", "Enabled")
                 _store_and_reload(file_lines)
             break
 

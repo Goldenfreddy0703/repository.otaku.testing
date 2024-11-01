@@ -877,11 +877,19 @@ msgid "AnimeTosho"
 msgstr ""
 
 msgctxt "#30402"
-msgid "HiAnime"
+msgid "H!Anime"
 msgstr ""
 
 msgctxt "#30403"
 msgid "Gogo"
+msgstr ""
+
+msgctxt "#30404"
+msgid "AnimePahe"
+msgstr ""
+
+msgctxt "#30405"
+msgid "Animix"
 msgstr ""
 
 msgctxt "#30410"
@@ -890,6 +898,18 @@ msgstr ""
 
 msgctxt "#30411"
 msgid "H!Anime Proxies (Region Problem)"
+msgstr ""
+
+msgctxt "#30412"
+msgid "Gogo Proxies (Region Problem)"
+msgstr ""
+
+msgctxt "#30413"
+msgid "Animix Proxies (Region Problem)"
+msgstr ""
+
+msgctxt "#30414"
+msgid "Nyaa Alt (For Verizon Users)"
 msgstr ""
 
 ######Context & Widgets#####
@@ -1279,4 +1299,20 @@ msgstr ""
 
 msgctxt "#30596"
 msgid "Rx - Hentai"
+msgstr ""
+
+msgctxt "#30597"
+msgid "InputStream Adaptive"
+msgstr ""
+
+msgctxt "#30598"
+msgid "Use InputStream Adaptive"
+msgstr ""
+
+msgctxt "#30599"
+msgid "Configure InputStream Adaptive"
+msgstr ""
+
+msgctxt "#30600"
+msgid "Install InputStream Adaptive"
 msgstr ""

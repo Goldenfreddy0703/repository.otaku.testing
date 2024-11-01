@@ -1,3 +1,6 @@
+Changelog v1.0.20 (2024-11-01)
+- Disable Error
+
 Changelog v1.0.19 (2024-07-25)
 - Install Error
 

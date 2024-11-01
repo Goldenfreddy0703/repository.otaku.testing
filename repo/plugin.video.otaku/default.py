@@ -688,7 +688,7 @@ def TOOLS_MENU(payload, params):
         (control.lang(30015), "completed_sync", {'plot': "Sync Completed Anime with Otaku"}, "sync_completed.png"),
         (control.lang(30016), 'download_manager', {'plot': "Open Download Manager"}, 'download_manager.png'),
         (control.lang(30017), 'sort_select', {'plot': "Choose Sorting..."}, 'sort_select.png'),
-        (control.lang(30018), 'clear_slected_fanart', {'plot': "Clear All Selected Fanart"}, 'wipe_addon_data.png')
+        (control.lang(30018), 'clear_selected_fanart', {'plot': "Clear All Selected Fanart"}, 'wipe_addon_data.png')
     ]
 
     control.draw_items([utils.allocate_item(name, url, False, False, image, info) for name, url, info, image in TOOLS_ITEMS], 'addons')
@@ -731,7 +731,7 @@ def CLEAR_SEARCH_HISTORY(payload, params):
         control.exit_code()
 
 
-@Route('clear_slected_fanart')
+@Route('clear_selected_fanart')
 def CLEAR_SELECTED_FANART(payload, params):
     fanart_all = control.getSetting(f'fanart.all').split(',')
     for i in fanart_all:
@@ -825,6 +825,22 @@ def TOGGLE_LANGUAGE_INVOKER(payload, params):
     import service
     service.toggle_reuselanguageinvoker()
 
+@Route('inputstreamadaptive')
+def INPUTSTREAMADAPTIVE(payload, params):
+    import xbmcaddon
+    try:
+        xbmcaddon.Addon('inputstream.adaptive').openSettings()
+    except RuntimeError:
+        control.notify(control.ADDON_NAME, "InputStream Adaptive is not installed.")
+
+@Route('inputstreamhelper')
+def INPUTSTREAMHELPER(payload, params):
+    import xbmcaddon
+    try:
+        xbmcaddon.Addon('inputstream.adaptive')
+        control.ok_dialog(control.ADDON_NAME, "InputStream Adaptive is already installed.")
+    except RuntimeError:
+        xbmc.executebuiltin('InstallAddon(inputstream.adaptive)')
 
 if __name__ == "__main__":
     router_process(control.get_plugin_url(), control.get_plugin_params())

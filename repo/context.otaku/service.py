@@ -14,7 +14,7 @@ properties = [
     'context.otaku.fanartselect'
 ]
 
-if xbmc.getCondVisibility('System.HasAddon(%s)' % 'plugin.video.otaku'):
+if xbmc.getCondVisibility('System.AddonIsEnabled(%s)' % 'plugin.video.otaku'):
     ADDON = xbmcaddon.Addon('plugin.video.otaku')
     for prop in properties:
         xbmc.executebuiltin(f"SetProperty({prop},{ADDON.getSetting(prop)},home)")

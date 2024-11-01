@@ -1,7 +1,6 @@
 import pickle
 import requests
 
-from resources.lib import pages
 from resources.lib import indexers
 from resources.lib.indexers import simkl, anizip, jikanmoe
 from resources.lib.ui import control, database, utils
@@ -71,7 +70,7 @@ def get_anime_init(mal_id):
             data = simkl.SIMKLAPI().get_episodes(mal_id, show_meta)
         elif meta_api == 'anizip':
             data = anizip.ANIZIPAPI().get_episodes(mal_id, show_meta)
-        else:    # elif meta_api == 'jikanmoa':
+        else:
             data = jikanmoe.JikanAPI().get_episodes(mal_id, show_meta)
 
     else:
@@ -86,6 +85,7 @@ def get_anime_init(mal_id):
 
 
 def get_sources(mal_id, episode, media_type, rescrape=False, source_select=False, silent=False):
+    from resources.lib import pages
     if not (show := database.get_show(mal_id)):
         show = BROWSER.get_anime(mal_id)
     kodi_meta = pickle.loads(show['kodi_meta'])

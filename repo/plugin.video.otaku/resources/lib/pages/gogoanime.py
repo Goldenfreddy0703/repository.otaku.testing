@@ -1,25 +1,25 @@
+import itertools
+import json
 import pickle
 import re
-import requests
-import itertools
 
 from functools import partial
 from bs4 import BeautifulSoup
-from resources.lib.ui import database, source_utils
+from resources.lib.ui import control, database, source_utils
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.indexers import malsync
 
 
 class Sources(BrowserBase):
-    _BASE_URL = 'https://gogoanime3.co/'
+    _BASE_URL = 'https://anitaku.to/' if control.getSetting('provider.gogoalt') == 'true' else 'https://gogoanime3.co/'
 
     def get_sources(self, mal_id, episode, get_backup):
         show = database.get_show(mal_id)
-        kodi_meta = pickle.loads(show['kodi_meta'])
+        kodi_meta = pickle.loads(show.get('kodi_meta'))
         title = kodi_meta.get('name')
         title = self._clean_title(title)
 
-        slugs = database.get_(malsync.get_slugs, 168, mal_id=mal_id, site='Gogoanime')
+        slugs = malsync.get_slugs(mal_id=mal_id, site='Gogoanime')
         if not slugs:
             headers = {'Referer': self._BASE_URL}
             params = {
@@ -27,14 +27,26 @@ class Sources(BrowserBase):
                 'id': -1,
                 'link_web': self._BASE_URL
             }
-            r = requests.get('https://ajax.gogo-load.com/site/loadAjaxSearch', headers=headers, params=params)
-            r = r.json().get('content')
+            r = database.get(
+                self._get_request,
+                8,
+                'https://ajax.gogo-load.com/site/loadAjaxSearch',
+                data=params,
+                headers=headers
+            )
+            r = json.loads(r).get('content')
 
             if not r and ':' in title:
                 title = title.split(':')[0]
-                params['keyword'] = title
-                r = requests.get('https://ajax.gogo-load.com/site/loadAjaxSearch', headers=headers, params=params)
-                r = r.json().get('content')
+                params.update({'keyword': title})
+                r = database.get(
+                    self._get_request,
+                    8,
+                    'https://ajax.gogo-load.com/site/loadAjaxSearch',
+                    data=params,
+                    headers=headers
+                )
+                r = json.loads(r).get('content')
 
             soup = BeautifulSoup(r, 'html.parser')
             items = soup.find_all('div', {'class': 'list_search_ajax'})
@@ -52,26 +64,36 @@ class Sources(BrowserBase):
                     or (item.a.text.strip().replace(':', ' ') + '   ').startswith(title + '   ')
                 ]
             if not slugs:
-                slugs = database.get_(get_backup, 168, mal_id, 'Gogoanime')
+                slugs = database.get(get_backup, 168, mal_id, 'Gogoanime')
                 if not slugs:
                     return []
         slugs = list(slugs.keys()) if isinstance(slugs, dict) else slugs
-        mapfunc = partial(self._process_gogo, episode=episode)
+        mapfunc = partial(self._process_gogo, show_id=mal_id, episode=episode)
         all_results = list(map(mapfunc, slugs))
         all_results = list(itertools.chain(*all_results))
         return all_results
 
-    def _process_gogo(self, slug, episode):
+    def _process_gogo(self, slug, show_id, episode):
         if slug.startswith('http'):
             slug = slug.split('/')[-1]
         url = "{0}{1}-episode-{2}".format(self._BASE_URL, slug, episode)
         headers = {'Referer': self._BASE_URL}
-        title = (slug.replace('-', ' ')).title() + '  Episode-{0}'.format(episode)
-        r = requests.get(url, headers=headers).text
+        title = (slug.replace('-', ' ')).title() + ' - Ep {0}'.format(episode)
+        r = database.get(
+            self._send_request,
+            8,
+            url,
+            headers=headers
+        )
 
         if not r:
             url = '{0}category/{1}'.format(self._BASE_URL, slug)
-            html = requests.get(url, headers=headers).text
+            html = database.get(
+                self._send_request,
+                8,
+                url,
+                headers=headers
+            )
             mid = re.findall(r'value="([^"]+)"\s*id="movie_id"', html)
             if mid:
                 params = {'ep_start': episode,
@@ -79,13 +101,13 @@ class Sources(BrowserBase):
                           'id': mid[0],
                           'alias': slug}
                 eurl = 'https://ajax.gogo-load.com/ajax/load-list-episode'
-                r2 = requests.get(eurl, headers=headers, params=params).text
+                r2 = self._get_request(eurl, data=params, headers=headers)
                 soup2 = BeautifulSoup(r2, 'html.parser')
                 eslug = soup2.find('a')
                 if eslug:
                     eslug = eslug.get('href').strip()
                     url = "{0}{1}".format(self._BASE_URL[:-1], eslug)
-                    r = requests.get(url, headers=headers).text
+                    r = self._send_request(url, headers=headers)
 
         soup = BeautifulSoup(r, 'html.parser')
         sources = []
@@ -96,6 +118,10 @@ class Sources(BrowserBase):
             if server.lower() in self.embeds():
                 if link.startswith('//'):
                     link = 'https:' + link
+
+                # Check if the slug ends with '-dub' or '-sub', if not, append '-sub'
+                if not slug.endswith('-dub') and not slug.endswith('-sub'):
+                    slug += '-sub'
 
                 source = {
                     'release_title': title,

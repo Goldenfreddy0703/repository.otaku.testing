@@ -337,26 +337,28 @@ class Monitor(xbmc.Monitor):
 
 @HookMimetype('application/dash+xml')
 def _DASH_HOOK(item):
-    import inputstreamhelper
-    is_helper = inputstreamhelper.Helper('mpd')
-    if is_helper.check_inputstream():
-        item.setProperty('inputstream', is_helper.inputstream_addon)
-        item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        item.setContentLookup(False)
-    else:
-        raise Exception("InputStream Adaptive is not supported.")
+    if control.getBool('inputstreamadaptive.embeds'):
+        import inputstreamhelper
+        is_helper = inputstreamhelper.Helper('mpd')
+        if is_helper.check_inputstream():
+            item.setProperty('inputstream', is_helper.inputstream_addon)
+            item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            item.setContentLookup(False)
+        else:
+            raise Exception("InputStream Adaptive is not supported.")
     return item
 
 
 @HookMimetype('application/vnd.apple.mpegurl')
 def _HLS_HOOK(item):
-    stream_url = item.getPath()
-    import inputstreamhelper
-    is_helper = inputstreamhelper.Helper('hls')
-    if '|' not in stream_url and is_helper.check_inputstream():
-        item.setProperty('inputstream', is_helper.inputstream_addon)
-        item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-    item.setProperty('MimeType', 'application/vnd.apple.mpegurl')
-    item.setMimeType('application/vnd.apple.mpegstream_url')
-    item.setContentLookup(False)
+    if control.getBool('inputstreamadaptive.enabled'):
+        stream_url = item.getPath()
+        import inputstreamhelper
+        is_helper = inputstreamhelper.Helper('hls')
+        if '|' not in stream_url and is_helper.check_inputstream():
+            item.setProperty('inputstream', is_helper.inputstream_addon)
+            item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        item.setProperty('MimeType', 'application/vnd.apple.mpegurl')
+        item.setMimeType('application/vnd.apple.mpegstream_url')
+        item.setContentLookup(False)
     return item

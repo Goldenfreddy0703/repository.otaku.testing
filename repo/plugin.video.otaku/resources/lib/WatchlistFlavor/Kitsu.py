@@ -62,7 +62,7 @@ class KitsuWLF(WatchlistFlavorBase):
         data = resp.json()
         control.setSetting('kitsu.token', data['access_token'])
         control.setSetting('kitsu.refresh', data['refresh_token'])
-        control.setSetting('kitsu.expiry', str(int(time.time()) + int(data['expires_in'])))
+        control.setSetting('kitsu.expiry', str(int(time.time() + int(data['expires_in']))))
 
     @staticmethod
     def handle_paging(hasnextpage, base_url, page):
@@ -234,7 +234,7 @@ class KitsuWLF(WatchlistFlavorBase):
             next_up = int(next_up)
             
             # Format the string with integers
-            base['url'] = 'play/%d/%d/' % (mal_id, next_up)
+            base['url'] = f"play/{mal_id}/{next_up}"
             return utils.parse_view(base, False, True, dub)
 
         if eres['attributes']['subtype'] == 'movie' and eres['attributes']['episodeCount'] == 1:

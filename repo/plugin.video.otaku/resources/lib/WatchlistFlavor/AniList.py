@@ -275,7 +275,10 @@ class AniListWLF(WatchlistFlavorBase):
         if (0 < episode_count < next_up) or (res['nextAiringEpisode'] and next_up == res['nextAiringEpisode']['episode']):
             return None
 
-        mal_id, next_up_meta, show = self._get_next_up_meta(mal_id, progress)
+        if mal_id:
+            mal_id, next_up_meta, show = self._get_next_up_meta(mal_id, progress)
+        else:
+            next_up_meta = None
         if next_up_meta:
             if next_up_meta.get('title'):
                 title = f"{title} - {next_up_meta['title']}"
@@ -391,10 +394,7 @@ class AniListWLF(WatchlistFlavorBase):
         results = r.json()
         return results['data']['MediaListCollection']['lists']
 
-    def get_watchlist_anime_info(self, mal_id):
-        anilist_id = self._get_mapping_id(mal_id, 'anilist_id')
-        if not anilist_id:
-            return False
+    def get_watchlist_anime_info(self, anilist_id):
         query = '''
         query ($mediaId: Int) {
             Media (id: $mediaId) {

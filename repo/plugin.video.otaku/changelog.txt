@@ -1,3 +1,21 @@
+Changelog v5.1.8 (2024-11-01):
+- Added Six Module
+- Added AnimePahe
+- Added Animixplay
+- Added Gogo Alt
+- Added Nyaa Alt
+- Added Find My Anime Api for backup
+- Added InputStream Adaptive Settings
+- Relabled HiAnime to H!Anime
+- Fixed typo with fanart_select
+- Fixed Simkl Auth Dialog
+- Fixed Anilist Watchlist Mappings
+- Fixed Watchlist Bugs
+- Fixed Re-Use Language Invoker
+- Fixed error in context menu
+- Moved pages to get_sources
+- Made InputStream Adaptive Optional
+
 Changelog v5.1.7 (2024-10-30):
 - Added Auto-Completion for Watchlists
 - Finally Fixed Watchlist Icons

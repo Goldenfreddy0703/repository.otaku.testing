@@ -65,7 +65,7 @@ class SimklWLF(WatchlistFlavorBase):
 Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["interval"])} Seconds
 '''
             control.progressDialog.update(int((inter - i) / inter * 100), f_string)
-            xbmc.sleep(device_code['interval'])
+            xbmc.sleep(device_code['interval'] * 1000)
 
     def __get_sort(self):
         sort_types = ['anime_title', 'list_updated_at', 'last_added', 'user_rating']
