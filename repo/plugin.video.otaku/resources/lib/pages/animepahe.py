@@ -100,13 +100,13 @@ class Sources(BrowserBase):
                 if any(x in item.get('data-src').lower() for x in self.embeds()):
                     qual = int(item.get('data-resolution'))
                     if qual < 577:
-                        quality = 3
+                        quality = 1
                     elif qual < 721:
                         quality = 2
                     elif qual < 1081:
-                        quality = 1
+                        quality = 3
                     else:
-                        quality = 0
+                        quality = 4
                     source = {
                         'release_title': '{0} - Ep {1}'.format(title, episode),
                         'hash': item.get('data-src'),

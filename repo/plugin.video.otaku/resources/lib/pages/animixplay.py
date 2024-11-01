@@ -96,9 +96,9 @@ class Sources(BrowserBase):
                     server = mitem.a.get('data-name')
                     qual = mitem.a.get('title')
                     if '1080p' in qual:
-                        qual = 4
-                    elif 'HD' in qual:
                         qual = 3
+                    elif 'HD' in qual:
+                        qual = 2
                     else:
                         qual = 0
                     lang = 2 if mitem.a.get('id').endswith('dub') else 0

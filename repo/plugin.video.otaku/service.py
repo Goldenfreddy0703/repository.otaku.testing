@@ -94,6 +94,19 @@ def getChangeLog():
     del windows
 
 
+def getInstructions():
+    instructions_path = os.path.join(control.ADDON_PATH, 'instructions.txt')
+    
+    with open(instructions_path) as instructions_file:
+        instructions_text = instructions_file.read()
+    
+    heading = '[B]%s -  v%s - Instructions[/B]' % (control.ADDON_NAME, control.ADDON_VERSION)
+    from resources.lib.windows.textviewer import TextViewerXML
+    windows = TextViewerXML('textviewer_1.xml', control.ADDON_PATH, heading=heading, instructions_text=instructions_text)
+    windows.run()
+    del windows
+
+
 def toggle_reuselanguageinvoker(forced_state=None):
     def _store_and_reload(output):
         with open(file_path, "w+") as addon_xml_:

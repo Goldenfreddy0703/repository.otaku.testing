@@ -1,3 +1,7 @@
+Changelog v5.1.9 (2024-11-01):
+- Fixed Quality with embeds
+- Added FlareSolverr Settings
+
 Changelog v5.1.8 (2024-11-01):
 - Added Six Module
 - Added AnimePahe

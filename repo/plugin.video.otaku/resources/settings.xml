@@ -2290,8 +2290,59 @@
                 </setting>
             </group>
 
+            <!-- Cloudflare & DDoS-GUARD Solver -->
+			<group id="4" label="30601">
+				<setting id="fs_enable" type="boolean" label="30602" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="fs_inst" type="action" label="30605" help="" parent="fs_enable">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.otaku/fs_inst)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="fs_enable">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="button" format="action"/>
+				</setting>
+				<setting id="fs_url" type="string" label="30603" help="" parent="fs_enable">
+					<level>0</level>
+					<default>http://localhost:8191/v1</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="fs_enable">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30603</heading>
+					</control>
+				</setting>
+				<setting id="fs_timeout" type="integer" label="30604" help="" parent="fs_enable">
+					<level>0</level>
+					<default>60</default>
+					<constraints>
+						<minimum>30</minimum>
+						<step>30</step>
+						<maximum>180</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="fs_enable">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
+			</group>
+
             <!-- Import/Export -->
-            <group id="4" label="30327" help="">
+            <group id="5" label="30327" help="">
                 <setting id="import_settings" type="action" label="30328" help="">
                     <level>3</level>
                     <data>RunPlugin(plugin://plugin.video.otaku/import_settings?setting=true)</data>

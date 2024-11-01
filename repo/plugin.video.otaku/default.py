@@ -715,6 +715,12 @@ def CHANGE_LOG(payload, params):
     if params.get('setting'):
         control.exit_code()
 
+@Route('fs_inst')
+def FS_INST(payload, params):
+    import service
+    service.getInstructions()
+    if params.get('setting'):
+        control.exit_code()
 
 @Route('clear_cache')
 def CLEAR_CACHE(payload, params):

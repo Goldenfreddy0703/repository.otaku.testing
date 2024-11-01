@@ -148,9 +148,9 @@ class Sources(BrowserBase):
                                 subs = [{'url': x.get('file'), 'lang': x.get('label')} for x in subs if x.get('kind') == 'captions']
                             skip = {}
                             if res.get('intro'):
-                                skip.update({'intro': res.get('intro')})
+                                skip['intro'] = res['intro']
                             if res.get('outro'):
-                                skip.update({'outro': res.get('outro')})
+                                skip['outro'] = res['outro']
                             if res.get('encrypted'):
                                 slink = self._process_link(res.get('sources'))
                             else:
@@ -163,11 +163,11 @@ class Sources(BrowserBase):
                             for qual, qlink in quals:
                                 qual = int(qual)
                                 if qual > 1080:
-                                    quality = 4
-                                elif qual > 720:
                                     quality = 3
-                                elif qual > 480:
+                                elif qual > 720:
                                     quality = 2
+                                elif qual > 480:
+                                    quality = 1
                                 else:
                                     quality = 0
 
