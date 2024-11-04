@@ -4,7 +4,7 @@ import xbmc
 properties = [
     "context.otaku.findrecommendations",
     "context.otaku.findrelations",
-    # "context.otaku.getwatchorder",
+    "context.otaku.getwatchorder",
     "context.otaku.rescrape",
     "context.otaku.sourceselect",
     "context.otaku.logout",

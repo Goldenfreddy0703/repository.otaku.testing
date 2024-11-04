@@ -3,7 +3,9 @@ import json
 import pickle
 import random
 import requests
+import re
 
+from bs4 import BeautifulSoup
 from functools import partial
 from resources.lib.ui import database, get_meta, utils, control
 from resources.lib.ui.divide_flavors import div_flavor
@@ -1052,6 +1054,35 @@ class AniListBrowser:
         }
         relations = database.get(self.get_relations_res, 24, variables)
         return self.process_relations_view(relations)
+    
+    def get_watch_order(self, mal_id):
+        url = 'https://chiaki.site/?/tools/watch_order/id/{}'.format(mal_id)
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+    
+        # Find the element with the desired information
+        anime_info = soup.find('tr', {'data-id': str(mal_id)})
+    
+        watch_order_list = []
+        if anime_info is not None:
+            # Find all 'a' tags in the entire page with href attributes that match the desired URL pattern
+            mal_links = soup.find_all('a', href=re.compile(r'https://myanimelist\.net/anime/\d+'))
+    
+            # Extract the MAL IDs from these tags
+            mal_ids = [re.search(r'\d+', link['href']).group() for link in mal_links]
+    
+            watch_order_list = []
+            for idmal in mal_ids:
+                variables = {
+                    'idMal': int(idmal),
+                    'type': "ANIME"
+                }
+    
+                anilist_item = database.get(self.get_anilist_res_with_mal_id, 24, variables)
+                if anilist_item is not None:
+                    watch_order_list.append(anilist_item)
+    
+        return self.process_watch_order_view(watch_order_list)
 
     def get_anime(self, mal_id):
         variables = {
@@ -1469,6 +1500,72 @@ class AniListBrowser:
             return
         json_res = results['data']['Media']
         return json_res
+    
+    def get_anilist_res_with_mal_id(self, variables):
+        query = '''
+        query($idMal: Int, $type: MediaType){Media(idMal: $idMal, type: $type) {
+            id
+            idMal
+            title {
+                userPreferred,
+                romaji,
+                english
+            }
+            coverImage {
+                extraLarge
+            }
+            bannerImage
+            startDate {
+                year,
+                month,
+                day
+            }
+            description
+            synonyms
+            format
+            episodes
+            status
+            genres
+            duration
+            countryOfOrigin
+            averageScore
+            characters (
+                page: 1,
+                sort: ROLE,
+                perPage: 10,
+            ) {
+                edges {
+                    node {
+                        name {
+                            userPreferred
+                        }
+                    }
+                    voiceActors (language: JAPANESE) {
+                        name {
+                            userPreferred
+                        }
+                        image {
+                            large
+                        }
+                    }
+                }
+            }
+            studios {
+                edges {
+                    node {
+                        name
+                    }
+                }
+            }
+            }
+        }
+        '''
+        r = requests.post(self._URL, json={'query': query, 'variables': variables})
+        results = r.json()
+        if "errors" in results.keys():
+            return
+        json_res = results['data']['Media']
+        return json_res
 
     def process_anilist_view(self, json_res, base_plugin_url, page):
         hasNextPage = json_res['pageInfo']['hasNextPage']
@@ -1494,6 +1591,13 @@ class AniListBrowser:
                 tnode = edge['node']
                 tnode['relationType'] = edge['relationType']
                 res.append(tnode)
+        get_meta.collect_meta(res)
+        mapfunc = partial(self.base_anilist_view, completed=self.open_completed())
+        all_results = list(filter(lambda x: True if x else False, map(mapfunc, res)))
+        return all_results
+    
+    def process_watch_order_view(self, json_res):
+        res = json_res
         get_meta.collect_meta(res)
         mapfunc = partial(self.base_anilist_view, completed=self.open_completed())
         all_results = list(filter(lambda x: True if x else False, map(mapfunc, res)))

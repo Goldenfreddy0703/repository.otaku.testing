@@ -6,6 +6,7 @@ import pickle
 import ast
 import re
 
+from bs4 import BeautifulSoup
 from functools import partial
 from resources.lib.ui import database, control, utils, get_meta
 from resources.lib.ui.divide_flavors import div_flavor
@@ -151,6 +152,37 @@ class MalBrowser:
                     count += 1
         mapfunc = partial(self.base_mal_view, completed=self.open_completed())
         all_results = list(map(mapfunc, relation_res))
+        return all_results
+    
+
+    def get_watch_order(self, mal_id):
+        url = 'https://chiaki.site/?/tools/watch_order/id/{}'.format(mal_id)
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+    
+        # Find the element with the desired information
+        anime_info = soup.find('tr', {'data-id': str(mal_id)})
+    
+        watch_order_list = []
+        if anime_info is not None:
+            # Find all 'a' tags in the entire page with href attributes that match the desired URL pattern
+            mal_links = soup.find_all('a', href=re.compile(r'https://myanimelist\.net/anime/\d+'))
+    
+            # Extract the MAL IDs from these tags
+            mal_ids = [re.search(r'\d+', link['href']).group() for link in mal_links]
+    
+            watch_order_list = []
+            count = 0
+            for idmal in mal_ids:
+                mal_item = database.get(self.get_base_res, 24, f'{self._URL}/anime/{idmal}')
+                if mal_item is not None:
+                    watch_order_list.append(mal_item['data'])
+                    if count % 3 == 0:
+                        time.sleep(2)
+                    count += 1
+    
+        mapfunc = partial(self.base_mal_view, completed=self.open_completed())
+        all_results = list(map(mapfunc, watch_order_list))
         return all_results
     
 

@@ -2147,6 +2147,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="context.otaku.getwatchorder" type="boolean" label="30606" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="context.otaku.rescrape" type="boolean" label="30503" help="">
                     <level>0</level>
                     <default>true</default>

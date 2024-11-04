@@ -14,9 +14,9 @@ def main():
     elif arg == 'findrelations':
         path = path.split(plugin, 1)[1]
         executebuiltin(f"ActivateWindow(Videos,{plugin}/find_relations{path})")
-    # elif arg == 'getwatchorder':
-    #     path = path.split(plugin, 1)[1]
-    #     executebuiltin(f"ActivateWindow(Videos,{plugin}/watch_order{path})")
+    elif arg == 'getwatchorder':
+        path = path.split(plugin, 1)[1]
+        executebuiltin(f"ActivateWindow(Videos,{plugin}/watch_order{path})")
     elif arg == 'rescrape':
         resume_time = item.getVideoInfoTag().getResumeTime()
         path += "?rescrape=true"

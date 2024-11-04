@@ -66,10 +66,10 @@ def FIND_RELATIONS(payload, params):
     control.draw_items(BROWSER.get_relations(mal_id), 'tvshows')
 
 
-# @Route('watch_order/*')
-# def WATCH_ORDER(payload, params):
-#     path, mal_id, eps_watched = payload.rsplit("/")
-#     control.draw_items(BROWSER.get_watch_order(mal_id), 'tvshows')
+@Route('watch_order/*')
+def WATCH_ORDER(payload, params):
+    path, mal_id, eps_watched = payload.rsplit("/")
+    control.draw_items(BROWSER.get_watch_order(mal_id), 'tvshows')
 
 
 @Route('airing_last_season/*')

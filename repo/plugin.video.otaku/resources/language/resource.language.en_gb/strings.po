@@ -1336,3 +1336,7 @@ msgstr ""
 msgctxt "#30605"
 msgid "Hosting Instructions"
 msgstr ""
+
+msgctxt "#30606"
+msgid "Get Watch Order"
+msgstr ""

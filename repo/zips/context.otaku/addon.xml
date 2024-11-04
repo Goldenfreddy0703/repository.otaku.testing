@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="context.otaku" version="1.0.20" name="Otaku - Global Context Menu" provider-name="TeamOtaku">
+<addon id="context.otaku" version="1.0.21" name="Otaku - Global Context Menu" provider-name="TeamOtaku">
   <requires>
      <import addon="xbmc.python" version="3.0.0" />
   </requires>
@@ -13,10 +13,10 @@
         <label>Find Relations</label>
         <visible>String.IsEqual(Window(home).Property(context.otaku.findrelations),true)+String.StartsWith(ListItem.Path,plugin://plugin.video.otaku/)+[String.IsEqual(ListItem.DBTYPE,tvshow)|String.IsEqual(ListItem.DBTYPE,movie)]</visible>
       </item>
-      <!-- <item library="default.py" args="getwatchorder">
+      <item library="default.py" args="getwatchorder">
         <label>Get Watch Order</label>
         <visible>String.IsEqual(Window(home).Property(context.otaku.getwatchorder),true)+String.StartsWith(ListItem.Path,plugin://plugin.video.otaku/)+[String.IsEqual(ListItem.DBTYPE,tvshow)|String.IsEqual(ListItem.DBTYPE,movie)]</visible>
-      </item> -->
+      </item>
       <item library="default.py" args="markedaswatched">
         <label>Marked as Watched [COLOR blue]WatchList[/COLOR]</label>
         <visible>String.IsEqual(Window(home).Property(context.otaku.markedaswatched),true)+String.StartsWith(ListItem.Path,plugin://plugin.video.otaku/)+[String.IsEqual(ListItem.DBTYPE,episode)|String.IsEqual(ListItem.DBTYPE,movie)]</visible>
