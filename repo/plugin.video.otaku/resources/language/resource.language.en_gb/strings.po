@@ -1340,3 +1340,35 @@ msgstr ""
 msgctxt "#30606"
 msgid "Get Watch Order"
 msgstr ""
+
+msgctxt "#30607"
+msgid "Set Content Year"
+msgstr ""
+
+msgctxt "#30608"
+msgid "Year"
+msgstr ""
+
+msgctxt "#30609"
+msgid "Set Content Season"
+msgstr ""
+
+msgctxt "#30610"
+msgid "Season"
+msgstr ""
+
+msgctxt "#30611"
+msgid "Winter"
+msgstr ""
+
+msgctxt "#30612"
+msgid "Spring"
+msgstr ""
+
+msgctxt "#30613"
+msgid "Summer"
+msgstr ""
+
+msgctxt "#30614"
+msgid "Fall"
+msgstr ""

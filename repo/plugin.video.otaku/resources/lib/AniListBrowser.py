@@ -17,10 +17,12 @@ class AniListBrowser:
     def __init__(self):
         self._TITLE_LANG = ["romaji", 'english'][int(control.getSetting("titlelanguage"))]
         self.perpage = int(control.getSetting('interface.perpage.general.anilist'))
+        self.year_type = int(control.getSetting('contentyear.menu')) if control.getBool('contentyear.bool') else 0
+        self.season_type = int(control.getSetting('contentseason.menu')) if control.getBool('contentseason.bool') else -1
         self.format_in_type = ['TV', 'MOVIE', 'TV_SHORT', 'SPECIAL', 'OVA', 'ONA', 'MUSIC'][int(control.getSetting('contentformat.menu'))] if control.getBool('contentformat.bool') else ''
         self.status = ['RELEASING', 'FINISHED', 'NOT_YET_RELEASED', 'CANCELLED'][int(control.getSetting('contentstatus.menu.anilist'))] if control.getBool('contentstatus.bool') else ''
         self.countryOfOrigin_type = ['JP', 'KR', 'CN', 'TW'][int(control.getSetting('contentorigin.menu'))] if control.getBool('contentorigin.bool') else ''
-
+    
     @staticmethod
     def handle_paging(hasnextpage, base_url, page):
         if not hasnextpage or not control.is_addon_visible() and control.getBool('widget.hide.nextpage'):
@@ -28,26 +30,37 @@ class AniListBrowser:
         next_page = page + 1
         name = "Next Page (%d)" % next_page
         return [utils.allocate_item(name, base_url % next_page, True, False, 'next.png', {'plot': name}, 'next.png')]
-
-    @staticmethod
-    def get_season_year(period='current'):
+    
+    def get_season_year(self, period='current'):
         import datetime
         date = datetime.datetime.today()
         year = date.year
         month = date.month
         seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-        
+
+        if self.year_type:
+            if 1916 < self.year_type <= year + 1:
+                year = self.year_type
+            else:
+                control.notify(control.ADDON_NAME, "Invalid year. Please select a year between 1916 and {0}.".format(year + 1))
+                return None, None
+
+        if self.season_type > -1:
+            season_id = self.season_type
+        else:
+            season_id = int((month - 1) / 3)
+
         if period == "next":
-            season = seasons[int((month - 1) / 3 + 1) % 4]
+            season = seasons[(season_id + 1) % 4]
             if season == 'WINTER':
                 year += 1
         elif period == "last":
-            season = seasons[int((month - 1) / 3 - 1) % 4]
+            season = seasons[(season_id - 1) % 4]
             if season == 'FALL' and month <= 3:
                 year -= 1
         else:
-            season = seasons[int((month - 1) / 3)]
-        
+            season = seasons[season_id]
+
         return season, year
     
 

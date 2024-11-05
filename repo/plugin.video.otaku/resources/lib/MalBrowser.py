@@ -18,6 +18,8 @@ class MalBrowser:
     def __init__(self):
         self._TITLE_LANG = ['title', 'title_english'][int(control.getSetting("titlelanguage"))]
         self.perpage = control.getInt('interface.perpage.general.mal')
+        self.year_type = int(control.getSetting('contentyear.menu')) if control.getBool('contentyear.bool') else 0
+        self.season_type = int(control.getSetting('contentseason.menu')) if control.getBool('contentseason.bool') else ''
         self.format_in_type = ['tv', 'movie', 'tv_special', 'special', 'ova', 'ona', 'music'][int(control.getSetting('contentformat.menu'))] if control.getBool('contentformat.bool') else ''
         self.status = ['airing', 'complete', 'upcoming'][int(control.getSetting('contentstatus.menu.mal'))] if control.getBool('contentstatus.bool') else ''
         self.rating = ['g', 'pg', 'pg13', 'r17', 'r', 'rx'][int(control.getSetting('contentrating.menu.mal'))] if control.getBool('contentrating.bool') else ''
@@ -53,8 +55,7 @@ class MalBrowser:
         get_meta.collect_meta([res])
         return database.get_show(res['mal_id'])
 
-    @staticmethod
-    def get_season_year(period='current'):
+    def get_season_year(self, period='current'):
         import datetime
         date = datetime.datetime.today()
         year = date.year
@@ -72,17 +73,38 @@ class MalBrowser:
             'SUMMER': datetime.date(year, 9, 30),
             'FALL': datetime.date(year, 12, 31)
         }
-        
-        if period == "next":
-            season = seasons[int((month - 1) / 3 + 1) % 4]
-            if season == 'WINTER':
-                year += 1
-        elif period == "last":
-            season = seasons[int((month - 1) / 3 - 1) % 4]
-            if season == 'FALL' and month <= 3:
-                year -= 1
+
+        if self.year_type:
+            if 1916 < self.year_type <= year + 1:
+                year = self.year_type
+            else:
+                control.notify(control.ADDON_NAME, "Invalid year. Please select a year between 1916 and {0}.".format(year + 1))
+                return None, None, None, None, None, None, None, None, None, None, None, None, None, None
+            
+        if self.season_type:
+            if 0 <= self.season_type < 4:
+                season = seasons[self.season_type]
+                if period == "next":
+                    next_season_index = (self.season_type + 1) % 4
+                    season = seasons[next_season_index]
+                    if season == 'WINTER':
+                        year += 1
+                elif period == "last":
+                    last_season_index = (self.season_type - 1) % 4
+                    season = seasons[last_season_index]
+                    if season == 'FALL' and month <= 3:
+                        year -= 1
         else:
-            season = seasons[int((month - 1) / 3)]
+            if period == "next":
+                season = seasons[int((month - 1) / 3 + 1) % 4]
+                if season == 'WINTER':
+                    year += 1
+            elif period == "last":
+                season = seasons[int((month - 1) / 3 - 1) % 4]
+                if season == 'FALL' and month <= 3:
+                    year -= 1
+            else:
+                season = seasons[int((month - 1) / 3)]
         
         # Adjust the start and end dates for this season
         season_start_date = season_start_dates[season]
