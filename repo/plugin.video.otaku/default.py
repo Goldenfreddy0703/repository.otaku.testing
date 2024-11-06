@@ -21,6 +21,7 @@
 
 import pickle
 import service
+import json
 
 from resources.lib import OtakuBrowser
 from resources.lib.ui import control, database, utils
@@ -193,12 +194,28 @@ def TOP_100(payload, params):
 
 
 @Route('genres/*')
-def ANILIST_GENRES_PAGES(payload, params):
+def GENRES_PAGES(payload, params):
     genres, tags, page = payload.rsplit("/")
     if genres or tags:
         control.draw_items(BROWSER.genres_payload(genres, tags, int(page)), 'tvshows')
     else:
         control.draw_items(BROWSER.get_genres(), 'tvshows')
+
+
+@Route('update_genre_settings')
+def UPDATE_GENRE_SETTINGS(payload, params):
+    selected_genres_mal, selected_genres_anilist, selected_tags = BROWSER.update_genre_settings()
+
+    # Create a dictionary to store the settings
+    settings = {
+        'selected_genres_mal': selected_genres_mal,
+        'selected_genres_anilist': selected_genres_anilist,
+        'selected_tags': selected_tags
+    }
+
+    # Write the settings to a JSON file
+    with open(control.genre_json, 'w') as f:
+        json.dump(settings, f)
 
 
 @Route('genre_action/*')
@@ -397,7 +414,7 @@ def PLAY_MOVIE(payload, params):
         if control.getSetting('general.dialog') == '4':
             SourceSelect(*('source_select_az.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
         else:
-            SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()    
+            SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
     else:
         from resources.lib.windows.resolver import Resolver
         if control.getSetting('general.dialog') == '4':
@@ -715,12 +732,14 @@ def CHANGE_LOG(payload, params):
     if params.get('setting'):
         control.exit_code()
 
+
 @Route('fs_inst')
 def FS_INST(payload, params):
     import service
     service.getInstructions()
     if params.get('setting'):
         control.exit_code()
+
 
 @Route('clear_cache')
 def CLEAR_CACHE(payload, params):
@@ -831,6 +850,7 @@ def TOGGLE_LANGUAGE_INVOKER(payload, params):
     import service
     service.toggle_reuselanguageinvoker()
 
+
 @Route('inputstreamadaptive')
 def INPUTSTREAMADAPTIVE(payload, params):
     import xbmcaddon
@@ -838,6 +858,7 @@ def INPUTSTREAMADAPTIVE(payload, params):
         xbmcaddon.Addon('inputstream.adaptive').openSettings()
     except RuntimeError:
         control.notify(control.ADDON_NAME, "InputStream Adaptive is not installed.")
+
 
 @Route('inputstreamhelper')
 def INPUTSTREAMHELPER(payload, params):
@@ -847,6 +868,7 @@ def INPUTSTREAMHELPER(payload, params):
         control.ok_dialog(control.ADDON_NAME, "InputStream Adaptive is already installed.")
     except RuntimeError:
         xbmc.executebuiltin('InstallAddon(inputstream.adaptive)')
+
 
 if __name__ == "__main__":
     router_process(control.get_plugin_url(), control.get_plugin_params())

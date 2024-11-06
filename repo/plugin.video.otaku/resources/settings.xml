@@ -490,6 +490,21 @@
                         </dependency>
                     </dependencies>
                 </setting>
+				<setting id="contentgenre.bool" type="boolean" label="30615" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+                <setting id="contentgenre.menu" type="action" label="30616" help="" parent="contentgenre.bool">
+					<level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku/update_genre_settings?setting=true)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                    <dependencies>
+                        <dependency type="visible" setting="contentgenre.bool">true</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="jz.dub" type="boolean" label="30320" help="">
                     <level>3</level>
                     <default>false</default>

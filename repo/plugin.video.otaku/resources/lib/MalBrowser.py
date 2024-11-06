@@ -5,6 +5,7 @@ import random
 import pickle
 import ast
 import re
+import os
 
 from bs4 import BeautifulSoup
 from functools import partial
@@ -24,6 +25,17 @@ class MalBrowser:
         self.status = ['airing', 'complete', 'upcoming'][int(control.getSetting('contentstatus.menu.mal'))] if control.getBool('contentstatus.bool') else ''
         self.rating = ['g', 'pg', 'pg13', 'r17', 'r', 'rx'][int(control.getSetting('contentrating.menu.mal'))] if control.getBool('contentrating.bool') else ''
         self.adult = 'true' if control.getSetting('search.adult') == "false" else 'false'
+        self.genre = self.load_genres_from_json() if control.getBool('contentgenre.bool') else ''
+
+        if self.genre == ('',):
+            self.genre = ''
+
+    def load_genres_from_json(self):
+        if os.path.exists(control.genre_json):
+            with open(control.genre_json, 'r') as f:
+                settings = json.load(f)
+                return tuple(settings.get('selected_genres_mal', []))
+        return ()
 
     @staticmethod
     def open_completed():
@@ -80,7 +92,7 @@ class MalBrowser:
             else:
                 control.notify(control.ADDON_NAME, "Invalid year. Please select a year between 1916 and {0}.".format(year + 1))
                 return None, None, None, None, None, None, None, None, None, None, None, None, None, None
-            
+
         if self.season_type:
             if 0 <= self.season_type < 4:
                 season = seasons[self.season_type]
@@ -105,46 +117,46 @@ class MalBrowser:
                     year -= 1
             else:
                 season = seasons[int((month - 1) / 3)]
-        
+
         # Adjust the start and end dates for this season
         season_start_date = season_start_dates[season]
         season_end_date = season_end_dates[season]
-        
+
         # Adjust the start and end dates for this year
         year_start_date = datetime.date(year, 1, 1)
         year_end_date = datetime.date(year, 12, 31)
-    
+
         # Adjust the start and end dates for last season
         last_season_index = (seasons.index(season) - 1) % 4
         last_season = seasons[last_season_index]
         last_season_year = year if last_season != 'FALL' or month > 3 else year - 1
         season_start_date_last = season_start_dates[last_season].replace(year=last_season_year)
         season_end_date_last = season_end_dates[last_season].replace(year=last_season_year)
-        
+
         # Adjust the start and end dates for last year
         year_start_date_last = datetime.date(year - 1, 1, 1)
         year_end_date_last = datetime.date(year - 1, 12, 31)
-    
+
         # Adjust the start and end dates for next season
         next_season_index = (seasons.index(season) + 1) % 4
         next_season = seasons[next_season_index]
         next_season_year = year if next_season != 'WINTER' else year + 1
         season_start_date_next = season_start_dates[next_season].replace(year=next_season_year)
         season_end_date_next = season_end_dates[next_season].replace(year=next_season_year)
-    
+
         # Adjust the start and end dates for next year
         year_start_date_next = datetime.date(year + 1, 1, 1)
         year_end_date_next = datetime.date(year + 1, 12, 31)
-    
+
         return (season, year, year_start_date, year_end_date, season_start_date, season_end_date,
                 season_start_date_last, season_end_date_last, year_start_date_last, year_end_date_last,
                 season_start_date_next, season_end_date_next, year_start_date_next, year_end_date_next)
-    
+
 
     def get_anime(self, mal_id):
         res = database.get(self.get_base_res, 24, f"{self._URL}/anime/{mal_id}")
         return self.process_res(res['data'])
-    
+
 
     def get_recommendations(self, mal_id, page):
         params = {
@@ -156,7 +168,7 @@ class MalBrowser:
         mapfunc = partial(self.recommendation_relation_view, completed=self.open_completed())
         all_results = list(map(mapfunc, recommendations['data']))
         return all_results
-    
+
 
     def get_relations(self, mal_id):
         relations = database.get(self.get_base_res, 24, f'{self._URL}/anime/{mal_id}/relations')
@@ -175,24 +187,24 @@ class MalBrowser:
         mapfunc = partial(self.base_mal_view, completed=self.open_completed())
         all_results = list(map(mapfunc, relation_res))
         return all_results
-    
+
 
     def get_watch_order(self, mal_id):
         url = 'https://chiaki.site/?/tools/watch_order/id/{}'.format(mal_id)
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-    
+
         # Find the element with the desired information
         anime_info = soup.find('tr', {'data-id': str(mal_id)})
-    
+
         watch_order_list = []
         if anime_info is not None:
             # Find all 'a' tags in the entire page with href attributes that match the desired URL pattern
             mal_links = soup.find_all('a', href=re.compile(r'https://myanimelist\.net/anime/\d+'))
-    
+
             # Extract the MAL IDs from these tags
             mal_ids = [re.search(r'\d+', link['href']).group() for link in mal_links]
-    
+
             watch_order_list = []
             count = 0
             for idmal in mal_ids:
@@ -202,11 +214,11 @@ class MalBrowser:
                     if count % 3 == 0:
                         time.sleep(2)
                     count += 1
-    
+
         mapfunc = partial(self.base_mal_view, completed=self.open_completed())
         all_results = list(map(mapfunc, watch_order_list))
         return all_results
-    
+
 
     def get_search(self, query, page=1):
         params = {
@@ -225,9 +237,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         search = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(search, f"search/{query}/%d", page)
-    
+
 
     def get_airing_last_season(self, page):
         season, year, _, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('last')
@@ -236,13 +251,13 @@ class MalBrowser:
             'limit': self.perpage,
             'sfw': self.adult,
         }
-        
+
         if self.format_in_type:
             params['type'] = self.format_in_type
-    
+
         airing = database.get(self.get_base_res, 24, f"{self._URL}/seasons/{year}/{season}", params)
         return self.process_mal_view(airing, "airing_last_season/%d", page)
-    
+
 
     def get_airing_this_season(self, page):
         season, year, _, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('this')
@@ -251,13 +266,13 @@ class MalBrowser:
             'limit': self.perpage,
             'sfw': self.adult
         }
-        
+
         if self.format_in_type:
             params['type'] = self.format_in_type
 
         airing = database.get(self.get_base_res, 24, f"{self._URL}/seasons/{year}/{season}", params)
         return self.process_mal_view(airing, "airing_this_season/%d", page)
-    
+
 
     def get_airing_next_season(self, page):
         season, year, _, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('next')
@@ -295,9 +310,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         trending = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(trending, "trending_last_year/%d", page)
-    
+
 
     def get_trending_this_year(self, page):
         _, _, year_start_date, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -319,9 +337,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         trending = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(trending, "trending_this_year/%d", page)
-    
+
 
     def get_trending_last_season(self, page):
         _, _, _, _, _, _, season_start_date_last, season_end_date_last, _, _, _, _, _, _ = self.get_season_year('')
@@ -344,9 +365,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         trending = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(trending, "trending_last_season/%d", page)
-    
+
 
     def get_trending_this_season(self, page):
         _, _, _, _, season_start_date, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -368,10 +392,13 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         trending = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(trending, "trending_this_season/%d", page)
-    
-    
+
+
     def get_all_time_trending(self, page):
         params = {
             'page': page,
@@ -390,9 +417,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         trending = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(trending, "all_time_trending/%d", page)
-    
+
 
     def get_popular_last_year(self, page):
         _, _, _, _, _, _, _, _, year_start_date_last, year_end_date_last, _, _, _, _ = self.get_season_year('')
@@ -415,9 +445,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         popular = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(popular, "popular_last_year/%d", page)
-    
+
 
     def get_popular_this_year(self, page):
         _, _, year_start_date, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -439,9 +472,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         popular = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(popular, "popular_this_year/%d", page)
-    
+
 
     def get_popular_last_season(self, page):
         _, _, _, _, _, _, season_start_date_last, season_end_date_last, _, _, _, _, _, _ = self.get_season_year('')
@@ -464,9 +500,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         popular = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(popular, "popular_last_season/%d", page)
-    
+
 
     def get_popular_this_season(self, page):
         _, _, _, _, season_start_date, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -488,9 +527,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         popular = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(popular, "popular_this_season/%d", page)
-    
+
 
     def get_all_time_popular(self, page):
         params = {
@@ -510,9 +552,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         popular = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(popular, "all_time_popular/%d", page)
-    
+
 
     def get_voted_last_year(self, page):
         _, _, _, _, _, _, _, _, year_start_date_last, year_end_date_last, _, _, _, _ = self.get_season_year('')
@@ -535,10 +580,13 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
 
         voted = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(voted, "voted_last_year/%d", page)
-    
+
 
     def get_voted_this_year(self, page):
         _, _, year_start_date, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -560,9 +608,15 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
+        if self.genre:
+            params['genres'] = self.genre
+
         voted = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(voted, "voted_this_year/%d", page)
-    
+
 
     def get_voted_last_season(self, page):
         _, _, _, _, _, _, season_start_date_last, season_end_date_last, _, _, _, _, _, _ = self.get_season_year('')
@@ -585,9 +639,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         voted = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(voted, "voted_last_season/%d", page)
-    
+
 
     def get_voted_this_season(self, page):
         _, _, _, _, season_start_date, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -609,9 +666,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         voted = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(voted, "voted_this_season/%d", page)
-    
+
 
     def get_all_time_voted(self, page):
         params = {
@@ -631,9 +691,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         voted = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(voted, "all_time_voted/%d", page)
-    
+
 
     def get_favourites_last_year(self, page):
         _, _, _, _, _, _, _, _, year_start_date_last, year_end_date_last, _, _, _, _ = self.get_season_year('')
@@ -656,9 +719,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         favourites = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(favourites, "favourites_last_year/%d", page)
-    
+
 
     def get_favourites_this_year(self, page):
         _, _, year_start_date, _, _, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -680,9 +746,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         favourites = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(favourites, "favourites_this_year/%d", page)
-    
+
 
     def get_favourites_last_season(self, page):
         _, _, _, _, _, _, season_start_date_last, season_end_date_last, _, _, _, _, _, _ = self.get_season_year('')
@@ -705,9 +774,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         favourites = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(favourites, "favourites_last_season/%d", page)
-    
+
 
     def get_favourites_this_season(self, page):
         _, _, _, _, season_start_date, _, _, _, _, _, _, _, _, _ = self.get_season_year('')
@@ -729,9 +801,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         favourites = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(favourites, "favourites_this_season/%d", page)
-    
+
 
     def get_all_time_favourites(self, page):
         params = {
@@ -751,9 +826,12 @@ class MalBrowser:
         if self.rating:
             params['rating'] = self.rating
 
+        if self.genre:
+            params['genres'] = self.genre
+
         favourites = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(favourites, "all_time_favourites/%d", page)
-    
+
 
     def get_top_100(self, page):
         params = {
@@ -770,6 +848,9 @@ class MalBrowser:
 
         if self.rating:
             params['rating'] = self.rating
+
+        if self.genre:
+            params['genres'] = self.genre
 
         top_100 = database.get(self.get_base_res, 24, f"{self._URL}/top/anime", params)
         return self.process_mal_view(top_100, "top_100/%d", page)
@@ -796,7 +877,7 @@ class MalBrowser:
 
         genre_action = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_action, "genre_action/%d", page)
-    
+
 
     def get_genre_adventure(self, page):
         params = {
@@ -819,7 +900,7 @@ class MalBrowser:
 
         genre_adventure = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_adventure, "genre_adventure/%d", page)
-    
+
 
     def get_genre_comedy(self, page):
         params = {
@@ -842,7 +923,7 @@ class MalBrowser:
 
         genre_comedy = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_comedy, "genre_comedy/%d", page)
-    
+
 
     def get_genre_drama(self, page):
         params = {
@@ -865,7 +946,7 @@ class MalBrowser:
 
         genre_drama = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_drama, "genre_drama/%d", page)
-    
+
 
     def get_genre_ecchi(self, page):
         params = {
@@ -888,7 +969,7 @@ class MalBrowser:
 
         genre_ecchi = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_ecchi, "genre_ecchi/%d", page)
-    
+
 
     def get_genre_fantasy(self, page):
         params = {
@@ -911,7 +992,7 @@ class MalBrowser:
 
         genre_fantasy = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_fantasy, "genre_fantasy/%d", page)
-    
+
 
     def get_genre_hentai(self, page):
         params = {
@@ -934,7 +1015,7 @@ class MalBrowser:
 
         genre_hentai = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_hentai, "genre_hentai/%d", page)
-    
+
 
     def get_genre_horror(self, page):
         params = {
@@ -957,7 +1038,7 @@ class MalBrowser:
 
         genre_horror = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_horror, "genre_horror/%d", page)
-    
+
 
     def get_genre_shoujo(self, page):
         params = {
@@ -980,7 +1061,7 @@ class MalBrowser:
 
         genre_shoujo = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_shoujo, "genre_shoujo/%d", page)
-    
+
 
     def get_genre_mecha(self, page):
         params = {
@@ -1003,7 +1084,7 @@ class MalBrowser:
 
         genre_mecha = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_mecha, "genre_mecha/%d", page)
-    
+
 
     def get_genre_music(self, page):
         params = {
@@ -1026,7 +1107,7 @@ class MalBrowser:
 
         genre_music = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_music, "genre_music/%d", page)
-    
+
 
     def get_genre_mystery(self, page):
         params = {
@@ -1049,7 +1130,7 @@ class MalBrowser:
 
         genre_mystery = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_mystery, "genre_mystery/%d", page)
-    
+
 
     def get_genre_psychological(self, page):
         params = {
@@ -1072,7 +1153,7 @@ class MalBrowser:
 
         genre_psychological = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_psychological, "genre_psychological/%d", page)
-    
+
 
     def get_genre_romance(self, page):
         params = {
@@ -1095,7 +1176,7 @@ class MalBrowser:
 
         genre_romance = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_romance, "genre_romance/%d", page)
-    
+
 
     def get_genre_sci_fi(self, page):
         params = {
@@ -1118,7 +1199,7 @@ class MalBrowser:
 
         genre_sci_fi = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_sci_fi, "genre_sci_fi/%d", page)
-    
+
 
     def get_genre_slice_of_life(self, page):
         params = {
@@ -1141,7 +1222,7 @@ class MalBrowser:
 
         genre_slice_of_life = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_slice_of_life, "genre_slice_of_life/%d", page)
-    
+
 
     def get_genre_sports(self, page):
         params = {
@@ -1164,7 +1245,7 @@ class MalBrowser:
 
         genre_sports = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_sports, "genre_sports/%d", page)
-    
+
 
     def get_genre_supernatural(self, page):
         params = {
@@ -1187,7 +1268,7 @@ class MalBrowser:
 
         genre_supernatural = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_supernatural, "genre_supernatural/%d", page)
-    
+
 
     def get_genre_thriller(self, page):
         params = {
@@ -1210,7 +1291,7 @@ class MalBrowser:
 
         genre_thriller = database.get(self.get_base_res, 24, f"{self._URL}/anime", params)
         return self.process_mal_view(genre_thriller, "genre_thriller/%d", page)
-    
+
 
     @staticmethod
     def get_base_res(url, params=None):
@@ -1296,7 +1377,6 @@ class MalBrowser:
         genres = database.get(self.get_base_res, 24, f'{self._URL}/anime', params)
         return self.process_mal_view(genres, f"genres/{genre_list}/{tag_list}/%d", page)
 
-
     @div_flavor
     def base_mal_view(self, res, completed=None, mal_dub=None):
         if not completed:
@@ -1374,7 +1454,6 @@ class MalBrowser:
             return utils.parse_view(base, False, True, dub)
         return utils.parse_view(base, True, False, dub)
 
-
     def database_update_show(self, res):
         mal_id = res['mal_id']
 
@@ -1409,6 +1488,24 @@ class MalBrowser:
                 kodi_meta['rating']['votes'] = res['scored_by']
 
         database.update_show(mal_id, pickle.dumps(kodi_meta))
+
+    def update_genre_settings(self):
+        res = database.get(self.get_base_res, 24, f'{self._URL}/genres/anime')
+
+        genre = res['data']
+        genres_list = [x['name'] for x in genre]
+
+        multiselect = control.multiselect_dialog(control.lang(30911), genres_list)
+        if not multiselect:
+            return []
+
+        selected_genres_mal = [str(genre[selection]['mal_id']) for selection in multiselect if selection < len(genres_list)]
+
+        selected_genres_anilist = []
+
+        selected_tags = []
+
+        return selected_genres_mal, selected_genres_anilist, selected_tags
 
     @staticmethod
     def duration_to_seconds(duration_str):

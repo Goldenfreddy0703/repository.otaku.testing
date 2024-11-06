@@ -1372,3 +1372,11 @@ msgstr ""
 msgctxt "#30614"
 msgid "Fall"
 msgstr ""
+
+msgctxt "#30615"
+msgid "Set Content Genres"
+msgstr ""
+
+msgctxt "#30616"
+msgid "Genres"
+msgstr ""

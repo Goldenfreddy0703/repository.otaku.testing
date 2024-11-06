@@ -1,3 +1,7 @@
+Changelog v5.1.12 (2024-11-06):
+- Added Content Genres
+- Alot of Linting
+
 Changelog v5.1.11 (2024-11-05):
 - Added Content Year
 - Added Content Season

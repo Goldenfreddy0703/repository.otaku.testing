@@ -37,6 +37,7 @@ mappingDB = os.path.join(dataPath, 'mappings.db')
 maldubFile = os.path.join(dataPath, 'mal_dub.json')
 downloads_json = os.path.join(dataPath, 'downloads.json')
 completed_json = os.path.join(dataPath, 'completed.json')
+genre_json = os.path.join(dataPath, 'genres.json')
 
 OTAKU_LOGO_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku.png')
 OTAKU_LOGO2_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku-small.png')
@@ -461,5 +462,6 @@ class SettingIDs:
 
         # Str
         self.browser_api = getString('browser.api')
+
 
 settingids = SettingIDs()
