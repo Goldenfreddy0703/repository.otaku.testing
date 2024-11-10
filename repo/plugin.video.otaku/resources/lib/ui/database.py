@@ -252,6 +252,7 @@ def get_show_meta(mal_id):
     control.try_release_lock(lock)
     return shows
 
+
 def remove_from_database(table, mal_id):
     lock.acquire()
     cursor = get_cursor()

@@ -27,7 +27,7 @@ class SIMKLAPI:
         image = self.imagePath % res['img'] if res.get('img') else poster
         info = {
             'UniqueIDs': {'mal_id': str(mal_id)},
-            'plot': res.get('description', ''),
+            'plot': res.get('description', 'No plot available'),
             'title': title,
             'season': season,
             'episode': episode,

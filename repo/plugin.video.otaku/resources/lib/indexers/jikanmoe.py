@@ -19,7 +19,7 @@ class JikanAPI:
 
     def get_episode_meta(self, mal_id):
         # url = f'{self.baseUrl}/anime/{mal_id}/videos/episodes'
-        url = f'{self.baseUrl}/anime/{mal_id}/episodes' # no pictures but can handle 100 per page
+        url = f'{self.baseUrl}/anime/{mal_id}/episodes'  # no pictures but can handle 100 per page
         r = requests.get(url)
         res = r.json()
         if not res['pagination']['has_next_page']:
@@ -55,7 +55,7 @@ class JikanAPI:
             'title': title,
             'season': season,
             'episode': episode,
-            # 'plot': res.get('description', ''),
+            'plot': 'No plot available',
             'tvshowtitle': tvshowtitle,
             'mediatype': 'episode'
         }

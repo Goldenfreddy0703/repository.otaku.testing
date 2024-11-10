@@ -34,7 +34,7 @@ class ANIZIPAPI:
 
         info = {
             'UniqueIDs': {'mal_id': str(mal_id)},
-            'plot': res.get('overview'),
+            'plot': res.get('overview', 'No plot available'),
             'title': title,
             'season': season,
             'episode': episode,

@@ -12,6 +12,7 @@ else:
     from resources.lib.AniListBrowser import AniListBrowser
     BROWSER = AniListBrowser()
 
+
 def parse_history_view(res):
     return utils.allocate_item(res, f'search/{res}/1', True, False)
 
@@ -93,6 +94,7 @@ def get_sources(mal_id, episode, media_type, rescrape=False, source_select=False
         'query': kodi_meta['query'],
         'mal_id': mal_id,
         'episode': episode,
+        'episodes': kodi_meta['episodes'],
         'status': kodi_meta['status'],
         'duration': kodi_meta['duration'],
         'media_type': media_type,
@@ -101,6 +103,6 @@ def get_sources(mal_id, episode, media_type, rescrape=False, source_select=False
         'source_select': source_select,
         'silent': silent
     }
-    
+
     sources = pages.getSourcesHelper(actionArgs)
     return sources

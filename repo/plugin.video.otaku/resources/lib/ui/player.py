@@ -97,16 +97,18 @@ class WatchlistPlayer(player):
                 self._watchlist_update(self.mal_id, self.episode)
                 self.updated = True
                 if playList.size() == 0 or playList.getposition() == (playList.size() - 1):
-                    # Retrieve the status from kodi_meta
+                    # Retrieve the status and total episode count from kodi_meta
                     show = database.get_show(self.mal_id)
                     if show:
                         kodi_meta = pickle.loads(show['kodi_meta'])
                         status = kodi_meta.get('status')
-                        if status in ['Finished Airing', 'FINISHED']:
-                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
-                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
-                            xbmc.sleep(3000)
-                            service.sync_watchlist(True)
+                        episodes = kodi_meta.get('episodes')
+                        if self.episode == episodes:
+                            if status in ['Finished Airing', 'FINISHED']:
+                                WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
+                                WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
+                                xbmc.sleep(3000)
+                                service.sync_watchlist(True)
                 break
             xbmc.sleep(5000)
 

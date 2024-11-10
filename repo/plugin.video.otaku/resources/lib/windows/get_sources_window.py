@@ -75,4 +75,3 @@ class GetSources(BaseWindow):
         self.remaining_providers_list.addItems(self.remainingProviders)
         self.setProperty("remaining_providers_list", control.colorstr(' | ').join([i.upper() for i in self.remainingProviders]))
         self.setProperty('progress', str(self.progress))
-
