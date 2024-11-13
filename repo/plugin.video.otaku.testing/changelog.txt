@@ -1,5 +1,8 @@
+Changelog v5.1.15 (2024-11-13):
+- Fix for Cloud Files
+
 Changelog v5.1.14 (2024-11-11):
-- Linting
+- More Linting
 - Made Otaku Testing its own addon. 
 - Changed Otaku to Otaku Testing
 

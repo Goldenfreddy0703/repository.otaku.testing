@@ -73,7 +73,7 @@ class Sources(BrowserBase):
     def premiumize_cloud_inspection(self, query, episode):
         cloud_items = premiumize.Premiumize().list_folder('')
 
-        filenames = [re.sub(r'\[.*?]\s*', '', i['name']) for i in cloud_items]
+        filenames = [re.sub(r'\[.*?]\s*', '', i['name'].replace(',', '')) for i in cloud_items]
         filenames_query = ','.join(filenames)
         r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
         resp = r.json()
@@ -94,7 +94,7 @@ class Sources(BrowserBase):
     def alldebrid_cloud_inspection(self, query, episode):
         api = all_debrid.AllDebrid()
         torrents = api.list_torrents()['links']
-        filenames = [re.sub(r'\[.*?]\s*', '', i['filename']) for i in torrents]
+        filenames = [re.sub(r'\[.*?]\s*', '', i['filename'].replace(',', '')) for i in torrents]
         filenames_query = ','.join(filenames)
         r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
         resp = r.json()

@@ -158,9 +158,9 @@ def get_cache_check_reg(episode):
                    )                                    # end non-grouping pattern
                  \s*                                    # 0-or-more whitespaces
                  (?<![\d])
-                 ({}|{})                                # episode num format: xx or xxx
+                 ({}|{}|{})                             # episode num format: xx or xxx or xxxx
                  (?![\d])
-                 '''.format(season, episode.zfill(2), episode.zfill(3))
+                 '''.format(season, episode.zfill(2), episode.zfill(3), episode.zfill(4))
     return re.compile(reg_string)
 
 
