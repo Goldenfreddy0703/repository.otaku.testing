@@ -119,6 +119,7 @@ def copy2clip(txt):
     if platform == 'win32':
         command = 'echo %s|clip' % txt
         os.system(command)
+        return True
 
 
 def colorstr(text, color=None):
@@ -136,15 +137,15 @@ def getSetting(key):
 
 
 def getBool(key):
-    return settings.getBool(key)
+    return ADDON.getSettingBool(key)
 
 
 def getInt(key):
-    return settings.getInt(key)
+    return ADDON.getSettingInt(key)
 
 
-def getString(key):
-    return settings.getString(key)
+def getStr(key):
+    return ADDON.getSettingString(key)
 
 
 def setSetting(settingid, value):
@@ -152,15 +153,15 @@ def setSetting(settingid, value):
 
 
 def setBool(settingid, value):
-    return settings.setBool(settingid, value)
+    return ADDON.setSettingBool(settingid, value)
 
 
 def setInt(settingid, value):
-    return settings.setInt(settingid, value)
+    return ADDON.setSettingInt(settingid, value)
 
 
-def setString(settingid, value):
-    return settings.setString(settingid, value)
+def setStr(settingid, value):
+    return ADDON.setSettingString(settingid, value)
 
 
 def lang(x):
@@ -337,8 +338,8 @@ def draw_items(video_data, content_type=None, draw_cm=None):
             if xbmc.getCondVisibility("Container.HasFiles"):
                 break
             xbmc.sleep(100)
-    if getSetting('interface.viewtype') == 'true':
-        if getSetting('interface.viewidswitch') == 'true':
+    if getBool('interface.viewtype'):
+        if getBool('interface.viewidswitch'):
             # Use integer view types
             if content_type == 'addons':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.addon.view.id')))
@@ -461,7 +462,7 @@ class SettingIDs:
         # Ints
 
         # Str
-        self.browser_api = getString('browser.api')
+        self.browser_api = getStr('browser.api')
 
 
 settingids = SettingIDs()

@@ -25,21 +25,21 @@ class WatchlistPlayer(player):
         self.current_time = 0
         self.updated = False
         self.media_type = None
-        self.update_percent = int(control.getSetting('watchlist.update.percent'))
+        self.update_percent = control.getInt('watchlist.update.percent')
 
         self.total_time = None
-        self.delay_time = int(control.getSetting('skipintro.delay'))
+        self.delay_time = control.getInt('skipintro.delay')
         self.skipintro_aniskip_enable = control.getBool('skipintro.aniskip.enable')
         self.skipoutro_aniskip_enable = control.getBool('skipoutro.aniskip.enable')
 
         self.skipintro_aniskip = False
         self.skipoutro_aniskip = False
-        self.skipintro_start = int(control.getSetting('skipintro.delay'))
-        self.skipintro_end = self.skipintro_start + int(control.getSetting('skipintro.duration')) * 60
+        self.skipintro_start = control.getInt('skipintro.delay')
+        self.skipintro_end = self.skipintro_start + control.getInt('skipintro.duration') * 60
         self.skipoutro_start = 0
         self.skipoutro_end = 0
-        self.skipintro_offset = int(control.getSetting('skipintro.aniskip.offset'))
-        self.skipoutro_offset = int(control.getSetting('skipoutro.aniskip.offset'))
+        self.skipintro_offset = control.getInt('skipintro.aniskip.offset')
+        self.skipoutro_offset = control.getInt('skipoutro.aniskip.offset')
 
     def handle_player(self, mal_id, watchlist_update, build_playlist, episode, resume_time):
         self.mal_id = mal_id
@@ -139,7 +139,7 @@ class WatchlistPlayer(player):
                 "ara", "hin", "tur", "pol", "swe", "nor",
                 "dan", "fin"
             ]
-            preferred_subtitle_setting = int(control.getSetting('general.subtitles'))
+            preferred_subtitle_setting = control.getInt('general.subtitles')
 
             if 0 <= preferred_subtitle_setting < len(subtitles):
                 preferred_subtitle = subtitles[preferred_subtitle_setting]
@@ -156,7 +156,7 @@ class WatchlistPlayer(player):
             # Audio Preferences
             audio_lang = self.getAvailableAudioStreams()
             audios = ['jpn', 'eng']
-            preferred_audio_setting = int(control.getSetting('general.audio'))
+            preferred_audio_setting = control.getInt('general.audio')
 
             if 0 <= preferred_audio_setting < len(audios):
                 preferred_audio = audios[preferred_audio_setting]
@@ -170,7 +170,7 @@ class WatchlistPlayer(player):
 
             if len(audio_lang) == 1:
                 if "jpn" not in audio_lang:
-                    if control.getSetting('general.dubsubtitles') == 'true':
+                    if control.getBool('general.dubsubtitles'):
                         if preferred_subtitle == "none":
                             self.showSubtitles(False)
                         else:
@@ -186,7 +186,7 @@ class WatchlistPlayer(player):
 
             if len(audio_lang) > 1:
                 if preferred_audio == "eng":
-                    if control.getSetting('general.dubsubtitles') == 'true':
+                    if control.getBool('general.dubsubtitles'):
                         if preferred_subtitle == "none":
                             self.showSubtitles(False)
                         else:
@@ -216,7 +216,7 @@ class WatchlistPlayer(player):
                 xbmc.sleep(1000)
         self.onWatchedPercent()
         # OtakuBrowser.get_sources(self.mal_id, str(self.episode), self.media_type, silent=True)
-        endpoint = int(control.getSetting('playingnext.time')) if control.getBool('smartplay.playingnextdialog') else 0
+        endpoint = control.getInt('playingnext.time') if control.getBool('smartplay.playingnextdialog') else 0
         if endpoint != 0:
             while self.isPlaying():
                 self.current_time = int(self.getTime())
@@ -277,16 +277,16 @@ class WatchlistPlayer(player):
 
     def process_hianime(self):
         if self.skipintro_aniskip_enable:
-            hianime_skipintro_start = int(control.getSetting('hianime.skipintro.start'))
+            hianime_skipintro_start = control.getInt('hianime.skipintro.start')
             if hianime_skipintro_start != -1:
                 self.skipintro_start = hianime_skipintro_start + self.skipintro_offset
-                self.skipintro_end = int(control.getSetting('hianime.skipintro.end')) + self.skipintro_offset
+                self.skipintro_end = control.getInt('hianime.skipintro.end') + self.skipintro_offset
                 self.skipintro_aniskip = True
         if self.skipoutro_aniskip_enable:
-            hianime_skipoutro_start = int(control.getSetting('hianime.skipoutro.start'))
+            hianime_skipoutro_start = control.getInt('hianime.skipoutro.start')
             if hianime_skipoutro_start != -1:
                 self.skipoutro_start = hianime_skipoutro_start + self.skipoutro_offset
-                self.skipoutro_end = int(control.getSetting('hianime.skipoutro.end')) + self.skipoutro_offset
+                self.skipoutro_end = control.getInt('hianime.skipoutro.end') + self.skipoutro_offset
                 self.skipoutro_aniskip = True
 
 

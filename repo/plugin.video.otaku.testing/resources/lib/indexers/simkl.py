@@ -86,7 +86,7 @@ class SIMKLAPI:
         last_updated = datetime.datetime.fromtimestamp(time.mktime(time.strptime(episodes[0].get('last_updated'), '%Y-%m-%d')))
         diff = (datetime.datetime.today() - last_updated).days
 
-        if diff >= int(control.getSetting('interface.check.updates')):
+        if diff >= control.getInt('interface.check.updates'):
             result_meta = self.get_episode_meta(mal_id)
             result_ep = [x for x in result_meta if x['type'] == 'episode']
             season = episodes[0]['season']
@@ -114,7 +114,7 @@ class SIMKLAPI:
                     eps_watched = kodi_meta['eps_watched'] = data['eps_watched']
                     database.update_kodi_meta(mal_id, kodi_meta)
         episodes = database.get_episode_list(mal_id)
-        dub_data = indexers.process_dub(mal_id, kodi_meta['ename']) if control.getSetting('jz.dub') == 'true' else None
+        dub_data = indexers.process_dub(mal_id, kodi_meta['ename']) if control.getBool('jz.dub') else None
         if episodes:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
                 return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, dub_data), 'episodes'

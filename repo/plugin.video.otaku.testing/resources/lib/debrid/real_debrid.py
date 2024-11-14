@@ -91,7 +91,7 @@ class RealDebrid:
         control.setSetting('rd.refresh', response['refresh_token'])
         self.token = response['access_token']
         self.refresh = response['refresh_token']
-        control.setSetting('rd.expiry', str(int(time.time()) + int(response['expires_in'])))
+        control.setInt('rd.expiry', int(time.time()) + int(response['expires_in']))
         user_info = requests.get(f'{self.BaseUrl}/user', headers=self.__headers()).json()
         control.setSetting('rd.username', user_info['username'])
         control.setSetting('rd.auth.status', user_info['type'])
@@ -112,7 +112,7 @@ class RealDebrid:
             self.refresh = response['refresh_token']
             control.setSetting('rd.auth', self.token)
             control.setSetting('rd.refresh', self.refresh)
-            control.setSetting('rd.expiry', str(int(time.time()) + int(response['expires_in'])))
+            control.setInt('rd.expiry', int(time.time()) + int(response['expires_in']))
             user_info = requests.get(f'{self.BaseUrl}/user', headers=self.__headers()).json()
             control.setSetting('rd.username', user_info['username'])
             control.setSetting('rd.auth.status', user_info['type'])

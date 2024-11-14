@@ -102,7 +102,7 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
         url = f'watchlist_status_type/{self._NAME}/{res[1]}'
         return [utils.allocate_item(res[0], url, True, False, f'{res[0].lower()}.png')]
 
-    def get_watchlist_status(self, status, next_up, offset=0, page=1):
+    def get_watchlist_status(self, status, next_up, offset, page):
         results = self.get_all_items(status)
         if not results:
             return []

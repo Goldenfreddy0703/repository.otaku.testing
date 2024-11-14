@@ -133,7 +133,7 @@ def get_cache_check_reg(episode):
     #     season = ''
     episode = str(episode)
     season = ''
-    # if control.getSetting('regex.question') == 'true':
+    # if control.getBool('regex.question'):
     #     reg_string = r'''(?ix)                              # Ignore case (i), and use verbose regex (x)
     #                  (?:                                    # non-grouping pattern
     #                    s|season                             # s or season

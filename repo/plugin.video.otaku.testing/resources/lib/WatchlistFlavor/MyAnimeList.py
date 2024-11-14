@@ -46,7 +46,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         login_data = {
             'token': res['access_token'],
             'refresh': res['refresh_token'],
-            'expiry': str(int(time.time()) + int(res['expires_in'])),
+            'expiry': int(time.time()) + int(res['expires_in']),
             'username': user['name']
         }
         return login_data
@@ -63,7 +63,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         res = r.json()
         control.setSetting('mal.token', res['access_token'])
         control.setSetting('mal.refresh', res['refresh_token'])
-        control.setSetting('mal.expiry', str(int(time.time()) + int(res['expires_in'])))
+        control.setInt('mal.expiry', int(time.time()) + int(res['expires_in']))
 
     @staticmethod
     def handle_paging(hasnextpage, base_url, page):
@@ -72,7 +72,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         next_page = page + 1
         name = "Next Page (%d)" % next_page
         offset = (re.compile("offset=(.+?)&").findall(hasnextpage))[0]
-        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}/{next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
+        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}?page={next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
 
     def __get_sort(self):
         sort_types = ['list_score', 'list_updated_at', 'anime_start_date', 'anime_title']
@@ -103,7 +103,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         ]
         return actions
 
-    def get_watchlist_status(self, status, next_up, offset=0, page=1):
+    def get_watchlist_status(self, status, next_up, offset, page):
         fields = [
             'alternative_titles',
             'list_status',
@@ -121,7 +121,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         params = {
             "status": status,
             "sort": self.__get_sort(),
-            "limit": int(control.getSetting('interface.perpage.watchlist')),
+            "limit": control.getInt('interface.perpage.watchlist'),
             "offset": offset,
             "fields": ','.join(fields),
             "nsfw": True

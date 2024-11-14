@@ -41,7 +41,7 @@ class DebridLink:
             self.refresh = response.get('refresh_token')
             control.setSetting('dl.auth', self.token)
             control.setSetting('dl.refresh', self.refresh)
-            control.setSetting('dl.expiry', str(int(time.time()) + int(response['expires_in'])))
+            control.setInt('dl.expiry', int(time.time()) + int(response['expires_in']))
             self.headers['Authorization'] = 'Bearer {0}'.format(self.token)
         return True
 
@@ -89,7 +89,7 @@ class DebridLink:
         if 'access_token' in response:
             self.token = response.get('access_token')
             control.setSetting('dl.auth', self.token)
-            control.setSetting('dl.expiry', str(int(time.time()) + response.get('expires_in')))
+            control.setInt('dl.expiry', int(time.time()) + response.get('expires_in'))
 
     def check_hash(self, hashlist):
         if isinstance(hashlist, list):

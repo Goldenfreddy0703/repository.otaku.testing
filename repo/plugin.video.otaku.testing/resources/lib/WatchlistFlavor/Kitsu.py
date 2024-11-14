@@ -45,7 +45,7 @@ class KitsuWLF(WatchlistFlavorBase):
             'userid': data2['id'],
             'token': data['access_token'],
             'refresh': data['refresh_token'],
-            'expiry': str(int(time.time()) + int(data['expires_in']))
+            'expiry': int(time.time()) + int(data['expires_in'])
         }
         return login_data
 
@@ -62,7 +62,7 @@ class KitsuWLF(WatchlistFlavorBase):
         data = resp.json()
         control.setSetting('kitsu.token', data['access_token'])
         control.setSetting('kitsu.refresh', data['refresh_token'])
-        control.setSetting('kitsu.expiry', str(int(time.time() + int(data['expires_in']))))
+        control.setInt('kitsu.expiry', int(time.time() + int(data['expires_in'])))
 
     @staticmethod
     def handle_paging(hasnextpage, base_url, page):
@@ -72,7 +72,7 @@ class KitsuWLF(WatchlistFlavorBase):
         name = "Next Page (%d)" % next_page
         parsed = parse.urlparse(hasnextpage)
         offset = parse.parse_qs(parsed.query)['page[offset]'][0]
-        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}/{next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
+        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}?page={next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
 
     def __get_sort(self):
         sort_types = ['-progressed_at', '-progress', f"anime.titles.{self.__get_title_lang()}"]
@@ -109,7 +109,7 @@ class KitsuWLF(WatchlistFlavorBase):
         ]
         return actions
 
-    def get_watchlist_status(self, status, next_up, offset=0, page=1):
+    def get_watchlist_status(self, status, next_up, offset, page):
         url = f'{self._URL}/edge/library-entries'
         params = {
             "fields[anime]": "titles,canonicalTitle,posterImage,episodeCount,synopsis,episodeLength,subtype,averageRating,ageRating,youtubeVideoId",

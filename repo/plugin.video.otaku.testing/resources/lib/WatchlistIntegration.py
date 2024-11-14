@@ -47,10 +47,11 @@ def WATCHLIST_STATUS_TYPE(payload, params):
 
 @Route('watchlist_status_type_pages/*')
 def WATCHLIST_STATUS_TYPE_PAGES(payload, params):
-    flavor, status, offset, page = payload.rsplit("/")
+    flavor, status, offset = payload.rsplit("/")
+    page = int(params.get('page', 1))
     next_up = bool(params.get('next_up'))
     content_type = 'videos' if next_up else 'tvshows'
-    control.draw_items(WatchlistFlavor.watchlist_status_request_pages(flavor, status, next_up, offset, int(page)), content_type)
+    control.draw_items(WatchlistFlavor.watchlist_status_request(flavor, status, next_up, offset, page), content_type)
 
 
 @Route('watchlist_to_ep/*')
@@ -136,7 +137,7 @@ def add_watchlist(items):
     flavors = WatchlistFlavor.get_enabled_watchlists()
     if flavors:
         for flavor in flavors:
-            items.insert(0, (f"{flavor.username}'s {flavor.title}", f"watchlist/{flavor.flavor_name}", flavor.image))
+            items.append((f"{flavor.username}'s {flavor.title}", f"watchlist/{flavor.flavor_name}", flavor.image))
     return items
 
 

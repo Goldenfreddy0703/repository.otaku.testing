@@ -1,3 +1,11 @@
+Changelog v5.1.16 (2024-11-13):
+- Fixed the Paging
+- Fixed Custom Search
+- Fixed Context Menus
+- Converted all integer settings
+- Converted all bool settings
+- Converted one string setting
+
 Changelog v5.1.15 (2024-11-13):
 - Fix for Cloud Files
 

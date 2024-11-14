@@ -51,11 +51,7 @@ class WatchlistFlavor:
         return WatchlistFlavor.__instance_flavor(name).watchlist()
 
     @staticmethod
-    def watchlist_status_request(name, status, next_up):
-        return WatchlistFlavor.__instance_flavor(name).get_watchlist_status(status, next_up)
-
-    @staticmethod
-    def watchlist_status_request_pages(name, status, next_up, offset, page):
+    def watchlist_status_request(name, status, next_up, offset=0, page=1):
         return WatchlistFlavor.__instance_flavor(name).get_watchlist_status(status, next_up, offset, page)
 
     @staticmethod
@@ -111,7 +107,7 @@ class WatchlistFlavor:
         if not res:
             return control.ok_dialog('Login', 'Incorrect username or password')
         for _id, value in list(res.items()):
-            control.setSetting('%s.%s' % (flavor, _id), value)
+            control.setSetting('%s.%s' % (flavor, _id), str(value))
         control.refresh()
         return control.ok_dialog('Login', 'Success')
 

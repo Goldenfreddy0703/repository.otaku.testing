@@ -104,7 +104,7 @@ class JikanAPI:
         update_time = datetime.date.today().isoformat()
         last_updated = datetime.datetime.fromtimestamp(time.mktime(time.strptime(episodes[0].get('last_updated'), '%Y-%m-%d')))
         diff = (datetime.datetime.today() - last_updated).days
-        if diff > int(control.getSetting('interface.check.updates')):
+        if diff > control.getInt('interface.check.updates'):
             result = self.get_episode_meta(mal_id)
             season = episodes[0]['season']
             mapfunc2 = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data, episodes=episodes)
@@ -130,7 +130,7 @@ class JikanAPI:
                     eps_watched = kodi_meta['eps_watched'] = data['eps_watched']
                     database.update_kodi_meta(mal_id, kodi_meta)
         episodes = database.get_episode_list(mal_id)
-        dub_data = indexers.process_dub(mal_id, kodi_meta['ename']) if control.getSetting('jz.dub') == 'true' else None
+        dub_data = indexers.process_dub(mal_id, kodi_meta['ename']) if control.getBool('jz.dub') else None
         if episodes:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
                 from resources.jz import anime_filler

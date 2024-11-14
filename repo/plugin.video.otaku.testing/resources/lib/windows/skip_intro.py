@@ -45,7 +45,7 @@ class SkipIntro(BaseWindow):
             if self.skipintro_aniskip:
                 self.player.seekTime(self.skipintro_end_skip_time)
             else:
-                self.player.seekTime(int(self.player.getTime()) + int(control.getSetting('skipintro.time')))
+                self.player.seekTime(int(self.player.getTime()) + control.getInt('skipintro.time'))
             self.close()
 
         if controlId == 3002:

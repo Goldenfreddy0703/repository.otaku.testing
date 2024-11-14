@@ -14,7 +14,7 @@
                             <option label="English (Attack on Titan)">1</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                 </setting>
                 <setting id="searchhistory" type="integer" label="30302" help="">
                     <level>0</level>
@@ -25,7 +25,7 @@
                             <option label="No">1</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                 </setting>
                 <setting id="showchangelog" type="integer" label="30529" help="">
 					<level>0</level>
@@ -379,7 +379,7 @@
                             <option label="30380">6</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                   	<dependencies>
                         <dependency type="visible" setting="contentformat.bool">true</dependency>
                     </dependencies>
@@ -400,7 +400,7 @@
                             <option label="30588">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                   	<dependencies>
                         <dependency type="visible">
                             <and>
@@ -420,7 +420,7 @@
                             <option label="30585">2</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                   	<dependencies>
                         <dependency type="visible">
                             <and>
@@ -451,7 +451,7 @@
                             <option label="30596">5</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                   	<dependencies>
                         <dependency type="visible">
                             <and>
@@ -480,7 +480,7 @@
                             <option label="30390">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                   	<dependencies>
                         <dependency type="visible">
                             <and>
@@ -519,7 +519,7 @@
                             <option label="Animeschedule">1</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="jz.dub">true</dependency>
                     </dependencies>
@@ -548,7 +548,7 @@
 							<option label="SerenV2">serenv2</option>
 						</options>
 					</constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                 </setting>
                 <setting id="general.dialog" type="integer" label="30534" help="">
 					<level>0</level>
@@ -1360,7 +1360,7 @@
                             <option label="Sub">2</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                 </setting>
             </group>
 
@@ -1680,7 +1680,7 @@
                             <option label="Last Added">5</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="anilist.enabled">true</dependency>
                     </dependencies>
@@ -1727,7 +1727,7 @@
                             <option label="Anime Title">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="mal.enabled">true</dependency>
                     </dependencies>
@@ -1802,7 +1802,7 @@
                             <option label="Anime Title">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="kitsu.enabled">true</dependency>
                     </dependencies>
@@ -1865,7 +1865,7 @@
                             <option label="User Rating">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="simkl.enabled">true</dependency>
                     </dependencies>
@@ -1881,7 +1881,7 @@
                             <option label="User Rating">3</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string" />
+                    <control type="spinner" format="string"/>
                     <dependencies>
                         <dependency type="visible" setting="simkl.enabled">true</dependency>
                     </dependencies>
@@ -1899,17 +1899,17 @@
                     <control type="toggle"/>
                     <visible>false</visible>
                 </setting>
-                <setting id="airing_last_season/1" type="boolean" label="30901" help="">
+                <setting id="airing_last_season" type="boolean" label="30901" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="airing_this_season/1" type="boolean" label="30902" help="">
+                <setting id="airing_this_season" type="boolean" label="30902" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="airing_next_season/1" type="boolean" label="30903" help="">
+                <setting id="airing_next_season" type="boolean" label="30903" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -1944,7 +1944,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="top_100/1" type="boolean" label="30910" help="">
+                <setting id="top_100" type="boolean" label="30910" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -1970,27 +1970,27 @@
 
             <!-- Sub Menu - Trending Items -->
             <group id="2" label="30576" help="">
-                <setting id="trending_last_year/1" type="boolean" label="30914" help="">
+                <setting id="trending_last_year" type="boolean" label="30914" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trending_this_year/1" type="boolean" label="30915" help="">
+                <setting id="trending_this_year" type="boolean" label="30915" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trending_last_season/1" type="boolean" label="30916" help="">
+                <setting id="trending_last_season" type="boolean" label="30916" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="trending_this_season/1" type="boolean" label="30917" help="">
+                <setting id="trending_this_season" type="boolean" label="30917" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="all_time_trending/1" type="boolean" label="30918" help="">
+                <setting id="all_time_trending" type="boolean" label="30918" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -1999,27 +1999,27 @@
 
             <!-- Sub Menu - Popular -->
             <group id="3" label="30577" help="">
-                <setting id="popular_last_year/1" type="boolean" label="30919" help="">
+                <setting id="popular_last_year" type="boolean" label="30919" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="popular_this_year/1" type="boolean" label="30920" help="">
+                <setting id="popular_this_year" type="boolean" label="30920" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="popular_last_season/1" type="boolean" label="30921" help="">
+                <setting id="popular_last_season" type="boolean" label="30921" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="popular_this_season/1" type="boolean" label="30922" help="">
+                <setting id="popular_this_season" type="boolean" label="30922" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="all_time_popular/1" type="boolean" label="30923" help="">
+                <setting id="all_time_popular" type="boolean" label="30923" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -2028,27 +2028,27 @@
 
             <!-- Sub Menu - Voted -->
             <group id="4" label="30578" help="">
-                <setting id="voted_last_year/1" type="boolean" label="30924" help="">
+                <setting id="voted_last_year" type="boolean" label="30924" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="voted_this_year/1" type="boolean" label="30925" help="">
+                <setting id="voted_this_year" type="boolean" label="30925" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="voted_last_season/1" type="boolean" label="30926" help="">
+                <setting id="voted_last_season" type="boolean" label="30926" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="voted_this_season/1" type="boolean" label="30927" help="">
+                <setting id="voted_this_season" type="boolean" label="30927" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="all_time_voted/1" type="boolean" label="30928" help="">
+                <setting id="all_time_voted" type="boolean" label="30928" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -2057,27 +2057,27 @@
 
             <!-- Sub Menu - Favourites -->
             <group id="5" label="30579" help="">
-                <setting id="favourites_last_year/1" type="boolean" label="30929" help="">
+                <setting id="favourites_last_year" type="boolean" label="30929" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="favourites_this_year/1" type="boolean" label="30930" help="">
+                <setting id="favourites_this_year" type="boolean" label="30930" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="favourites_last_season/1" type="boolean" label="30931" help="">
+                <setting id="favourites_last_season" type="boolean" label="30931" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="favourites_this_season/1" type="boolean" label="30932" help="">
+                <setting id="favourites_this_season" type="boolean" label="30932" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="all_time_favourites/1" type="boolean" label="30933" help="">
+                <setting id="all_time_favourites" type="boolean" label="30933" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -2086,102 +2086,102 @@
 
             <!-- Genres Menu -->
             <group id="6" label="30580" help="">
-                <setting id="genres///1" type="boolean" label="30934" help="">
+                <setting id="genres//" type="boolean" label="30934" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_action/1" type="boolean" label="30935" help="">
+                <setting id="genre_action" type="boolean" label="30935" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_adventure/1" type="boolean" label="30936" help="">
+                <setting id="genre_adventure" type="boolean" label="30936" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_comedy/1" type="boolean" label="30937" help="">
+                <setting id="genre_comedy" type="boolean" label="30937" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_drama/1" type="boolean" label="30938" help="">
+                <setting id="genre_drama" type="boolean" label="30938" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_ecchi/1" type="boolean" label="30939" help="">
+                <setting id="genre_ecchi" type="boolean" label="30939" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_fantasy/1" type="boolean" label="30940" help="">
+                <setting id="genre_fantasy" type="boolean" label="30940" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_hentai/1" type="boolean" label="30941" help="">
+                <setting id="genre_hentai" type="boolean" label="30941" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_horror/1" type="boolean" label="30942" help="">
+                <setting id="genre_horror" type="boolean" label="30942" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_shoujo/1" type="boolean" label="30943" help="">
+                <setting id="genre_shoujo" type="boolean" label="30943" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_mecha/1" type="boolean" label="30944" help="">
+                <setting id="genre_mecha" type="boolean" label="30944" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_music/1" type="boolean" label="30945" help="">
+                <setting id="genre_music" type="boolean" label="30945" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_mystery/1" type="boolean" label="30946" help="">
+                <setting id="genre_mystery" type="boolean" label="30946" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_psychological/1" type="boolean" label="30947" help="">
+                <setting id="genre_psychological" type="boolean" label="30947" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_romance/1" type="boolean" label="30948" help="">
+                <setting id="genre_romance" type="boolean" label="30948" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_sci_fi/1" type="boolean" label="30949" help="">
+                <setting id="genre_sci_fi" type="boolean" label="30949" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_slice_of_life/1" type="boolean" label="30950" help="">
+                <setting id="genre_slice_of_life" type="boolean" label="30950" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_sports/1" type="boolean" label="30951" help="">
+                <setting id="genre_sports" type="boolean" label="30951" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_supernatural/1" type="boolean" label="30952" help="">
+                <setting id="genre_supernatural" type="boolean" label="30952" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="genre_thriller/1" type="boolean" label="30953" help="">
+                <setting id="genre_thriller" type="boolean" label="30953" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -2416,6 +2416,60 @@
                     <control type="button" format="action">
                         <close>false</close>
                     </control>
+                </setting>
+            </group>
+
+            <!-- Integer Settings -->
+            <group id="6" label="" help="">
+                <setting id="update.time.30" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="update.time.7" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="rd.expiry" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="dl.expiry" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="kitsu.expiry" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="mal.expiry" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="hianime.skipintro.start" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="hianime.skipintro.end" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="hianime.skipoutro.start" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="hianime.skipoutro.end" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
                 </setting>
             </group>
         </category>

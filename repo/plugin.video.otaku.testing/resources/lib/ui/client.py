@@ -260,7 +260,7 @@ def request(
                 elif any(x == error_code for x in [403, 429, 503]) and any(x in result for x in ['__cf_chl_f_tk', '__cf_chl_jschl_tk__=', '/cdn-cgi/challenge-platform/']):
                     url_parsed = urllib_parse.urlparse(url)
                     netloc = '%s://%s/' % (url_parsed.scheme, url_parsed.netloc)
-                    if control.getSetting('fs_enable') == 'true':
+                    if control.getBool('fs_enable'):
                         cf_cookie, cf_ua = cfcookie().get(netloc, timeout)
                         if cf_cookie is None:
                             control.log('%s has an unsolvable Cloudflare challenge.' % (netloc))
@@ -283,7 +283,7 @@ def request(
             elif server and 'ddos-guard' in server.lower() and e.code == 403:
                 url_parsed = urllib_parse.urlparse(url)
                 netloc = '%s://%s/' % (url_parsed.scheme, url_parsed.netloc)
-                if control.getSetting('fs_enable') == 'true':
+                if control.getBool('fs_enable'):
                     ddg_cookie, ddg_ua = ddgcookie().get(netloc, timeout)
                     if ddg_cookie is None:
                         control.log('%s has an unsolvable DDos-Guard challenge.' % (netloc))
@@ -580,7 +580,7 @@ class cfcookie:
 
     def _get_cookie(self, netloc, timeout):
         fs_url = control.getSetting('fs_url')
-        fs_timeout = int(control.getSetting('fs_timeout'))
+        fs_timeout = control.getInt('fs_timeout')
         if not fs_url.startswith('http'):
             control.log('Sorry, malformed flaresolverr url')
             return
@@ -623,7 +623,7 @@ class ddgcookie:
 
     def _get_cookie(self, netloc, timeout):
         fs_url = control.getSetting('fs_url')
-        fs_timeout = int(control.getSetting('fs_timeout'))
+        fs_timeout = control.getInt('fs_timeout')
         if not fs_url.startswith('http'):
             control.log('Sorry, malformed flaresolverr url')
             return

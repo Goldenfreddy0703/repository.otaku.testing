@@ -7,7 +7,7 @@ def main():
     arg = sys.argv[1]
     item = sys.listitem
     path = item.getPath()
-    plugin = 'plugin://plugin.video.otaku'
+    plugin = 'plugin://plugin.video.otaku.testing'
     if arg == 'findrecommendations':
         path = path.split(plugin, 1)[1]
         executebuiltin(f"ActivateWindow(Videos,{plugin}/find_recommendations{path})")

@@ -27,11 +27,11 @@ from resources.lib import OtakuBrowser
 from resources.lib.ui import control, database, utils
 from resources.lib.ui.router import Route, router_process
 from resources.lib.WatchlistIntegration import add_watchlist
-from resources.lib.OtakuBrowser import BROWSER
 
+BROWSER = OtakuBrowser.BROWSER
 
 if control.ADDON_VERSION != control.getSetting('version'):
-    if int(control.getSetting('showchangelog')) == 0:
+    if control.getInt('showchangelog') == 0:
         service.getChangeLog()
     control.setSetting('version', control.ADDON_VERSION)
 
@@ -41,7 +41,7 @@ def add_last_watched(items):
     try:
         kodi_meta = pickle.loads(database.get_show(mal_id)['kodi_meta'])
         last_watched = "%s[I]%s[/I]" % (control.lang(30900), kodi_meta.get('title_userPreferred'))
-        items.insert(0, (last_watched, f'animes/{mal_id}/', kodi_meta['poster']))
+        items.append((last_watched, f'animes/{mal_id}/', kodi_meta['poster']))
     except TypeError:
         pass
     return items
@@ -57,8 +57,8 @@ def ANIMES_PAGE(payload, params):
 @Route('find_recommendations/*')
 def FIND_RECOMMENDATIONS(payload, params):
     path, mal_id, eps_watched = payload.rsplit("/")
-    page = params.get('page', 1)
-    control.draw_items(BROWSER.get_recommendations(mal_id, int(page)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_recommendations(mal_id, page), 'tvshows')
 
 
 @Route('find_relations/*')
@@ -73,131 +73,156 @@ def WATCH_ORDER(payload, params):
     control.draw_items(BROWSER.get_watch_order(mal_id), 'tvshows')
 
 
-@Route('airing_last_season/*')
+@Route('airing_last_season')
 def AIRING_LAST_SEASON(payload, params):
-    control.draw_items(BROWSER.get_airing_last_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_airing_last_season(page), 'tvshows')
 
 
-@Route('airing_this_season/*')
+@Route('airing_this_season')
 def AIRING_THIS_SEASON(payload, params):
-    control.draw_items(BROWSER.get_airing_this_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_airing_this_season(page), 'tvshows')
 
 
-@Route('airing_next_season/*')
+@Route('airing_next_season')
 def AIRING_NEXT_SEASON(payload, params):
-    control.draw_items(BROWSER.get_airing_next_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_airing_next_season(page), 'tvshows')
 
 
-@Route('trending_last_year/*')
+@Route('trending_last_year')
 def TRENDING_LAST_YEAR(payload, params):
-    control.draw_items(BROWSER.get_trending_last_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_trending_last_year(page), 'tvshows')
 
 
-@Route('trending_this_year/*')
+@Route('trending_this_year')
 def TRENDING_THIS_YEAR(payload, params):
-    control.draw_items(BROWSER.get_trending_this_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_trending_this_year(page), 'tvshows')
 
 
-@Route('trending_last_season/*')
+@Route('trending_last_season')
 def TRENDING_LAST_SEASON(payload, params):
-    control.draw_items(BROWSER.get_trending_last_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_trending_last_season(page), 'tvshows')
 
 
-@Route('trending_this_season/*')
+@Route('trending_this_season')
 def TRENDING_THIS_SEASON(payload, params):
-    control.draw_items(BROWSER.get_trending_this_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_trending_this_season(page), 'tvshows')
 
 
-@Route('all_time_trending/*')
+@Route('all_time_trending')
 def ALL_TIME_TRENDING(payload, params):
-    control.draw_items(BROWSER.get_all_time_trending(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_all_time_trending(page), 'tvshows')
 
 
-@Route('popular_last_year/*')
+@Route('popular_last_year')
 def POPULAR_LAST_YEAR(payload, params):
-    control.draw_items(BROWSER.get_popular_last_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_popular_last_year(page), 'tvshows')
 
 
-@Route('popular_this_year/*')
+@Route('popular_this_year')
 def POPULAR_THIS_YEAR(payload, params):
-    control.draw_items(BROWSER.get_popular_this_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_popular_this_year(page), 'tvshows')
 
 
-@Route('popular_last_season/*')
+@Route('popular_last_season')
 def POPULAR_LAST_SEASON(payload, params):
-    control.draw_items(BROWSER.get_popular_last_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_popular_last_season(page), 'tvshows')
 
 
-@Route('popular_this_season/*')
+@Route('popular_this_season')
 def POPULAR_THIS_SEASON(payload, params):
-    control.draw_items(BROWSER.get_popular_this_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_popular_this_season(page), 'tvshows')
 
 
-@Route('all_time_popular/*')
+@Route('all_time_popular')
 def ALL_TIME_POPULAR(payload, params):
-    control.draw_items(BROWSER.get_all_time_popular(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_all_time_popular(page), 'tvshows')
 
 
-@Route('voted_last_year/*')
+@Route('voted_last_year')
 def VOTED_LAST_YEAR(payload, params):
-    control.draw_items(BROWSER.get_voted_last_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_voted_last_year(page), 'tvshows')
 
 
-@Route('voted_this_year/*')
+@Route('voted_this_year')
 def VOTED_THIS_YEAR(payload, params):
-    control.draw_items(BROWSER.get_voted_this_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_voted_this_year(page), 'tvshows')
 
 
-@Route('voted_last_season/*')
+@Route('voted_last_season')
 def VOTED_LAST_SEASON(payload, params):
-    control.draw_items(BROWSER.get_voted_last_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_voted_last_season(page), 'tvshows')
 
 
-@Route('voted_this_season/*')
+@Route('voted_this_season')
 def VOTED_THIS_SEASON(payload, params):
-    control.draw_items(BROWSER.get_voted_this_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_voted_this_season(page), 'tvshows')
 
 
-@Route('all_time_voted/*')
+@Route('all_time_voted')
 def ALL_TIME_VOTED(payload, params):
-    control.draw_items(BROWSER.get_all_time_voted(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_all_time_voted(page), 'tvshows')
 
 
-@Route('favourites_last_year/*')
+@Route('favourites_last_year')
 def FAVOURITES_LAST_YEAR(payload, params):
-    control.draw_items(BROWSER.get_favourites_last_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_favourites_last_year(page), 'tvshows')
 
 
-@Route('favourites_this_year/*')
+@Route('favourites_this_year')
 def FAVOURITES_THIS_YEAR(payload, params):
-    control.draw_items(BROWSER.get_favourites_this_year(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_favourites_this_year(page), 'tvshows')
 
 
-@Route('favourites_last_season/*')
+@Route('favourites_last_season')
 def FAVOURITES_LAST_SEASON(payload, params):
-    control.draw_items(BROWSER.get_favourites_last_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_favourites_last_season(page), 'tvshows')
 
 
-@Route('favourites_this_season/*')
+@Route('favourites_this_season')
 def FAVOURITES_THIS_SEASON(payload, params):
-    control.draw_items(BROWSER.get_favourites_this_season(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_favourites_this_season(page), 'tvshows')
 
 
-@Route('all_time_favourites/*')
+@Route('all_time_favourites')
 def ALL_TIME_FAVOURITES(payload, params):
-    control.draw_items(BROWSER.get_all_time_favourites(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_all_time_favourites(page), 'tvshows')
 
 
-@Route('top_100/*')
+@Route('top_100')
 def TOP_100(payload, params):
-    control.draw_items(BROWSER.get_top_100(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_top_100(page), 'tvshows')
 
 
 @Route('genres/*')
 def GENRES_PAGES(payload, params):
-    genres, tags, page = payload.rsplit("/")
+    genres, tags = payload.rsplit("/")
+    page = int(params.get('page', 1))
     if genres or tags:
-        control.draw_items(BROWSER.genres_payload(genres, tags, int(page)), 'tvshows')
+        control.draw_items(BROWSER.genres_payload(genres, tags, page), 'tvshows')
     else:
         control.draw_items(BROWSER.get_genres(), 'tvshows')
 
@@ -218,105 +243,124 @@ def UPDATE_GENRE_SETTINGS(payload, params):
         json.dump(settings, f)
 
 
-@Route('genre_action/*')
+@Route('genre_action')
 def GENRE_ACTION(payload, params):
-    control.draw_items(BROWSER.get_genre_action(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_action(page), 'tvshows')
 
 
-@Route('genre_adventure/*')
+@Route('genre_adventure')
 def GENRE_ADVENTURE(payload, params):
-    control.draw_items(BROWSER.get_genre_adventure(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_adventure(page), 'tvshows')
 
 
-@Route('genre_comedy/*')
+@Route('genre_comedy')
 def GENRE_COMEDY(payload, params):
-    control.draw_items(BROWSER.get_genre_comedy(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_comedy(page), 'tvshows')
 
 
-@Route('genre_drama/*')
+@Route('genre_drama')
 def GENRE_DRAMA(payload, params):
-    control.draw_items(BROWSER.get_genre_drama(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_drama(page), 'tvshows')
 
 
-@Route('genre_ecchi/*')
+@Route('genre_ecchi')
 def GENRE_ECCHI(payload, params):
-    control.draw_items(BROWSER.get_genre_ecchi(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_ecchi(page), 'tvshows')
 
 
-@Route('genre_fantasy/*')
+@Route('genre_fantasy')
 def GENRE_FANTASY(payload, params):
-    control.draw_items(BROWSER.get_genre_fantasy(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_fantasy(page), 'tvshows')
 
 
-@Route('genre_hentai/*')
+@Route('genre_hentai')
 def GENRE_HENTAI(payload, params):
-    control.draw_items(BROWSER.get_genre_hentai(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_hentai(page), 'tvshows')
 
 
-@Route('genre_horror/*')
+@Route('genre_horror')
 def GENRE_HORROR(payload, params):
-    control.draw_items(BROWSER.get_genre_horror(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_horror(page), 'tvshows')
 
 
-@Route('genre_shoujo/*')
+@Route('genre_shoujo')
 def GENRE_SHOUJO(payload, params):
-    control.draw_items(BROWSER.get_genre_shoujo(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_shoujo(page), 'tvshows')
 
 
-@Route('genre_mecha/*')
+@Route('genre_mecha')
 def GENRE_MECHA(payload, params):
-    control.draw_items(BROWSER.get_genre_mecha(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_mecha(page), 'tvshows')
 
 
-@Route('genre_music/*')
+@Route('genre_music')
 def GENRE_MUSIC(payload, params):
-    control.draw_items(BROWSER.get_genre_music(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_music(page), 'tvshows')
 
 
-@Route('genre_mystery/*')
+@Route('genre_mystery')
 def GENRE_MYSTERY(payload, params):
-    control.draw_items(BROWSER.get_genre_mystery(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_mystery(page), 'tvshows')
 
 
-@Route('genre_psychological/*')
+@Route('genre_psychological')
 def GENRE_PSYCHOLOGICAL(payload, params):
-    control.draw_items(BROWSER.get_genre_psychological(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_psychological(page), 'tvshows')
 
 
-@Route('genre_romance/*')
+@Route('genre_romance')
 def GENRE_ROMANCE(payload, params):
-    control.draw_items(BROWSER.get_genre_romance(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_romance(page), 'tvshows')
 
 
-@Route('genre_sci_fi/*')
+@Route('genre_sci_fi')
 def GENRE_SCI_FI(payload, params):
-    control.draw_items(BROWSER.get_genre_sci_fi(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_sci_fi(page), 'tvshows')
 
 
-@Route('genre_slice_of_life/*')
+@Route('genre_slice_of_life')
 def GENRE_SLICE_OF_LIFE(payload, params):
-    control.draw_items(BROWSER.get_genre_slice_of_life(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_slice_of_life(page), 'tvshows')
 
 
-@Route('genre_sports/*')
+@Route('genre_sports')
 def GENRE_SPORTS(payload, params):
-    control.draw_items(BROWSER.get_genre_sports(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_sports(page), 'tvshows')
 
 
-@Route('genre_supernatural/*')
+@Route('genre_supernatural')
 def GENRE_SUPERNATURAL(payload, params):
-    control.draw_items(BROWSER.get_genre_supernatural(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_supernatural(page), 'tvshows')
 
 
-@Route('genre_thriller/*')
+@Route('genre_thriller')
 def GENRE_THRILLER(payload, params):
-    control.draw_items(BROWSER.get_genre_thriller(int(payload)), 'tvshows')
+    page = int(params.get('page', 1))
+    control.draw_items(BROWSER.get_genre_thriller(page), 'tvshows')
 
 
 @Route('search_history')
 def SEARCH_HISTORY(payload, params):
     history = database.getSearchHistory('show')
-    if int(control.getSetting('searchhistory')) == 0:
+    if control.getInt('searchhistory') == 0:
         draw_cm = [('Remove from Item', 'remove_search_item'), ("Edit Search Item...", "edit_search_item")]
         control.draw_items(OtakuBrowser.search_history(history), 'addons', draw_cm)
     else:
@@ -325,40 +369,37 @@ def SEARCH_HISTORY(payload, params):
 
 @Route('search/*')
 def SEARCH(payload, params):
-    query, page = payload.rsplit("/", 1)
+    query = payload
+    page = int(params.get('page', 1))
     if not query:
         query = control.keyboard(control.lang(30905))
         if not query:
             return control.draw_items([], 'tvshows')
-        if int(control.getSetting('searchhistory')) == 0:
+        if control.getInt('searchhistory') == 0:
             database.addSearchHistory(query, 'show')
         control.draw_items(BROWSER.get_search(query), 'tvshows')
     else:
-        control.draw_items(BROWSER.get_search(query, int(page)), 'tvshows')
+        control.draw_items(BROWSER.get_search(query, page), 'tvshows')
 
 
 @Route('remove_search_item/*')
 def REMOVE_SEARCH_ITEM(payload, params):
     if 'search/' in payload:
-        payload_list = payload.rsplit('search/')[1].rsplit('/', 1)
-        if len(payload_list) == 2 and payload_list[0]:
-            search_item, page = payload_list
-            return database.remove_search(table='show', value=search_item)
-    control.notify(control.ADDON_NAME, "Invalid Search Item")
+        search_item = payload.rsplit('search/')[1]
+        database.remove_search(table='show', value=search_item)
+    control.exit_code()
 
 
 @Route('edit_search_item/*')
 def EDIT_SEARCH_ITEM(payload, params):
     if 'search/' in payload:
-        payload_list = payload.rsplit('search/')[1].rsplit('/', 1)
-        if len(payload_list) == 2 and payload_list[0]:
-            search_item, page = payload_list
+        search_item = payload.rsplit('search/')[1]
+        if search_item:
             query = control.keyboard(control.lang(30905), search_item)
             if query and query != search_item:
                 database.remove_search(table='show', value=search_item)
                 database.addSearchHistory(query, 'show')
-            return
-    control.notify(control.ADDON_NAME, "Invalid Search Item")
+    control.exit_code()
 
 
 @Route('play/*')
@@ -506,42 +547,42 @@ def FANART(payload, params):
 @Route('')
 def LIST_MENU(payload, params):
     MENU_ITEMS = [
-        (control.lang(30901), "airing_last_season/1", 'airing_anime.png'),
-        (control.lang(30902), "airing_this_season/1", 'airing_anime.png'),
-        (control.lang(30903), "airing_next_season/1", 'airing_anime.png'),
+        (control.lang(30901), "airing_last_season", 'airing_anime.png'),
+        (control.lang(30902), "airing_this_season", 'airing_anime.png'),
+        (control.lang(30903), "airing_next_season", 'airing_anime.png'),
         # (control.lang(30904), "movies", 'movies.png'),
         # (control.lang(30905), "tv_shows", 'tv_shows.png'),
         (control.lang(30906), "trending", 'trending.png'),
         (control.lang(30907), "popular", 'popular.png'),
         (control.lang(30908), "voted", 'voted.png'),
         (control.lang(30909), "favourites", 'favourites.png'),
-        (control.lang(30910), "top_100/1", 'top_100_anime.png'),
+        (control.lang(30910), "top_100", 'top_100_anime.png'),
         (control.lang(30911), "genres", 'genres_&_tags.png'),
         (control.lang(30912), "search_history", 'search.png'),
         (control.lang(30913), "tools", 'tools.png')
     ]
 
+    final_menu_items = []
+    final_menu_items = add_watchlist(final_menu_items)
     if control.getBool('menu.lastwatched'):
-        MENU_ITEMS = add_last_watched(MENU_ITEMS)
-    MENU_ITEMS = add_watchlist(MENU_ITEMS)
-    MENU_ITEMS_ = MENU_ITEMS[:]
+        final_menu_items = add_last_watched(final_menu_items)
     for i in MENU_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            MENU_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in MENU_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            final_menu_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in final_menu_items], 'addons')
 
 
 # @Route('movies')
 # def MOVIES_MENU(payload, params):
 #     MOVIES_ITEMS = [
-#         (control.lang(30901), "airing_last_season/1", 'airing_anime.png'),
-#         (control.lang(30902), "airing_this_season/1", 'airing_anime.png'),
-#         (control.lang(30903), "airing_next_season/1", 'airing_anime.png'),
+#         (control.lang(30901), "airing_last_season", 'airing_anime.png'),
+#         (control.lang(30902), "airing_this_season", 'airing_anime.png'),
+#         (control.lang(30903), "airing_next_season", 'airing_anime.png'),
 #         (control.lang(30906), "trending", 'trending.png'),
 #         (control.lang(30907), "popular", 'popular.png'),
 #         (control.lang(30908), "voted", 'voted.png'),
 #         (control.lang(30909), "favourites", 'favourites.png'),
-#         (control.lang(30910), "top_100/1", 'top_100_anime.png'),
+#         (control.lang(30910), "top_100", 'top_100_anime.png'),
 #         (control.lang(30911), "genres", 'genres_&_tags.png'),
 #         (control.lang(30912), "search_history_movie", 'search.png')
 #     ]
@@ -560,14 +601,14 @@ def LIST_MENU(payload, params):
 # @Route('tv_shows')
 # def TV_SHOWS_MENU(payload, params):
 #     TV_SHOWS_ITEMS = [
-#         (control.lang(30901), "airing_last_season/1", 'airing_anime.png'),
-#         (control.lang(30902), "airing_this_season/1", 'airing_anime.png'),
-#         (control.lang(30903), "airing_next_season/1", 'airing_anime.png'),
+#         (control.lang(30901), "airing_last_season", 'airing_anime.png'),
+#         (control.lang(30902), "airing_this_season", 'airing_anime.png'),
+#         (control.lang(30903), "airing_next_season", 'airing_anime.png'),
 #         (control.lang(30906), "trending", 'trending.png'),
 #         (control.lang(30907), "popular", 'popular.png'),
 #         (control.lang(30908), "voted", 'voted.png'),
 #         (control.lang(30909), "favourites", 'favourites.png'),
-#         (control.lang(30910), "top_100/1", 'top_100_anime.png'),
+#         (control.lang(30910), "top_100", 'top_100_anime.png'),
 #         (control.lang(30911), "genres", 'genres_&_tags.png'),
 #         (control.lang(30912), "search_history_tvshow", 'search.png')
 #     ]
@@ -586,101 +627,101 @@ def LIST_MENU(payload, params):
 @Route('trending')
 def TRENDING_MENU(payload, params):
     TRENDING_ITEMS = [
-        (control.lang(30914), "trending_last_year/1", 'trending.png'),
-        (control.lang(30915), "trending_this_year/1", 'trending.png'),
-        (control.lang(30916), "trending_last_season/1", 'trending.png'),
-        (control.lang(30917), "trending_this_season/1", 'trending.png'),
-        (control.lang(30918), "all_time_trending/1", 'trending.png')
+        (control.lang(30914), "trending_last_year", 'trending.png'),
+        (control.lang(30915), "trending_this_year", 'trending.png'),
+        (control.lang(30916), "trending_last_season", 'trending.png'),
+        (control.lang(30917), "trending_this_season", 'trending.png'),
+        (control.lang(30918), "all_time_trending", 'trending.png')
     ]
 
-    TRENDING_ITEMS_ = TRENDING_ITEMS[:]
+    enabled_trending_items = []
     for i in TRENDING_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            TRENDING_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in TRENDING_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            enabled_trending_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_trending_items], 'addons')
 
 
 @Route('popular')
 def POPULAR_MENU(payload, params):
     POPULAR_ITEMS = [
-        (control.lang(30919), "popular_last_year/1", 'popular.png'),
-        (control.lang(30920), "popular_this_year/1", 'popular.png'),
-        (control.lang(30921), "popular_last_season/1", 'popular.png'),
-        (control.lang(30922), "popular_this_season/1", 'popular.png'),
-        (control.lang(30923), "all_time_popular/1", 'popular.png')
+        (control.lang(30919), "popular_last_year", 'popular.png'),
+        (control.lang(30920), "popular_this_year", 'popular.png'),
+        (control.lang(30921), "popular_last_season", 'popular.png'),
+        (control.lang(30922), "popular_this_season", 'popular.png'),
+        (control.lang(30923), "all_time_popular", 'popular.png')
     ]
 
-    POPULAR_ITEMS_ = POPULAR_ITEMS[:]
+    enabled_popular_items = []
     for i in POPULAR_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            POPULAR_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in POPULAR_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            enabled_popular_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_popular_items], 'addons')
 
 
 @Route('voted')
 def VOTED_MENU(payload, params):
     VOTED_ITEMS = [
-        (control.lang(30924), "voted_last_year/1", 'voted.png'),
-        (control.lang(30925), "voted_this_year/1", 'voted.png'),
-        (control.lang(30926), "voted_last_season/1", 'voted.png'),
-        (control.lang(30927), "voted_this_season/1", 'voted.png'),
-        (control.lang(30928), "all_time_voted/1", 'voted.png')
+        (control.lang(30924), "voted_last_year", 'voted.png'),
+        (control.lang(30925), "voted_this_year", 'voted.png'),
+        (control.lang(30926), "voted_last_season", 'voted.png'),
+        (control.lang(30927), "voted_this_season", 'voted.png'),
+        (control.lang(30928), "all_time_voted", 'voted.png')
     ]
 
-    VOTED_ITEMS_ = VOTED_ITEMS[:]
+    enabled_voted_items = []
     for i in VOTED_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            VOTED_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in VOTED_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            enabled_voted_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_voted_items], 'addons')
 
 
 @Route('favourites')
 def FAVOURITES_MENU(payload, params):
     FAVOURITES_ITEMS = [
-        (control.lang(30929), "favourites_last_year/1", 'favourites.png'),
-        (control.lang(30930), "favourites_this_year/1", 'favourites.png'),
-        (control.lang(30931), "favourites_last_season/1", 'favourites.png'),
-        (control.lang(30932), "favourites_this_season/1", 'favourites.png'),
-        (control.lang(30933), "all_time_favourites/1", 'favourites.png')
+        (control.lang(30929), "favourites_last_year", 'favourites.png'),
+        (control.lang(30930), "favourites_this_year", 'favourites.png'),
+        (control.lang(30931), "favourites_last_season", 'favourites.png'),
+        (control.lang(30932), "favourites_this_season", 'favourites.png'),
+        (control.lang(30933), "all_time_favourites", 'favourites.png')
     ]
 
-    FAVOURITES_ITEMS_ = FAVOURITES_ITEMS[:]
+    enabled_favourites_items = []
     for i in FAVOURITES_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            FAVOURITES_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in FAVOURITES_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            enabled_favourites_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_favourites_items], 'addons')
 
 
 @Route('genres')
 def GENRES_MENU(payload, params):
     GENRES_ITEMS = [
-        (control.lang(30934), "genres///1", 'genre_multi.png'),
-        (control.lang(30935), "genre_action/1", 'genre_action.png'),
-        (control.lang(30936), "genre_adventure/1", 'genre_adventure.png'),
-        (control.lang(30937), "genre_comedy/1", 'genre_comedy.png'),
-        (control.lang(30938), "genre_drama/1", 'genre_drama.png'),
-        (control.lang(30939), "genre_ecchi/1", 'genre_ecchi.png'),
-        (control.lang(30940), "genre_fantasy/1", 'genre_fantasy.png'),
-        (control.lang(30941), "genre_hentai/1", 'genre_hentai.png'),
-        (control.lang(30942), "genre_horror/1", 'genre_horror.png'),
-        (control.lang(30943), "genre_shoujo/1", 'genre_shoujo.png'),
-        (control.lang(30944), "genre_mecha/1", 'genre_mecha.png'),
-        (control.lang(30945), "genre_music/1", 'genre_music.png'),
-        (control.lang(30946), "genre_mystery/1", 'genre_mystery.png'),
-        (control.lang(30947), "genre_psychological/1", 'genre_psychological.png'),
-        (control.lang(30948), "genre_romance/1", 'genre_romance.png'),
-        (control.lang(30949), "genre_sci_fi/1", 'genre_sci-fi.png'),
-        (control.lang(30950), "genre_slice_of_life/1", 'genre_slice_of_life.png'),
-        (control.lang(30951), "genre_sports/1", 'genre_sports.png'),
-        (control.lang(30952), "genre_supernatural/1", 'genre_supernatural.png'),
-        (control.lang(30953), "genre_thriller/1", 'genre_thriller.png')
+        (control.lang(30934), "genres//", 'genre_multi.png'),
+        (control.lang(30935), "genre_action", 'genre_action.png'),
+        (control.lang(30936), "genre_adventure", 'genre_adventure.png'),
+        (control.lang(30937), "genre_comedy", 'genre_comedy.png'),
+        (control.lang(30938), "genre_drama", 'genre_drama.png'),
+        (control.lang(30939), "genre_ecchi", 'genre_ecchi.png'),
+        (control.lang(30940), "genre_fantasy", 'genre_fantasy.png'),
+        (control.lang(30941), "genre_hentai", 'genre_hentai.png'),
+        (control.lang(30942), "genre_horror", 'genre_horror.png'),
+        (control.lang(30943), "genre_shoujo", 'genre_shoujo.png'),
+        (control.lang(30944), "genre_mecha", 'genre_mecha.png'),
+        (control.lang(30945), "genre_music", 'genre_music.png'),
+        (control.lang(30946), "genre_mystery", 'genre_mystery.png'),
+        (control.lang(30947), "genre_psychological", 'genre_psychological.png'),
+        (control.lang(30948), "genre_romance", 'genre_romance.png'),
+        (control.lang(30949), "genre_sci_fi", 'genre_sci-fi.png'),
+        (control.lang(30950), "genre_slice_of_life", 'genre_slice_of_life.png'),
+        (control.lang(30951), "genre_sports", 'genre_sports.png'),
+        (control.lang(30952), "genre_supernatural", 'genre_supernatural.png'),
+        (control.lang(30953), "genre_thriller", 'genre_thriller.png')
     ]
 
-    GENRES_ITEMS_ = GENRES_ITEMS[:]
+    enabled_genres_items = []
     for i in GENRES_ITEMS:
-        if control.getSetting(i[1]) == 'false':
-            GENRES_ITEMS_.remove(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in GENRES_ITEMS_], 'addons')
+        if control.getBool(i[1]):
+            enabled_genres_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_genres_items], 'addons')
 
 
 # @Route('search')

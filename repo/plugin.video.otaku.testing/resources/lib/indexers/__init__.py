@@ -27,7 +27,7 @@ def process_episodes(episodes, eps_watched, dub_data=None):
 def process_dub(mal_id, ename):
     update_time = date.today().isoformat()
     if not (show_data := database.get_show_data(mal_id)) or show_data['last_updated'] != update_time:
-        if int(control.getSetting('jz.dub.api')) == 0:
+        if control.getInt('jz.dub.api') == 0:
             from resources.jz import teamup
             dub_data = teamup.get_dub_data(ename)
             data = {"dub_data": dub_data}

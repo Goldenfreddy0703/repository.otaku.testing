@@ -11,7 +11,7 @@ from resources.lib.ui.BrowserBase import BrowserBase
 
 
 class Sources(BrowserBase):
-    _BASE_URL = 'https://nyaa-si.translate.goog/?_x_tr_sl=es&_x_tr_tl=en&_x_tr_hl=en/' if control.getSetting('provider.nyaaalt') == 'true' else 'https://nyaa.si/'
+    _BASE_URL = 'https://nyaa-si.translate.goog/?_x_tr_sl=es&_x_tr_tl=en&_x_tr_hl=en/' if control.getBool('provider.nyaaalt') else 'https://nyaa.si/'
 
     def __init__(self):
         self.all_sources = []

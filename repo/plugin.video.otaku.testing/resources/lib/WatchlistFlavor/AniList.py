@@ -78,7 +78,7 @@ class AniListWLF(WatchlistFlavorBase):
         ]
         return actions
 
-    def get_watchlist_status(self, status, next_up, offset=0, page=1):
+    def get_watchlist_status(self, status, next_up, offset, page):
         query = '''
         query ($userId: Int, $userName: String, $status: MediaListStatus, $type: MediaType, $sort: [MediaListSort], $forceSingleCompletedList: Boolean) {
             MediaListCollection(userId: $userId, userName: $userName, status: $status, type: $type, sort: $sort, forceSingleCompletedList: $forceSingleCompletedList) {

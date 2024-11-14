@@ -54,12 +54,12 @@ class Sources(GetSources):
         self.setProperty('process_started', 'true')
 
         # set skipintro times to -1 before scraping
-        control.setSetting('hianime.skipintro.start', '-1')
-        control.setSetting('hianime.skipintro.end', '-1')
+        control.setInt('hianime.skipintro.start', -1)
+        control.setInt('hianime.skipintro.end', -1)
 
         # set skipoutro times to -1 before scraping
-        control.setSetting('hianime.skipoutro.start', '-1')
-        control.setSetting('hianime.skipoutro.end', '-1')
+        control.setInt('hianime.skipoutro.start', -1)
+        control.setInt('hianime.skipoutro.end', -1)
 
         if control.real_debrid_enabled() or control.all_debrid_enabled() or control.debrid_link_enabled() or control.premiumize_enabled():
             t = threading.Thread(target=self.user_cloud_inspection, args=(query, mal_id, episode))
@@ -121,7 +121,7 @@ class Sources(GetSources):
         else:
             self.remainingProviders.remove('animepahe')
 
-        timeout = 60 if rescrape else int(control.getSetting('general.timeout'))
+        timeout = 60 if rescrape else control.getInt('general.timeout')
         start_time = time.perf_counter()
         runtime = 0
 
@@ -175,11 +175,11 @@ class Sources(GetSources):
         self.embedSources += hianime_sources
         for x in hianime_sources:
             if x and x['skip'].get('intro') and x['skip']['intro']['start'] != 0:
-                control.setSetting('hianime.skipintro.start', str(x['skip']['intro']['start']))
-                control.setSetting('hianime.skipintro.end', str(x['skip']['intro']['end']))
+                control.setInt('hianime.skipintro.start', int(x['skip']['intro']['start']))
+                control.setInt('hianime.skipintro.end', int(x['skip']['intro']['end']))
             if x and x['skip'].get('outro') and x['skip']['outro']['start'] != 0:
-                control.setSetting('hianime.skipoutro.start', str(x['skip']['outro']['start']))
-                control.setSetting('hianime.skipoutro.end', str(x['skip']['outro']['end']))
+                control.setInt('hianime.skipoutro.start', int(x['skip']['outro']['start']))
+                control.setInt('hianime.skipoutro.end', int(x['skip']['outro']['end']))
         self.remainingProviders.remove('hianime')
 
     def gogo_worker(self, mal_id, episode, rescrape, get_backup):
@@ -200,11 +200,11 @@ class Sources(GetSources):
 
     def user_cloud_inspection(self, query, mal_id, episode):
         debrid = {}
-        if control.real_debrid_enabled() and control.getSetting('rd.cloudInspection') == 'true':
+        if control.real_debrid_enabled() and control.getBool('rd.cloudInspection'):
             debrid['real_debrid'] = True
-        if control.premiumize_enabled() and control.getSetting('premiumize.cloudInspection') == 'true':
+        if control.premiumize_enabled() and control.getBool('premiumize.cloudInspection'):
             debrid['premiumize'] = True
-        if control.all_debrid_enabled() and control.getSetting('alldebrid.cloudInspection') == 'true':
+        if control.all_debrid_enabled() and control.getBool('alldebrid.cloudInspection'):
             debrid['all_debrid'] = True
         self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode)
         self.remainingProviders.remove('Cloud Inspection')
@@ -219,7 +219,7 @@ class Sources(GetSources):
 
         if filter_option == '1':
             # web speed limit
-            webspeed = int(control.getSetting('general.webspeed'))
+            webspeed = control.getInt('general.webspeed')
             len_in_sec = int(duration) * 60
 
             _torrent_list = torrent_list
@@ -249,7 +249,7 @@ class Sources(GetSources):
                         torrent_list.append(i)
 
         # Filter by release title
-        if control.getSetting('general.release_title_filter.enabled') == 'true':
+        if control.getBool('general.release_title_filter.enabled'):
             release_title_filter1 = control.getSetting('general.release_title_filter.value1')
             release_title_filter2 = control.getSetting('general.release_title_filter.value2')
             release_title_filter3 = control.getSetting('general.release_title_filter.value3')
@@ -257,11 +257,11 @@ class Sources(GetSources):
             release_title_filter5 = control.getSetting('general.release_title_filter.value5')
 
             # Get the new settings
-            exclude_filter1 = control.getSetting('general.release_title_filter.exclude1') == 'true'
-            exclude_filter2 = control.getSetting('general.release_title_filter.exclude2') == 'true'
-            exclude_filter3 = control.getSetting('general.release_title_filter.exclude3') == 'true'
-            exclude_filter4 = control.getSetting('general.release_title_filter.exclude4') == 'true'
-            exclude_filter5 = control.getSetting('general.release_title_filter.exclude5') == 'true'
+            exclude_filter1 = control.getBool('general.release_title_filter.exclude1')
+            exclude_filter2 = control.getBool('general.release_title_filter.exclude2')
+            exclude_filter3 = control.getBool('general.release_title_filter.exclude3')
+            exclude_filter4 = control.getBool('general.release_title_filter.exclude4')
+            exclude_filter5 = control.getBool('general.release_title_filter.exclude5')
 
             _torrent_list = torrent_list
             release_title_logic = control.getSetting('general.release_title_filter.logic')
@@ -290,11 +290,11 @@ class Sources(GetSources):
         sortedList = [x for x in sortedList if x in torrent_list or x in embed_list or x in cloud_files or x in local_files]
 
         # Filter out sources
-        if control.getSetting('general.disable265') == 'true':
+        if control.getBool('general.disable265'):
             sortedList = [i for i in sortedList if 'HEVC' not in i['info']]
-        if control.getSetting('general.disablebatch') == 'true':
+        if control.getBool('general.disablebatch'):
             sortedList = [i for i in sortedList if 'BATCH' not in i['info']]
-        lang = int(control.getSetting("general.source"))
+        lang = control.getInt("general.source")
         if lang != 1:
             langs = [0, 1, 2]
             sortedList = [i for i in sortedList if i['lang'] != langs[lang]]
