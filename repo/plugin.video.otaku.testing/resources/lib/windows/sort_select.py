@@ -10,8 +10,8 @@ SORT_METHODS = ['none', 'type', 'audio', 'resolution', 'size']
 SORT_OPTIONS = {
     'sortmethod': SORT_METHODS,
     "none": [],
-    "audio": ['dualaudio', 'sub', 'dub', 'none'],
     "type": ['files', 'cloud', 'torrent', 'embeds', "none"],
+    "audio": ['dualaudio', 'dub', 'sub', 'none'],
     "resolution": [],
     "size": []
 }
@@ -36,8 +36,8 @@ default_sort_options = {
         'type.4': 3,
         'type.5': 4,
         'audio.1': 0,
-        'audio.2': 1,
-        'audio.3': 2,
+        'audio.2': 2,
+        'audio.3': 1,
         'audio.4': 3
     }
 
@@ -46,6 +46,7 @@ try:
         sort_options = json.load(f)
 except FileNotFoundError:
     sort_options = default_sort_options
+
 
 class SortSelect(BaseWindow):
     def __init__(self, xml_file, location):
@@ -72,10 +73,10 @@ class SortSelect(BaseWindow):
     def handle_action(self, control_id):
         if control_id == 9001:   # close
             self.close()
-        elif control_id == 9002: # save
+        elif control_id == 9002:  # save
             self.save_settings()
             control.ok_dialog(control.ADDON_NAME, 'Saved Sort Configuration')
-        elif control_id == 9003: # set default
+        elif control_id == 9003:  # set default
             self.sort_options = default_sort_options
             self.save_settings()
         elif control_id in [1111, 2222, 3333, 4444, 5555]:

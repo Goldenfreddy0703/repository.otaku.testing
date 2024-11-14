@@ -1,3 +1,7 @@
+Changelog v5.1.17 (2024-11-14):
+- Fixed Sort Select with Audio
+- Fixed some scrapping bugs
+
 Changelog v5.1.16 (2024-11-13):
 - Fixed the Paging
 - Fixed Custom Search
