@@ -51,6 +51,8 @@ class WatchlistPlayer(player):
         # process skip times
         self.process_hianime()
         if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+            self.process_aniwave()
+        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
             self.process_aniskip()
         if not self.skipintro_aniskip or not self.skipoutro_aniskip:
             self.process_animeskip()
@@ -273,6 +275,20 @@ class WatchlistPlayer(player):
             if outro_start is not None and outro_end is not None:
                 self.skipoutro_start = int(outro_start) + self.skipoutro_offset
                 self.skipoutro_end = int(outro_end) + self.skipoutro_offset
+                self.skipoutro_aniskip = True
+
+    def process_aniwave(self):
+        if self.skipintro_aniskip_enable:
+            aniwave_skipintro_start = control.getInt('aniwave.skipintro.start')
+            if aniwave_skipintro_start != -1:
+                self.skipintro_start = aniwave_skipintro_start + self.skipintro_offset
+                self.skipintro_end = control.getInt('aniwave.skipintro.end') + self.skipintro_offset
+                self.skipintro_aniskip = True
+        if self.skipoutro_aniskip_enable:
+            aniwave_skipoutro_start = control.getInt('aniwave.skipoutro.start')
+            if aniwave_skipoutro_start != -1:
+                self.skipoutro_start = aniwave_skipoutro_start + self.skipoutro_offset
+                self.skipoutro_end = control.getInt('aniwave.skipoutro.end') + self.skipoutro_offset
                 self.skipoutro_aniskip = True
 
     def process_hianime(self):

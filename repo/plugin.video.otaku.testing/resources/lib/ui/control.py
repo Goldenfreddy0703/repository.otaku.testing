@@ -425,6 +425,24 @@ def wait_for_abort(timeout=1.0):
     return abort_requested_
 
 
+def arc4(t, n):
+    u = 0
+    h = ''
+    s = list(range(256))
+    for e in range(256):
+        x = t[e % len(t)]
+        u = (u + s[e] + (x if isinstance(x, int) else ord(x))) % 256
+        s[e], s[u] = s[u], s[e]
+
+    e = u = 0
+    for c in range(len(n)):
+        e = (e + 1) % 256
+        u = (u + s[e]) % 256
+        s[e], s[u] = s[u], s[e]
+        h += chr((n[c] if isinstance(n[c], int) else ord(n[c])) ^ s[(s[e] + s[u]) % 256])
+    return h
+
+
 def print(string, *args):
     for i in list(args):
         string = f'{string} {i}'

@@ -892,6 +892,10 @@ msgctxt "#30405"
 msgid "Animix"
 msgstr ""
 
+msgctxt "#30406"
+msgid "AniWave"
+msgstr ""
+
 msgctxt "#30410"
 msgid "Scrape Local Files"
 msgstr ""

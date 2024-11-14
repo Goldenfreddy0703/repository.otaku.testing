@@ -122,38 +122,43 @@ class Sources(BrowserBase):
                         referer=eurl,
                         cookie=cookie
                     )
-                    embed_url = urllib_parse.urljoin(eurl, re.findall(r'<iframe.+?src="([^"]+)', r)[0])
-                    subs = ''
-                    slink = ''
-                    s = client.request(embed_url, referer=eurl)
-                    sdiv = re.search(r'<source.+?src="([^"]+)', s)
-                    if sdiv:
-                        slink = sdiv.group(1)
-                    else:
-                        sdiv = re.search(r'sources:.+?file:\s*"([^"]+)', s, re.DOTALL)
-                        if sdiv:
-                            slink = sdiv.group(1)
-                    subdiv = re.search(r'captions:\s*\[.+?file:\s*"([^"]+)', s, re.DOTALL)
-                    if subdiv:
-                        subs = subdiv.group(1)
 
-                    if slink:
-                        source = {
-                            'release_title': '{0} - Ep {1}'.format(title, episode),
-                            'hash': slink,  # + '|Referer={0}&Origin={1}&User-Agent=iPad'.format(referer, referer[:-1]),
-                            'type': type_,
-                            'quality': qual,
-                            'debrid_provider': '',
-                            'provider': 'animix',
-                            'size': 'NA',
-                            'byte_size': 0,
-                            'info': [server, 'DUB' if lang == 2 else 'SUB'],
-                            'lang': lang
-                        }
+                    matches = re.findall(r'<iframe.+?src="([^"]+)', r)
+                    if matches:
+                        embed_url = urllib_parse.urljoin(eurl, matches[0])
+                        subs = ''
+                        slink = ''
+                        s = client.request(embed_url, referer=eurl)
 
-                        if subs:
-                            source.update({'subs': [{'url': subs, 'lang': 'English'}]})
+                        if isinstance(s, str):
+                            sdiv = re.search(r'<source.+?src="([^"]+)', s)
+                            if sdiv:
+                                slink = sdiv.group(1)
+                            else:
+                                sdiv = re.search(r'sources:.+?file:\s*"([^"]+)', s, re.DOTALL)
+                                if sdiv:
+                                    slink = sdiv.group(1)
+                            subdiv = re.search(r'captions:\s*\[.+?file:\s*"([^"]+)', s, re.DOTALL)
+                            if subdiv:
+                                subs = subdiv.group(1)
 
-                        sources.append(source)
+                            if slink:
+                                source = {
+                                    'release_title': '{0} - Ep {1}'.format(title, episode),
+                                    'hash': slink,  # + '|Referer={0}&Origin={1}&User-Agent=iPad'.format(referer, referer[:-1]),
+                                    'type': type_,
+                                    'quality': qual,
+                                    'debrid_provider': '',
+                                    'provider': 'animix',
+                                    'size': 'NA',
+                                    'byte_size': 0,
+                                    'info': [server, 'DUB' if lang == 2 else 'SUB'],
+                                    'lang': lang
+                                }
 
-        return sources
+                                if subs:
+                                    source.update({'subs': [{'url': subs, 'lang': 'English'}]})
+
+                                sources.append(source)
+
+                    return sources

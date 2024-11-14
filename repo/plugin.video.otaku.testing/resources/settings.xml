@@ -634,6 +634,11 @@
 
             <!-- Embeds -->
             <group id="2" label="30333" help="">
+                <setting id="provider.animepahe" type="boolean" label="30404" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="provider.animix" type="boolean" label="30405" help="">
                     <level>0</level>
                     <default>true</default>
@@ -647,23 +652,10 @@
                         <dependency type="visible" setting="provider.animix">true</dependency>
                     </dependencies>
                 </setting>
-                <setting id="provider.animepahe" type="boolean" label="30404" help="">
+                <setting id="provider.aniwave" type="boolean" label="30406" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
-                </setting>
-                <setting id="provider.hianime" type="boolean" label="30402" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="provider.hianimealt" type="boolean" label="30411" help="" parent="provider.hianime">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                    <dependencies>
-                        <dependency type="visible" setting="provider.hianime">true</dependency>
-                    </dependencies>
                 </setting>
                 <setting id="provider.gogo" type="boolean" label="30403" help="">
                     <level>0</level>
@@ -676,6 +668,19 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="provider.gogo">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="provider.hianime" type="boolean" label="30402" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="provider.hianimealt" type="boolean" label="30411" help="" parent="provider.hianime">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="provider.hianime">true</dependency>
                     </dependencies>
                 </setting>
             </group>
@@ -2447,6 +2452,26 @@
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="mal.expiry" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="aniwave.skipintro.start" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="aniwave.skipintro.end" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="aniwave.skipoutro.start" type="integer" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                    <control type="edit" format="integer" />
+                </setting>
+                <setting id="aniwave.skipoutro.end" type="integer" label="" help="">
                     <level>4</level>
                     <default>0</default>
                     <control type="edit" format="integer" />

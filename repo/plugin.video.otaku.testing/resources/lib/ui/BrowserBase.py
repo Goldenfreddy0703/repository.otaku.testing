@@ -82,6 +82,6 @@ class BrowserBase(object):
     def embeds():
         return [
             'doodstream', 'filelions', 'filemoon', 'hd-2', 'iga', 'kwik',
-            'megaf', 'moonf', 'mp4upload', 'mp4u', 'mycloud', 'streamtape',
-            'streamwish', 'vidcdn', 'vidplay', 'vidstream', 'yourupload', 'zto'
-        ]
+            'megaf', 'moonf', 'mp4upload', 'mp4u', 'mycloud', 'noads', 'noadsalt',
+            'swish', 'streamtape', 'streamwish', 'vidcdn', 'vidplay', 'vidstream',
+            'yourupload', 'zto']
