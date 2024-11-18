@@ -2458,42 +2458,42 @@
                 </setting>
                 <setting id="aniwave.skipintro.start" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="aniwave.skipintro.end" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="aniwave.skipoutro.start" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="aniwave.skipoutro.end" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="hianime.skipintro.start" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="hianime.skipintro.end" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="hianime.skipoutro.start" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
                 <setting id="hianime.skipoutro.end" type="integer" label="" help="">
                     <level>4</level>
-                    <default>0</default>
+                    <default>-1</default>
                     <control type="edit" format="integer" />
                 </setting>
             </group>

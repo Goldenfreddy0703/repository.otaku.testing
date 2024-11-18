@@ -61,6 +61,14 @@ class Sources(GetSources):
         control.setInt('hianime.skipoutro.start', -1)
         control.setInt('hianime.skipoutro.end', -1)
 
+        # set skipintro times to -1 before scraping
+        control.setInt('aniwave.skipintro.start', -1)
+        control.setInt('aniwave.skipintro.end', -1)
+
+        # set skipoutro times to -1 before scraping
+        control.setInt('aniwave.skipoutro.start', -1)
+        control.setInt('aniwave.skipoutro.end', -1)
+
         if control.real_debrid_enabled() or control.all_debrid_enabled() or control.debrid_link_enabled() or control.premiumize_enabled():
             t = threading.Thread(target=self.user_cloud_inspection, args=(query, mal_id, episode))
             t.start()
