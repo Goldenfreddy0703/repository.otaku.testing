@@ -1,3 +1,8 @@
+Changelog v5.1.21 (2024-11-23):
+- Added Famart to all Watchlist
+- Shows will be added to Watchlist Current if Watched
+- Fixed some small code in get_meta
+
 Changelog v5.1.20 (2024-11-21):
 - Updated Episode Meta for Jikanmoe
 

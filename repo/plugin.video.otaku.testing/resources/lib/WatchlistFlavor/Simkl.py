@@ -1,8 +1,9 @@
 import xbmc
 import requests
 import pickle
+import random
 
-from resources.lib.ui import utils, database, control
+from resources.lib.ui import utils, database, control, get_meta
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.ui.divide_flavors import div_flavor
 
@@ -104,6 +105,11 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
 
     def get_watchlist_status(self, status, next_up, offset, page):
         results = self.get_all_items(status)
+
+        # Extract mal_ids from the new API response structure
+        mal_ids = [{'mal_id': anime['show']['ids']['mal']} for anime in results['anime']]
+        get_meta.collect_meta(mal_ids)
+
         if not results:
             return []
 
@@ -149,13 +155,22 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
 
         image = f'https://wsrv.nl/?url=https://simkl.in/posters/{res["show"]["poster"]}_m.jpg'
 
+        show_meta = database.get_show_meta(mal_id)
+        kodi_meta = pickle.loads(show_meta.get('art')) if show_meta else {}
         base = {
             "name": '%s - %d/%d' % (title, res["watched_episodes_count"], res["total_episodes_count"]),
             "url": f'watchlist_to_ep/{mal_id}/{res["watched_episodes_count"]}',
             "image": image,
-            "fanart": image,
+            'fanart': kodi_meta['fanart'] if kodi_meta.get('fanart') else image,
             "info": info
         }
+
+        if kodi_meta.get('thumb'):
+            base['landscape'] = random.choice(kodi_meta['thumb'])
+        if kodi_meta.get('clearart'):
+            base['clearart'] = random.choice(kodi_meta['clearart'])
+        if kodi_meta.get('clearlogo'):
+            base['clearlogo'] = random.choice(kodi_meta['clearlogo'])
 
         if res["total_episodes_count"] == 1:
             base['url'] = f'play_movie/{mal_id}/'
@@ -215,6 +230,18 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
             "fanart": image,
             "poster": poster
         }
+
+        show_meta = database.get_show_meta(mal_id)
+        if show_meta:
+            art = pickle.loads(show_meta['art'])
+            if art.get('fanart'):
+                base['fanart'] = art['fanart']
+            if art.get('thumb'):
+                base['landscape'] = random.choice(art['thumb'])
+            if art.get('clearart'):
+                base['clearart'] = random.choice(art['clearart'])
+            if art.get('clearlogo'):
+                base['clearlogo'] = random.choice(art['clearlogo'])
 
         if res["total_episodes_count"] == 1:
             base['url'] = f'play_movie/{mal_id}/'

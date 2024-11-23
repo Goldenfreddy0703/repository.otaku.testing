@@ -1,7 +1,9 @@
 import time
 import requests
+import random
+import pickle
 
-from resources.lib.ui import control, database, utils
+from resources.lib.ui import control, database, utils, get_meta
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.indexers.simkl import SIMKLAPI
 from urllib import parse
@@ -134,6 +136,10 @@ class KitsuWLF(WatchlistFlavorBase):
         el = result["included"][:len(_list)]
         self._mapping = [x for x in result['included'] if x['type'] == 'mappings']
 
+        # Extract mal_ids from the new API response structure
+        mal_ids = [{'mal_id': item['attributes']['externalId']} for item in self._mapping if item['attributes']['externalSite'] == 'myanimelist/anime']
+        get_meta.collect_meta(mal_ids)
+
         if next_up:
             all_results = map(self._base_next_up_view, _list, el)
         else:
@@ -170,6 +176,8 @@ class KitsuWLF(WatchlistFlavorBase):
         except TypeError:
             pass
 
+        show_meta = database.get_show_meta(mal_id)
+        kodi_meta = pickle.loads(show_meta.get('art')) if show_meta else {}
         poster_image = eres["attributes"]['posterImage']
         base = {
             "name": '%s - %d/%d' % (eres["attributes"]["titles"].get(self.__get_title_lang(), eres["attributes"]['canonicalTitle']),
@@ -177,8 +185,16 @@ class KitsuWLF(WatchlistFlavorBase):
                                     eres["attributes"].get('episodeCount', 0) if eres["attributes"]['episodeCount'] else 0),
             "url": f'watchlist_to_ep/{mal_id}/{res["attributes"]["progress"]}',
             "image": poster_image.get('large', poster_image['original']),
+            'fanart': kodi_meta['fanart'] if kodi_meta.get('fanart') else poster_image.get('large', poster_image['original']),
             "info": info
         }
+
+        if kodi_meta.get('thumb'):
+            base['landscape'] = random.choice(kodi_meta['thumb'])
+        if kodi_meta.get('clearart'):
+            base['clearart'] = random.choice(kodi_meta['clearart'])
+        if kodi_meta.get('clearlogo'):
+            base['clearlogo'] = random.choice(kodi_meta['clearlogo'])
 
         if eres['attributes']['subtype'] == 'movie' and eres['attributes']['episodeCount'] == 1:
             base['url'] = f'play_movie/{mal_id}/'
@@ -227,6 +243,18 @@ class KitsuWLF(WatchlistFlavorBase):
             "fanart": image,
             "poster": poster
         }
+
+        show_meta = database.get_show_meta(mal_id)
+        if show_meta:
+            art = pickle.loads(show_meta['art'])
+            if art.get('fanart'):
+                base['fanart'] = art['fanart']
+            if art.get('thumb'):
+                base['landscape'] = random.choice(art['thumb'])
+            if art.get('clearart'):
+                base['clearart'] = random.choice(art['clearart'])
+            if art.get('clearlogo'):
+                base['clearlogo'] = random.choice(art['clearlogo'])
 
         if next_up_meta:
             # Ensure mal_id and next_up are integers

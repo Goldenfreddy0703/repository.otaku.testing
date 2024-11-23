@@ -1,8 +1,10 @@
 import re
 import time
 import requests
+import random
+import pickle
 
-from resources.lib.ui import utils, control
+from resources.lib.ui import utils, control, get_meta, database
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.ui.divide_flavors import div_flavor
 
@@ -132,8 +134,12 @@ class MyAnimeListWLF(WatchlistFlavorBase):
     def _process_status_view(self, url, params, next_up, base_plugin_url, page):
         r = requests.get(url, headers=self.__headers(), params=params)
         results = r.json()
-        all_results = list(map(self._base_next_up_view, results['data'])) if next_up else list(map(self._base_watchlist_status_view, results['data']))
 
+        # Extract mal_ids and create a list of dictionaries with 'mal_id' keys
+        mal_ids = [{'mal_id': item['node']['id']} for item in results['data']]
+        get_meta.collect_meta(mal_ids)
+
+        all_results = list(map(self._base_next_up_view, results['data'])) if next_up else list(map(self._base_watchlist_status_view, results['data']))
         all_results += self.handle_paging(results['paging'].get('next'), base_plugin_url, page)
         return all_results
 
@@ -169,13 +175,23 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         if eps_watched == eps and eps != 0:
             info['playcount'] = 1
 
+        show_meta = database.get_show_meta(mal_id)
+        kodi_meta = pickle.loads(show_meta.get('art')) if show_meta else {}
         base = {
             "name": f"{title} - {eps_watched}/{eps}",
             "url": f'watchlist_to_ep/{mal_id}/{eps_watched}',
             "image": image,
-            "info": info,
-            'fanart': image
+            "poster": image,
+            'fanart': kodi_meta['fanart'] if kodi_meta.get('fanart') else image,
+            "info": info
         }
+
+        if kodi_meta.get('thumb'):
+            base['landscape'] = random.choice(kodi_meta['thumb'])
+        if kodi_meta.get('clearart'):
+            base['clearart'] = random.choice(kodi_meta['clearart'])
+        if kodi_meta.get('clearlogo'):
+            base['clearlogo'] = random.choice(kodi_meta['clearlogo'])
 
         if res['node']['media_type'] == 'movie' and eps == 1:
             base['url'] = f'play_movie/{mal_id}/'
@@ -231,6 +247,18 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             "fanart": image,
             "poster": poster
         }
+
+        show_meta = database.get_show_meta(mal_id)
+        if show_meta:
+            art = pickle.loads(show_meta['art'])
+            if art.get('fanart'):
+                base['fanart'] = art['fanart']
+            if art.get('thumb'):
+                base['landscape'] = random.choice(art['thumb'])
+            if art.get('clearart'):
+                base['clearart'] = random.choice(art['clearart'])
+            if art.get('clearlogo'):
+                base['clearlogo'] = random.choice(art['clearlogo'])
 
         if res['node']['media_type'] == 'movie' and eps_total == 1:
             base['url'] = f'play_movie/{mal_id}/'

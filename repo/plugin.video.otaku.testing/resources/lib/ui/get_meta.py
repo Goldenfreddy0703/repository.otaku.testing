@@ -7,6 +7,8 @@ from resources.lib.indexers import tmdb, fanart
 def collect_meta(anime_list):
     threads = []
     for anime in anime_list:
+        if 'media' in anime.keys():
+            anime = anime.get('media')
         mal_id = anime.get('idMal') or anime.get('mal_id')
         if not mal_id:
             continue

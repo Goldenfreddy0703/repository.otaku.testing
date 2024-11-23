@@ -98,19 +98,23 @@ class WatchlistPlayer(player):
             if watched_percentage > self.update_percent:
                 self._watchlist_update(self.mal_id, self.episode)
                 self.updated = True
-                if playList.size() == 0 or playList.getposition() == (playList.size() - 1):
-                    # Retrieve the status and total episode count from kodi_meta
-                    show = database.get_show(self.mal_id)
-                    if show:
-                        kodi_meta = pickle.loads(show['kodi_meta'])
-                        status = kodi_meta.get('status')
-                        episodes = kodi_meta.get('episodes')
-                        if self.episode == episodes:
-                            if status in ['Finished Airing', 'FINISHED']:
-                                WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
-                                WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
-                                xbmc.sleep(3000)
-                                service.sync_watchlist(True)
+                
+                # Retrieve the status and total episode count from kodi_meta
+                show = database.get_show(self.mal_id)
+                if show:
+                    kodi_meta = pickle.loads(show['kodi_meta'])
+                    status = kodi_meta.get('status')
+                    episodes = kodi_meta.get('episodes')
+                    if self.episode == episodes:
+                        if status in ['Finished Airing', 'FINISHED']:
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
+                            xbmc.sleep(3000)
+                            service.sync_watchlist(True)
+                    else:
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'watching')
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'current')
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'CURRENT')
                 break
             xbmc.sleep(5000)
 
