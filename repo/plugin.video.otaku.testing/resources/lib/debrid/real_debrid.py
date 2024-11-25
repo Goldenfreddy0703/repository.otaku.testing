@@ -117,24 +117,6 @@ class RealDebrid:
             control.setSetting('rd.username', user_info['username'])
             control.setSetting('rd.auth.status', user_info['type'])
 
-    def checkHash(self, hashlist):
-        self.cache_check_results = {}
-        hashlist = [hashlist[x: x + 100] for x in range(0, len(hashlist), 100)]
-        threads = []
-        for arg in hashlist:
-            t = threading.Thread(target=self._check_hash_thread, args=[arg])
-            t.start()
-            threads.append(t)
-        for i in threads:
-            i.join()
-        return self.cache_check_results
-
-    def _check_hash_thread(self, hashes):
-        hashString = '/'.join(hashes)
-        response = requests.get(f'{self.BaseUrl}/torrents/instantAvailability/{hashString}', headers=self.__headers())
-        response = response.json()
-        self.cache_check_results.update(response)
-
     def addMagnet(self, magnet):
         postData = {
             'magnet': magnet
@@ -198,7 +180,7 @@ class RealDebrid:
             self.deleteTorrent(torrent['id'])
             return stream_link
 
-    def resolve_uncached_source(self, source, runinbackground):
+    def resolve_uncached_source(self, source, runinbackground, silent):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
         if not runinbackground:
             control.progressDialog.create(heading, "Caching Progress")
@@ -237,7 +219,8 @@ class RealDebrid:
                     hash_ = torrent['links'][f_index]
                     stream_link = self.resolve_hoster(hash_)
                     break
-            control.ok_dialog(heading, f'Finished Caching Source\nThe source has been added to your cloud')
+            if not silent:
+                control.ok_dialog(heading, f'Finished Caching Source\nThe source has been added to your cloud')
         else:
             self.deleteTorrent(torrent['id'])
         return stream_link

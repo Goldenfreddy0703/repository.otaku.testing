@@ -78,15 +78,9 @@ class TorrentCacheCheck:
         hash_list = [i['hash'] for i in torrent_list]
         if len(hash_list) == 0:
             return
-        api = real_debrid.RealDebrid()
-        realDebridCache = api.checkHash(hash_list)
         for torrent in torrent_list:
-            hash_info = realDebridCache.get(torrent['hash'], {})
             torrent['debrid_provider'] = 'real_debrid'
-            if 'rd' in hash_info and len(hash_info['rd']) >= 1:
-                self.realdebridCached.append(torrent)
-            else:
-                self.realdebridUnCached.append(torrent)
+            self.realdebridUnCached.append(torrent)
 
     def premiumize_worker(self, torrent_list):
         hash_list = [i['hash'] for i in torrent_list]

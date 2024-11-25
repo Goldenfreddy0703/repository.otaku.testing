@@ -24,7 +24,11 @@ def get(function, duration, *args, **kwargs):
         key += kwargs.pop('key')
     cache_result = cache_get(key)
     if cache_result and is_cache_valid(cache_result['date'], duration):
-        return_data = ast.literal_eval(cache_result['value'])
+        try:
+            return_data = ast.literal_eval(cache_result['value'])
+        except Exception as e:
+            control.log(e, 'warning')
+            return_data = None
         return return_data
 
     fresh_result = repr(function(*args, **kwargs))
