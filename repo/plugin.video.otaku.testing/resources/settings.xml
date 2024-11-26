@@ -510,7 +510,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="jz.dub.api" type="string" label="30321" help="" parent="jz.dub">
+                <setting id="jz.dub.api" type="integer" label="30321" help="" parent="jz.dub">
                     <level>3</level>
                     <default>1</default>
                     <constraints>
@@ -519,7 +519,7 @@
                             <option label="Animeschedule">1</option>
                         </options>
                     </constraints>
-                    <control type="spinner" format="string"/>
+                    <control type="spinner" format="integer"/>
                     <dependencies>
                         <dependency type="visible" setting="jz.dub">true</dependency>
                     </dependencies>
@@ -726,6 +726,14 @@
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="uncached.runinforground" type="boolean" label="30617" help="" parent="show.uncached">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="show.uncached">true</dependency>
+                    </dependencies>
                 </setting>
             </group>
 
@@ -1428,14 +1436,6 @@
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
-                    <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
-                    </dependencies>
-                </setting>
-                <setting id="uncached.runinforground" type="boolean" label="30617" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="rd.enabled">true</dependency>
                     </dependencies>

@@ -192,8 +192,11 @@ class AniListWLF(WatchlistFlavorBase):
     def base_watchlist_status_view(self, res, mal_dub=None):
         progress = res['progress']
         res = res['media']
+        anilist_id = res['id']
 
         mal_id = res.get('idMal')
+        if not mal_id:
+            control.log(f"AniList ID not found for {anilist_id}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         title = res['title'].get(self._title_lang) or res['title'].get('userPreferred')

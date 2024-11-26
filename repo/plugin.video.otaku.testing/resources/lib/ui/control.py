@@ -70,11 +70,6 @@ def log(msg, level="info"):
     xbmc.log(f'{ADDON_NAME.upper()} ({HANDLE}): {msg}', level)
 
 
-def try_release_lock(lock):
-    if lock.locked():
-        lock.release()
-
-
 def real_debrid_enabled():
     return True if getSetting('rd.auth') != '' and getBool('rd.enabled') else False
 
@@ -117,9 +112,12 @@ def watchlist_to_update():
 def copy2clip(txt):
     platform = sys.platform
     if platform == 'win32':
-        command = 'echo %s|clip' % txt
-        os.system(command)
-        return True
+        try:
+            os.system('echo %s|clip' % txt)
+            return True
+        except AttributeError:
+            pass
+    return False
 
 
 def colorstr(text, color=None):

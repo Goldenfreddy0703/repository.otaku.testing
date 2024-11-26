@@ -810,8 +810,8 @@ def CLEAR_SELECTED_FANART(payload, params):
 
 @Route('rebuild_database')
 def REBUILD_DATABASE(payload, params):
-    from resources.lib.ui.database_sync import MalSyncDatabase
-    MalSyncDatabase().re_build_database()
+    from resources.lib.ui.database_sync import SyncDatabase
+    SyncDatabase().re_build_database()
     if params.get('setting'):
         control.exit_code()
 

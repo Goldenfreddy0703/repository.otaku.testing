@@ -132,6 +132,8 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
         show_ids = res['show']['ids']
 
         mal_id = show_ids.get('mal')
+        if not mal_id:
+            control.log(f"Simkl ID not found for {show_ids}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         show = database.get_show(mal_id)

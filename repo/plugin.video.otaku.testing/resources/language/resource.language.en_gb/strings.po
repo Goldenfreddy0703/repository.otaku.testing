@@ -418,7 +418,7 @@ msgid "Theme"
 msgstr ""
 
 msgctxt "#30320"
-msgid "Show Dub Release Dates"
+msgid "Show Dub Upcoming Dates"
 msgstr ""
 
 msgctxt "#30321"

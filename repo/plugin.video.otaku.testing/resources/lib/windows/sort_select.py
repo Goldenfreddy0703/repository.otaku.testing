@@ -17,7 +17,7 @@ SORT_OPTIONS = {
 }
 
 audio = [1, 2, 0, 'none']
-source_type = [['cloud'], ['torrent'], ['direct', 'embed'], ['local'], ['none']]
+source_type = [['local'], ['cloud'], ['torrent', 'torrent (uncached)'], ['direct', 'embed'], ['none']]
 
 default_sort_options = {
         'sortmethod.1': 2,

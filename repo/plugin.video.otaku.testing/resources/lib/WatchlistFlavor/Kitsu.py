@@ -152,7 +152,10 @@ class KitsuWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_watchlist_view(self, res, eres, mal_dub=None):
         kitsu_id = eres['id']
+        
         mal_id = self.mapping_mal(kitsu_id)
+        if not mal_id:
+            control.log(f"Kitsu ID not found for {kitsu_id}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         info = {

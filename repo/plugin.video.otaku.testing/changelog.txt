@@ -1,8 +1,15 @@
+Changelog v5.1.23 (2024-11-25):
+- Added Warning Logs to Watchlist
+- Fixed Bugs in Database
+- Fixed Type in Sort Order
+- Fixed Dub Api for Upcoming Dates
+- Moved Uncached Settings in Scrapping
+
 Changelog v5.1.22 (2024-11-25):
 - Fixed real-debrid
 
 Changelog v5.1.21 (2024-11-23):
-- Added Famart to all Watchlist
+- Added Fanart to all Watchlist
 - Shows will be added to Watchlist Current if Watched
 - Fixed some small code in get_meta
 

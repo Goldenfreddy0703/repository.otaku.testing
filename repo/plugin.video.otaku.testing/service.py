@@ -147,7 +147,7 @@ def version_check():
 if __name__ == "__main__":
     control.log('##################  RUNNING MAINTENANCE  ######################')
     version_check()
-    database_sync.MalSyncDatabase()
+    database_sync.SyncDatabase()
     refresh_apis()
     if control.getSetting('update.time.30') == '' or control.getSetting('update.time.7') == '':
         update_mappings_db()
