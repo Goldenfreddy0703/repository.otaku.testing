@@ -39,6 +39,7 @@ downloads_json = os.path.join(dataPath, 'downloads.json')
 completed_json = os.path.join(dataPath, 'completed.json')
 genre_json = os.path.join(dataPath, 'genres.json')
 
+IMAGES_PATH = os.path.join(ADDON_PATH, 'resources', 'images')
 OTAKU_LOGO_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku.png')
 OTAKU_LOGO2_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku-small.png')
 OTAKU_LOGO3_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku-large.png')
@@ -46,7 +47,10 @@ OTAKU_ICONS_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'icons', ADDO
 OTAKU_GENRE_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'genres')
 
 dialogWindow = xbmcgui.WindowDialog
+menuItem = xbmcgui.ListItem
 execute = xbmc.executebuiltin
+get_region = xbmc.getRegion
+trakt_gmt_format = '%Y-%m-%dT%H:%M:%S.000Z'
 progressDialog = xbmcgui.DialogProgress()
 playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
 

@@ -240,6 +240,10 @@ msgctxt "#30956"
 msgid "Search TV Shows"
 msgstr ""
 
+msgctxt "#30957"
+msgid "Airing Anime Calendar"
+msgstr ""
+
 ######TOOLS & SEARCH DIRECTORY#######
 msgctxt "#30010"
 msgid "View Changelog"

@@ -73,6 +73,19 @@ def WATCH_ORDER(payload, params):
     control.draw_items(BROWSER.get_watch_order(mal_id), 'tvshows')
 
 
+@Route('airing_calendar')
+def AIRING_CALENDAR(payload, params):
+    airing = BROWSER.get_airing_calendar()
+    from resources.lib.windows.anichart import Anichart
+
+    anime = Anichart(*('anichart.xml', control.ADDON_PATH), get_anime=OtakuBrowser.get_anime_init, anime_items=airing).doModal()
+    if not anime:
+        return
+
+    anime, content_type = anime
+    control.draw_items(anime, content_type)
+
+
 @Route('airing_last_season')
 def AIRING_LAST_SEASON(payload, params):
     page = int(params.get('page', 1))
@@ -547,6 +560,7 @@ def FANART(payload, params):
 @Route('')
 def LIST_MENU(payload, params):
     MENU_ITEMS = [
+        (control.lang(30957), "airing_calendar", 'airing_anime_calendar.png'),
         (control.lang(30901), "airing_last_season", 'airing_anime.png'),
         (control.lang(30902), "airing_this_season", 'airing_anime.png'),
         (control.lang(30903), "airing_next_season", 'airing_anime.png'),

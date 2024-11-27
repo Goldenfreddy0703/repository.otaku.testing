@@ -87,6 +87,39 @@ class AniListBrowser:
         return season, year
 
 
+    def get_airing_calendar(self, page=1, format_in=''):
+        import datetime
+        import time
+        import itertools
+
+        today = datetime.date.today()
+        today_ts = int(time.mktime(today.timetuple()))
+        weekStart = today_ts - 86400
+        weekEnd = today_ts + (86400 * 6)
+        variables = {
+            'weekStart': weekStart,
+            'weekEnd': weekEnd,
+            'page': page
+        }
+
+        list_ = []
+
+        for i in range(0, 4):
+            popular = self.get_airing_calendar_res(variables, page)
+            list_.append(popular)
+
+            if not popular['pageInfo']['hasNextPage']:
+                break
+
+            page += 1
+            variables['page'] = page
+
+        results = list(map(self.process_airing_view, list_))
+        results = list(itertools.chain(*results))
+        airing = database.get(lambda x, y: results, 12, page, self.format_in_type)
+        return airing
+
+
     def get_airing_last_season(self, page):
         season, year = self.get_season_year('last')
         variables = {
@@ -1685,6 +1718,61 @@ class AniListBrowser:
         json_res = results['data']['Media']
         return json_res
 
+    def get_airing_calendar_res(self, variables, page=1):
+        query = '''
+        query (
+                $weekStart: Int,
+                $weekEnd: Int,
+                $page: Int,
+        ){
+            Page(page: $page) {
+                pageInfo {
+                        hasNextPage
+                        total
+                }
+
+                airingSchedules(
+                        airingAt_greater: $weekStart
+                        airingAt_lesser: $weekEnd
+                ) {
+                    id
+                    episode
+                    airingAt
+                    media {
+                        id
+                        idMal
+                        title {
+                                romaji
+                                userPreferred
+                                english
+                        }
+                        description
+                        countryOfOrigin
+                        genres
+                        averageScore
+                        isAdult
+                        rankings {
+                                rank
+                                type
+                                season
+                        }
+                        coverImage {
+                                extraLarge
+                        }
+                        bannerImage
+                    }
+                }
+            }
+        }
+        '''
+
+        r = requests.post(self._URL, json={'query': query, 'variables': variables})
+        results = r.json()
+        if "errors" in results.keys():
+            return
+        json_res = results['data']['Page']
+        return json_res
+
     def get_anilist_res_with_mal_id(self, variables):
         query = '''
         query($idMal: Int, $type: MediaType){Media(idMal: $idMal, type: $type) {
@@ -1785,6 +1873,14 @@ class AniListBrowser:
         get_meta.collect_meta(res)
         mapfunc = partial(self.base_anilist_view, completed=self.open_completed())
         all_results = list(filter(lambda x: True if x else False, map(mapfunc, res)))
+        return all_results
+
+    def process_airing_view(self, json_res):
+        import time
+        filter_json = [x for x in json_res['airingSchedules'] if x['media']['isAdult'] is False]
+        ts = int(time.time())
+        mapfunc = partial(self.base_airing_view, ts=ts)
+        all_results = list(map(mapfunc, filter_json))
         return all_results
 
     def process_res(self, res):
@@ -1893,6 +1989,39 @@ class AniListBrowser:
             base['info']['mediatype'] = 'movie'
             return utils.parse_view(base, False, True, dub)
         return utils.parse_view(base, True, False, dub)
+
+    def base_airing_view(self, res, ts):
+        import datetime
+        airingAt = datetime.datetime.fromtimestamp(res['airingAt'])
+        airingAt_day = airingAt.strftime('%A')
+        airingAt_time = airingAt.strftime('%I:%M %p')
+        airing_status = 'airing' if res['airingAt'] > ts else 'aired'
+        rank = None
+        rankings = res['media']['rankings']
+        if rankings and rankings[-1]['season']:
+            rank = rankings[-1]['rank']
+        genres = res['media']['genres']
+        if genres:
+            genres = ' | '.join(genres[:3])
+        else:
+            genres = 'Genres Not Found'
+        title = res['media']['title'][self._TITLE_LANG]
+        if not title:
+            title = res['media']['title']['userPreferred']
+
+        base = {
+            'release_title': title,
+            'poster': res['media']['coverImage']['extraLarge'],
+            'ep_title': '{} {} {}'.format(res['episode'], airing_status, airingAt_day),
+            'ep_airingAt': airingAt_time,
+            'averageScore': res['media']['averageScore'],
+            'rank': rank,
+            'plot': res['media']['description'].replace('<br><br>', '[CR]').replace('<br>', '').replace('<i>', '[I]').replace('</i>', '[/I]') if res['media']['description'] else res['media']['description'],
+            'genres': genres,
+            'id': res['media']['idMal']
+        }
+
+        return base
 
     def database_update_show(self, res):
         mal_id = res.get('idMal')

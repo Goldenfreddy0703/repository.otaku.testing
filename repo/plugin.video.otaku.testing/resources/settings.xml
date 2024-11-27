@@ -1912,6 +1912,11 @@
                     <control type="toggle"/>
                     <visible>false</visible>
                 </setting>
+                <setting id="airing_calendar" type="boolean" label="30957" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="airing_last_season" type="boolean" label="30901" help="">
                     <level>0</level>
                     <default>true</default>
