@@ -19,6 +19,7 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         self.setProperty('texture.averstr', os.path.join(control.IMAGES_PATH, 'anichart-icon-null.png'))
         self.setProperty('texture.aversad', os.path.join(control.IMAGES_PATH, 'anichart-icon-frown.png'))
         self.setProperty('texture.popular', os.path.join(control.IMAGES_PATH, 'anichart-icon-popular.png'))
+        self.setProperty('texture.simkl_rank', os.path.join(control.IMAGES_PATH, 'anichart-icon-simkl.png'))
         self.setProperty('otaku.logo', control.OTAKU_LOGO3_PATH)
         self.setProperty('otaku.fanart', control.OTAKU_FANART)
         self.setProperty('settings.color', 'deepskyblue')

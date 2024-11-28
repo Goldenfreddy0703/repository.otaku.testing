@@ -87,7 +87,7 @@ class AniListBrowser:
         return season, year
 
 
-    def get_airing_calendar(self, page=1, format_in=''):
+    def get_airing_calendar(self, page=1):
         import datetime
         import time
         import itertools
@@ -116,7 +116,7 @@ class AniListBrowser:
 
         results = list(map(self.process_airing_view, list_))
         results = list(itertools.chain(*results))
-        airing = database.get(lambda x, y: results, 12, page, self.format_in_type)
+        airing = database.get(lambda x: results, 24, page)
         return airing
 
 

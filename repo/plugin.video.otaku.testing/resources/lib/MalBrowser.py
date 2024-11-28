@@ -161,7 +161,7 @@ class MalBrowser:
                 season_start_date_last, season_end_date_last, year_start_date_last, year_end_date_last,
                 season_start_date_next, season_end_date_next, year_start_date_next, year_end_date_next)
 
-    def get_airing_calendar(self, page=1, format_in=''):
+    def get_airing_calendar(self, page=1):
         import time
 
         days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -1548,7 +1548,7 @@ class MalBrowser:
         airingAt_day = airingAt.strftime('%A')
         airingAt_time = airingAt.strftime('%I:%M %p')
         airing_status = 'airing' if airingAt.timestamp() > ts else 'aired'
-        rank = None
+        simkl_rank = None
         genres = [genre['name'] for genre in res['genres']]
         if genres:
             genres = ' | '.join(genres[:3])
@@ -1563,6 +1563,7 @@ class MalBrowser:
         if simkl_entry:
             episode = simkl_entry['episode']['episode']
             rating = simkl_entry['ratings']['simkl']['rating']
+            simkl_rank = simkl_entry['rank']
             airingAt = datetime.datetime.fromisoformat(simkl_entry['date'].replace('Z', '+00:00'))
             airingAt_day = airingAt.strftime('%A')
             airingAt_time = airingAt.strftime('%I:%M %p')
@@ -1578,8 +1579,8 @@ class MalBrowser:
             'poster': res['images']['jpg']['image_url'],
             'ep_title': '{} {} {}'.format(episode, airing_status, airingAt_day),
             'ep_airingAt': airingAt_time,
-            'averageScore': score,
-            'rank': rank,
+            'rating': score,
+            'simkl_rank': simkl_rank,
             'plot': res['synopsis'].replace('<br><br>', '[CR]').replace('<br>', '').replace('<i>', '[I]').replace('</i>', '[/I]') if res['synopsis'] else res['synopsis'],
             'genres': genres,
             'id': res['mal_id']

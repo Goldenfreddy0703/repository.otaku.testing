@@ -374,10 +374,8 @@ def draw_items(video_data, content_type=None, draw_cm=None):
             for _ in range(num_watched):
                 if getInt('smart.scroll.direction') == 0:
                     xbmc.executebuiltin('Action(Down)')
-                    print('down')
                 else:
                     xbmc.executebuiltin('Action(Right)')
-                    print('right')
 
 
 def bulk_player_list(video_data, draw_cm=None, bulk_add=True):
