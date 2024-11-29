@@ -82,11 +82,11 @@ def update_dub_json():
 def getChangeLog():
     changelog_path = os.path.join(control.ADDON_PATH, 'changelog.txt')
     news_path = os.path.join(control.ADDON_PATH, 'news.txt')
-    
-    with open(changelog_path) as changelog_file, open(news_path) as news_file:
+
+    with open(changelog_path, encoding='utf-8') as changelog_file, open(news_path, encoding='utf-8') as news_file:
         changelog_text = changelog_file.read()
         news_text = news_file.read()
-    
+
     heading = '[B]%s -  v%s - ChangeLog & News[/B]' % (control.ADDON_NAME, control.ADDON_VERSION)
     from resources.lib.windows.textviewer import TextViewerXML
     windows = TextViewerXML('textviewer.xml', control.ADDON_PATH, heading=heading, changelog_text=changelog_text, news_text=news_text)
@@ -96,10 +96,10 @@ def getChangeLog():
 
 def getInstructions():
     instructions_path = os.path.join(control.ADDON_PATH, 'instructions.txt')
-    
-    with open(instructions_path) as instructions_file:
+
+    with open(instructions_path, encoding='utf-8') as instructions_file:
         instructions_text = instructions_file.read()
-    
+
     heading = '[B]%s -  v%s - Instructions[/B]' % (control.ADDON_NAME, control.ADDON_VERSION)
     from resources.lib.windows.textviewer import TextViewerXML
     windows = TextViewerXML('textviewer_1.xml', control.ADDON_PATH, heading=heading, instructions_text=instructions_text)
@@ -143,6 +143,7 @@ def version_check():
         toggle_reuselanguageinvoker(reuselang)
         control.setSetting('otaku.version', control.ADDON_VERSION)
         control.log(f"### {reuselang} Re-uselanguageinvoker")
+
 
 if __name__ == "__main__":
     control.log('##################  RUNNING MAINTENANCE  ######################')

@@ -1,3 +1,6 @@
+Changelog v5.1.26 (2024-11-28):
+- Fix Small Bugs
+
 Changelog v5.1.25 (2024-11-28):
 - Improved Airing Calendar for Mal
 - Fix Small Bug with smartscroll

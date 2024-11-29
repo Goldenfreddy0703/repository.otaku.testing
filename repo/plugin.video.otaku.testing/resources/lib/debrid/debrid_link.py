@@ -143,4 +143,4 @@ class DebridLink:
     @staticmethod
     def resolve_uncached_source(source, runinbackground):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
-        control.ok_dialog(heading, 'Cache Reolver Has not been added for Premiumize')
+        control.ok_dialog(heading, 'Cache Reolver Has not been added for Debrid-Link')
