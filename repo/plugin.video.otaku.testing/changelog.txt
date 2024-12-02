@@ -1,3 +1,10 @@
+Changelog v5.1.27 (2024-12-01):
+- Improved Loading Speed Browsers
+- Added Fanart to Some Items
+- Replaced Request with Client for Browsers
+- Fixed Genres for Mal
+- Fix Context Menu Addon Conflict
+
 Changelog v5.1.26 (2024-11-28):
 - Fix Small Bugs
 

@@ -1,15 +1,15 @@
 import time
-import requests
 import json
 import random
 import pickle
 import ast
 import re
 import os
+import xbmc
 
 from bs4 import BeautifulSoup
 from functools import partial
-from resources.lib.ui import database, control, utils, get_meta
+from resources.lib.ui import database, control, client, utils, get_meta
 from resources.lib.ui.divide_flavors import div_flavor
 
 
@@ -29,14 +29,12 @@ class MalBrowser:
 
         self.simkl_cache = None
 
-        if self.genre == ('',):
-            self.genre = ''
-
     def load_genres_from_json(self):
         if os.path.exists(control.genre_json):
             with open(control.genre_json, 'r') as f:
                 settings = json.load(f)
-                return tuple(settings.get('selected_genres_mal', []))
+                genres = settings.get('selected_genres_mal', [])
+                return (', '.join(genres))
         return ()
 
     @staticmethod
@@ -238,6 +236,7 @@ class MalBrowser:
 
     def get_relations(self, mal_id):
         relations = database.get(self.get_base_res, 24, f'{self._URL}/anime/{mal_id}/relations')
+        get_meta.collect_meta(relations['data'])
 
         relation_res = []
         count = 0
@@ -257,8 +256,11 @@ class MalBrowser:
 
     def get_watch_order(self, mal_id):
         url = 'https://chiaki.site/?/tools/watch_order/id/{}'.format(mal_id)
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        response = client.request(url)
+        if response:
+            soup = BeautifulSoup(response, 'html.parser')
+        else:
+            soup = None
 
         # Find the element with the desired information
         anime_info = soup.find('tr', {'data-id': str(mal_id)})
@@ -270,16 +272,28 @@ class MalBrowser:
 
             # Extract the MAL IDs from these tags
             mal_ids = [re.search(r'\d+', link['href']).group() for link in mal_links]
+            meta_ids = [{'mal_id': mal_id} for mal_id in mal_ids]
+            get_meta.collect_meta(meta_ids)
 
             watch_order_list = []
             count = 0
+            retry_limit = 3
+
             for idmal in mal_ids:
-                mal_item = database.get(self.get_base_res, 24, f'{self._URL}/anime/{idmal}')
-                if mal_item is not None:
-                    watch_order_list.append(mal_item['data'])
-                    if count % 3 == 0:
-                        time.sleep(2)
-                    count += 1
+                retries = 0
+                while retries < retry_limit:
+                    mal_item = database.get(self.get_base_res, 24, f'{self._URL}/anime/{idmal}')
+
+                    if mal_item is not None and 'data' in mal_item:
+                        watch_order_list.append(mal_item['data'])
+                        break
+                    else:
+                        retries += 1
+                        xbmc.sleep(int(100 * retries))  # Reduced linear backoff
+
+                count += 1
+                if count % 3 == 0:
+                    xbmc.sleep(1000)  # Ensure we do not exceed 3 requests per second
 
         mapfunc = partial(self.base_mal_view, completed=self.open_completed())
         all_results = list(map(mapfunc, watch_order_list))
@@ -1361,8 +1375,9 @@ class MalBrowser:
 
     @staticmethod
     def get_base_res(url, params=None):
-        r = requests.get(url, params=params)
-        return r.json()
+        r = client.request(url, params=params)
+        if r:
+            return json.loads(r)
 
 
     def get_airing_calendar_res(self, day, page=1):
@@ -1531,9 +1546,9 @@ class MalBrowser:
     def fetch_and_find_simkl_entry(self, mal_id):
         if self.simkl_cache is None:
             url = 'https://data.simkl.in/calendar/anime.json'
-            response = requests.get(url)
-            if response.status_code == 200:
-                self.simkl_cache = response.json()
+            response = client.request(url)
+            if response:
+                self.simkl_cache = json.loads(response)
             else:
                 return None
 

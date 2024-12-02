@@ -475,7 +475,7 @@ class SettingIDs:
         self.dubonly = getBool("divflavors.dubonly")
         self.showdub = getBool("divflavors.showdub")
         self.watchlist_data = getBool('interface.watchlist.data')
-        self.fanart_select = getBool('context.otaku.fanartselect')
+        self.fanart_select = getBool('context.otaku.testing.fanartselect')
 
         # Ints
 

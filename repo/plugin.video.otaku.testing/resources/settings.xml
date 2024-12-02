@@ -2210,52 +2210,52 @@
         <!-- Context Customization -->
         <category id="Context Customization" label="30500" help="" >
             <group id="1" label="30512" help="">
-                <setting id="context.otaku.findrecommendations" type="boolean" label="30501" help="">
+                <setting id="context.otaku.testing.findrecommendations" type="boolean" label="30501" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.findrelations" type="boolean" label="30502" help="">
+                <setting id="context.otaku.testing.findrelations" type="boolean" label="30502" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.getwatchorder" type="boolean" label="30606" help="">
+                <setting id="context.otaku.testing.getwatchorder" type="boolean" label="30606" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.rescrape" type="boolean" label="30503" help="">
+                <setting id="context.otaku.testing.rescrape" type="boolean" label="30503" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.sourceselect" type="boolean" label="30504" help="">
+                <setting id="context.otaku.testing.sourceselect" type="boolean" label="30504" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.logout" type="boolean" label="30505" help="">
+                <setting id="context.otaku.testing.logout" type="boolean" label="30505" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.deletefromdatabase" type="boolean" label="30506" help="">
+                <setting id="context.otaku.testing.deletefromdatabase" type="boolean" label="30506" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.watchlist" type="boolean" label="30507" help="">
+                <setting id="context.otaku.testing.watchlist" type="boolean" label="30507" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.markedaswatched" type="boolean" label="30508" help="">
+                <setting id="context.otaku.testing.markedaswatched" type="boolean" label="30508" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="context.otaku.fanartselect" type="boolean" label="30509" help="">
+                <setting id="context.otaku.testing.fanartselect" type="boolean" label="30509" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
