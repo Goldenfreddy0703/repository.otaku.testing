@@ -436,13 +436,13 @@ def PLAY(payload, params):
     _mock_args = {"mal_id": mal_id, "episode": episode, 'play': True, 'resume_time': resume_time, 'context': rescrape or source_select}
     if control.getSetting('general.playstyle.episode') == '1' or source_select or rescrape:
         from resources.lib.windows.source_select import SourceSelect
-        if control.getSetting('general.dialog') == '4':
+        if control.getSetting('general.dialog') == '5':
             SourceSelect(*('source_select_az.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
         else:
             SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
     else:
         from resources.lib.windows.resolver import Resolver
-        if control.getSetting('general.dialog') == '4':
+        if control.getSetting('general.dialog') == '5':
             Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
         else:
             Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
@@ -468,13 +468,13 @@ def PLAY_MOVIE(payload, params):
     control.playList.clear()
     if control.getSetting('general.playstyle.movie') == '1' or source_select or rescrape:
         from resources.lib.windows.source_select import SourceSelect
-        if control.getSetting('general.dialog') == '4':
+        if control.getSetting('general.dialog') == '5':
             SourceSelect(*('source_select_az.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
         else:
             SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
     else:
         from resources.lib.windows.resolver import Resolver
-        if control.getSetting('general.dialog') == '4':
+        if control.getSetting('general.dialog') == '5':
             Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
         else:
             Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)

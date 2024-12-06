@@ -9,7 +9,7 @@ from resources.lib.windows import sort_select
 
 
 def getSourcesHelper(actionargs):
-    if control.getSetting('general.dialog') == '4':
+    if control.getSetting('general.dialog') == '5':
         sources_window = Sources('get_sources_az.xml', control.ADDON_PATH, actionargs=actionargs)
     else:
         sources_window = Sources('get_sources.xml', control.ADDON_PATH, actionargs=actionargs)

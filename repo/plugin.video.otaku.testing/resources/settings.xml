@@ -559,7 +559,8 @@
 							<option label="Arctic Horizon 2">1</option>
 							<option label="AuraMod">2</option>
 							<option label="Arctic Fuse">3</option>
-							<option label="Arctic Zephyr - Reloaded">4</option>
+                            <option label="Arctic Fuse 2">4</option>
+							<option label="Arctic Zephyr - Reloaded">5</option>
 						</options>
 					</constraints>
 					<control type="spinner" format="string"/>

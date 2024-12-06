@@ -62,80 +62,7 @@ class WatchlistPlayer(player):
     # def onPlayBackStarted(self):
     #     pass
 
-    def onPlayBackStarted(self):
-        if self._build_playlist and playList.size() == 1:
-            self._build_playlist(self.mal_id, self.episode)
-
-        current_ = playList.getposition()
-        try:
-            self.media_type = playList[current_].getVideoInfoTag().getMediaType()
-        except:
-            self.media_type = ''
-
-    def onPlayBackStopped(self):
-        control.closeAllDialogs()
-        playList.clear()
-
-    def onPlayBackEnded(self):
-        control.closeAllDialogs()
-
-    def onPlayBackError(self):
-        control.closeAllDialogs()
-        playList.clear()
-        control.exit_(1)
-
-    def getWatchedPercent(self):
-        current_position = self.getTime()
-        media_length = self.getTotalTime()
-        return float(current_position) / float(media_length) * 100 if int(media_length) != 0 else 0
-
-    def onWatchedPercent(self):
-        if not self._watchlist_update:
-            return
-        while self.isPlaying() and not self.updated:
-            watched_percentage = self.getWatchedPercent()
-            self.current_time = self.getTime()
-            if watched_percentage > self.update_percent:
-                self._watchlist_update(self.mal_id, self.episode)
-                self.updated = True
-                
-                # Retrieve the status and total episode count from kodi_meta
-                show = database.get_show(self.mal_id)
-                if show:
-                    kodi_meta = pickle.loads(show['kodi_meta'])
-                    status = kodi_meta.get('status')
-                    episodes = kodi_meta.get('episodes')
-                    if self.episode == episodes:
-                        if status in ['Finished Airing', 'FINISHED']:
-                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
-                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
-                            xbmc.sleep(3000)
-                            service.sync_watchlist(True)
-                    else:
-                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'watching')
-                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'current')
-                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'CURRENT')
-                break
-            xbmc.sleep(5000)
-
-    def keepAlive(self):
-        for inx in range(30):
-            if self.isPlayingVideo() and self.getTotalTime() != 0:
-                break
-            xbmc.sleep(250)
-
-        if not self.isPlayingVideo():
-            return
-
-        self.vtag = self.getVideoInfoTag()
-        self.media_type = self.vtag.getMediaType()
-        control.setSetting('addon.last_watched', self.mal_id)
-
-        self.total_time = int(self.getTotalTime())
-        control.closeAllDialogs()
-        if self.resume_time:
-            player().seekTime(self.resume_time)
-
+    def set_audio_and_subtitle_preferences(self):
         if control.getSetting('general.kodi_language') == 'false':
             # Subtitle Preferences
             subtitle_lang = self.getAvailableSubtitleStreams()
@@ -206,6 +133,82 @@ class WatchlistPlayer(player):
                     else:
                         self.showSubtitles(True)
 
+    def onPlayBackStarted(self):
+        self.set_audio_and_subtitle_preferences()
+
+        if self._build_playlist and playList.size() == 1:
+            self._build_playlist(self.mal_id, self.episode)
+
+        current_ = playList.getposition()
+        try:
+            self.media_type = playList[current_].getVideoInfoTag().getMediaType()
+        except:
+            self.media_type = ''
+
+    def onPlayBackStopped(self):
+        control.closeAllDialogs()
+        playList.clear()
+
+    def onPlayBackEnded(self):
+        control.closeAllDialogs()
+
+    def onPlayBackError(self):
+        control.closeAllDialogs()
+        playList.clear()
+        control.exit_(1)
+
+    def getWatchedPercent(self):
+        current_position = self.getTime()
+        media_length = self.getTotalTime()
+        return float(current_position) / float(media_length) * 100 if int(media_length) != 0 else 0
+
+    def onWatchedPercent(self):
+        if not self._watchlist_update:
+            return
+        while self.isPlaying() and not self.updated:
+            watched_percentage = self.getWatchedPercent()
+            self.current_time = self.getTime()
+            if watched_percentage > self.update_percent:
+                self._watchlist_update(self.mal_id, self.episode)
+                self.updated = True
+
+                # Retrieve the status and total episode count from kodi_meta
+                show = database.get_show(self.mal_id)
+                if show:
+                    kodi_meta = pickle.loads(show['kodi_meta'])
+                    status = kodi_meta.get('status')
+                    episodes = kodi_meta.get('episodes')
+                    if self.episode == episodes:
+                        if status in ['Finished Airing', 'FINISHED']:
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'completed')
+                            WatchlistIntegration.set_watchlist_status(self.mal_id, 'COMPLETED')
+                            xbmc.sleep(3000)
+                            service.sync_watchlist(True)
+                    else:
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'watching')
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'current')
+                        WatchlistIntegration.set_watchlist_status(self.mal_id, 'CURRENT')
+                break
+            xbmc.sleep(5000)
+
+    def keepAlive(self):
+        for inx in range(30):
+            if self.isPlayingVideo() and self.getTotalTime() != 0:
+                break
+            xbmc.sleep(250)
+
+        if not self.isPlayingVideo():
+            return
+
+        self.vtag = self.getVideoInfoTag()
+        self.media_type = self.vtag.getMediaType()
+        control.setSetting('addon.last_watched', self.mal_id)
+
+        self.total_time = int(self.getTotalTime())
+        control.closeAllDialogs()
+        if self.resume_time:
+            player().seekTime(self.resume_time)
+
         if self.media_type == 'movie':
             return self.onWatchedPercent()
 
@@ -230,7 +233,6 @@ class WatchlistPlayer(player):
                     PlayerDialogs().display_dialog(self.skipoutro_aniskip, self.skipoutro_end)
                     break
                 xbmc.sleep(5000)
-
 
     def process_aniskip(self):
         if self.skipintro_aniskip_enable:
@@ -332,7 +334,8 @@ class PlayerDialogs(xbmc.Player):
                 '1': 'skip_outro_ah2.xml',
                 '2': 'skip_outro_auramod.xml',
                 '3': 'skip_outro_af.xml',
-                '4': 'skip_outro_az.xml'
+                '4': 'skip_outro_af2.xml',
+                '5': 'skip_outro_az.xml'
             }
 
             setting_value = control.getSetting('general.dialog')
@@ -347,7 +350,8 @@ class PlayerDialogs(xbmc.Player):
                 '1': 'playing_next_ah2.xml',
                 '2': 'playing_next_auramod.xml',
                 '3': 'playing_next_af.xml',
-                '4': 'playing_next_az.xml'
+                '4': 'playing_next_af2.xml',
+                '5': 'playing_next_az.xml'
             }
 
             setting_value = control.getSetting('general.dialog')
@@ -372,7 +376,8 @@ class PlayerDialogs(xbmc.Player):
             '1': 'skip_intro_ah2.xml',
             '2': 'skip_intro_auramod.xml',
             '3': 'skip_intro_af.xml',
-            '4': 'skip_intro_az.xml'
+            '4': 'skip_intro_af2.xml',
+            '5': 'skip_intro_az.xml'
         }
 
         setting_value = control.getSetting('general.dialog')

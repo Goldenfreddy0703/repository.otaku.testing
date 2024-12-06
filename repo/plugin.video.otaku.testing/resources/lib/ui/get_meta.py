@@ -9,11 +9,22 @@ def collect_meta(anime_list):
     for anime in anime_list:
         if 'media' in anime.keys():
             anime = anime.get('media')
+
+        if 'entry' in anime.keys():
+            anime = anime.get('entry')
+
         mal_id = anime.get('idMal') or anime.get('mal_id')
+        meta_ids = database.get_mappings(mal_id, 'mal_id')
+        anime_media_episodes = meta_ids.get('anime_media_episodes', '0')
+        total_episodes = int(anime_media_episodes.split('-')[-1].strip())
+
         if not mal_id:
             continue
+
         if not database.get_show_meta(mal_id):
-            if (anime.get('format') or anime.get('type')) in ['MOVIE', 'ONA', 'SPECIAL', 'Movie', 'Special'] and anime.get('episodes') == 1:
+            if (anime.get('format') or anime.get('type')) in ['MOVIE', 'ONA', 'OVA', 'SPECIAL', 'Movie', 'Special'] and anime.get('episodes') == 1:
+                mtype = 'movies'
+            if meta_ids.get('anime_media_type') in ['MOVIE', 'ONA', 'OVA', 'SPECIAL'] and total_episodes == 1:
                 mtype = 'movies'
             else:
                 mtype = 'tv'

@@ -1,3 +1,8 @@
+Changelog v5.1.28 (2024-12-06):
+- Added Af2 Theme Support
+- Added Database Stuff
+- Small Fixes
+
 Changelog v5.1.27 (2024-12-01):
 - Improved Loading Speed Browsers
 - Added Fanart to Some Items

@@ -63,7 +63,6 @@ class MalBrowser:
         return all_results
 
     def process_airing_view(self, json_res):
-        import time
         ts = int(time.time())
         mapfunc = partial(self.base_airing_view, ts=ts)
         all_results = list(map(mapfunc, json_res['data']))
@@ -160,8 +159,6 @@ class MalBrowser:
                 season_start_date_next, season_end_date_next, year_start_date_next, year_end_date_next)
 
     def get_airing_calendar(self, page=1):
-        import time
-
         days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         list_ = []
 
@@ -223,32 +220,63 @@ class MalBrowser:
 
 
     def get_recommendations(self, mal_id, page):
-        params = {
-            'page': page,
-            'limit': self.perpage,
-            'sfw': self.adult
-        }
-        recommendations = database.get(self.get_base_res, 24, f'{self._URL}/anime/{mal_id}/recommendations', params)
-        mapfunc = partial(self.recommendation_relation_view, completed=self.open_completed())
-        all_results = list(map(mapfunc, recommendations['data']))
-        return all_results
+        recommendations = database.get(self.get_base_res, 24, f'{self._URL}/anime/{mal_id}/recommendations')
+        get_meta.collect_meta(recommendations['data'])
 
+        recommendation_res = []
+        count = 0
+        retry_limit = 3
+
+        for recommendation in recommendations['data']:
+            entry = recommendation.get('entry')
+            if entry and entry.get('mal_id'):
+                retries = 0
+                while retries < retry_limit:
+                    res_data = database.get(self.get_base_res, 24, f"{self._URL}/anime/{entry['mal_id']}")
+                    if res_data is not None and 'data' in res_data:
+                        res_data['data']['votes'] = recommendation.get('votes')
+                        recommendation_res.append(res_data['data'])
+                        break
+                    else:
+                        retries += 1
+                        xbmc.sleep(int(100 * retries))  # Reduced linear backoff
+
+                count += 1
+                if count % 3 == 0:
+                    xbmc.sleep(1000)  # Ensure we do not exceed 3 requests per second
+
+        mapfunc = partial(self.base_mal_view, completed=self.open_completed())
+        all_results = list(map(mapfunc, recommendation_res))
+        return all_results
+    
 
     def get_relations(self, mal_id):
         relations = database.get(self.get_base_res, 24, f'{self._URL}/anime/{mal_id}/relations')
-        get_meta.collect_meta(relations['data'])
+        meta_ids = [{'mal_id': entry['mal_id']} for relation in relations['data'] for entry in relation['entry']]
+        get_meta.collect_meta(meta_ids)
 
         relation_res = []
         count = 0
+        retry_limit = 3
+
         for relation in relations['data']:
             for entry in relation['entry']:
                 if entry['type'] == 'anime':
-                    res_data = database.get(self.get_base_res, 24, f"{self._URL}/anime/{mal_id}")['data']
-                    res_data['relation'] = relation['relation']
-                    relation_res.append(res_data)
-                    if count % 3 == 0:
-                        time.sleep(2)
+                    retries = 0
+                    while retries < retry_limit:
+                        res_data = database.get(self.get_base_res, 24, f"{self._URL}/anime/{entry['mal_id']}")
+                        if res_data is not None and 'data' in res_data:
+                            res_data['data']['relation'] = relation['relation']
+                            relation_res.append(res_data['data'])
+                            break
+                        else:
+                            retries += 1
+                            xbmc.sleep(int(100 * retries))  # Reduced linear backoff
+
                     count += 1
+                    if count % 3 == 0:
+                        xbmc.sleep(1000)  # Ensure we do not exceed 3 requests per second
+
         mapfunc = partial(self.base_mal_view, completed=self.open_completed())
         all_results = list(map(mapfunc, relation_res))
         return all_results
@@ -1380,6 +1408,7 @@ class MalBrowser:
             return json.loads(r)
 
 
+    @staticmethod
     def get_airing_calendar_res(self, day, page=1):
         url = f'{self._URL}/schedules?kids=false&sfw=false&limit=25&page={page}&filter={day}'
         results = self.get_base_res(url)
@@ -1388,42 +1417,52 @@ class MalBrowser:
         return results
 
 
-    @div_flavor
-    def recommendation_relation_view(self, res, completed=None, mal_dub=None):
-        if res.get('entry'):
-            res = res['entry']
-        if not completed:
-            completed = {}
+    # @div_flavor
+    # def recommendation_relation_view(self, res, completed=None, mal_dub=None):
+    #     if res.get('entry'):
+    #         res = res['entry']
+    #     if not completed:
+    #         completed = {}
 
-        mal_id = res['mal_id']
-        title = res['title']
-        if res.get('relation'):
-            title += ' [I]%s[/I]' % control.colorstr(res['relation'], 'limegreen')
+    #     mal_id = res['mal_id']
+    #     meta_ids = database.get_mappings(mal_id, 'mal_id')
 
-        info = {
-            'UniqueIDs': {'mal_id': str(mal_id)},
-            'title': title,
-            'mediatype': 'tvshow'
-        }
+    #     title = res['title']
+    #     if res.get('relation'):
+    #         title += ' [I]%s[/I]' % control.colorstr(res['relation'], 'limegreen')
 
-        if completed.get(str(mal_id)):
-            info['playcount'] = 1
+    #     info = {
+    #         'UniqueIDs': {'mal_id': str(mal_id)},
+    #         'title': title,
+    #         'mediatype': 'tvshow'
+    #     }
 
-        dub = True if mal_dub and mal_dub.get(str(res.get('idMal'))) else False
+    #     if completed.get(str(mal_id)):
+    #         info['playcount'] = 1
 
-        image = res['images']['webp']['large_image_url'] if res.get('images') else None
+    #     dub = True if mal_dub and mal_dub.get(str(res.get('idMal'))) else False
 
-        base = {
-            "name": title,
-            "url": f'animes/{mal_id}/',
-            "image": image,
-            "poster": image,
-            'fanart': image,
-            "banner": image,
-            "info": info
-        }
+    #     image = res['images']['webp']['large_image_url'] if res.get('images') else None
 
-        return utils.parse_view(base, True, False, dub)
+    #     base = {
+    #         "name": title,
+    #         "url": f'animes/{mal_id}/',
+    #         "image": image,
+    #         "poster": image,
+    #         'fanart': image,
+    #         "banner": image,
+    #         "info": info
+    #     }
+
+    #     anime_media_episodes = meta_ids.get('anime_media_episodes', '0')
+    #     total_episodes = int(anime_media_episodes.split('-')[-1].strip())
+
+    #     if meta_ids.get('anime_media_type') in ['MOVIE', 'ONA', 'OVA', 'SPECIAL'] and total_episodes == 1:
+    #         base['url'] = f'play_movie/{mal_id}/'
+    #         base['info']['mediatype'] = 'movie'
+    #         return utils.parse_view(base, False, True, dub)
+    #     return utils.parse_view(base, True, False, dub)
+
 
     def get_genres(self):
         res = database.get(self.get_base_res, 24, f'{self._URL}/genres/anime')
@@ -1515,7 +1554,6 @@ class MalBrowser:
 
         if res.get('trailer'):
             info['trailer'] = f"plugin://plugin.video.youtube/play/?video_id={res['trailer']['youtube_id']}"
-
 
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
