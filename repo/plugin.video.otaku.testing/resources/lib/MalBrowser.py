@@ -1408,7 +1408,6 @@ class MalBrowser:
             return json.loads(r)
 
 
-    @staticmethod
     def get_airing_calendar_res(self, day, page=1):
         url = f'{self._URL}/schedules?kids=false&sfw=false&limit=25&page={page}&filter={day}'
         results = self.get_base_res(url)

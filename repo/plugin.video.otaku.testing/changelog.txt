@@ -1,3 +1,6 @@
+Changelog v5.1.29 (2024-12-07):
+- Fix Database Stuff Again
+
 Changelog v5.1.28 (2024-12-06):
 - Added Af2 Theme Support
 - Added Database Stuff
