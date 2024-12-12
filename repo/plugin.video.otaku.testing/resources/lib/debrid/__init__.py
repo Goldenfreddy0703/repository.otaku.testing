@@ -20,27 +20,27 @@ threads = []
 
 def torrentCacheCheck(torrent_list):
     enabled_debrids = control.enabled_debrid()
-    if enabled_debrids['Real-Debrid']:
+    if enabled_debrids['realdebrid']:
         t = threading.Thread(target=real_debrid_worker, args=(deepcopy(torrent_list),))
         t.start()
         threads.append(t)
 
-    if enabled_debrids['Debrid-Link']:
+    if enabled_debrids['debridlink']:
         t = threading.Thread(target=debrid_link_worker, args=(deepcopy(torrent_list),))
         threads.append(t)
         t.start()
 
-    if enabled_debrids['Premiumize']:
+    if enabled_debrids['premiumize']:
         t = threading.Thread(target=premiumize_worker, args=(deepcopy(torrent_list),))
         t.start()
         threads.append(t)
 
-    if enabled_debrids['Alldebrid']:
+    if enabled_debrids['alldebrid']:
         t = threading.Thread(target=all_debrid_worker, args=(deepcopy(torrent_list),))
         t.start()
         threads.append(t)
 
-    if enabled_debrids['TorBox']:
+    if enabled_debrids['torbox']:
         t = threading.Thread(target=torbox_worker, args=(deepcopy(torrent_list),))
         t.start()
         threads.append(t)
