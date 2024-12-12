@@ -5,7 +5,7 @@ from resources.lib.ui import source_utils, control
 
 class TorBox:
     def __init__(self):
-        self.token = control.getSetting('torbox.token')
+        self.token = control.getSetting('torbox.apikey')
         self.BaseUrl = "https://api.torbox.app/v1/api"
         self.headers = {'Authorization': f"Bearer {self.token}"}
 

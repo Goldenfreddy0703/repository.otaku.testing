@@ -43,7 +43,8 @@ class DebridLink:
             control.setSetting('dl.refresh', self.refresh)
             control.setInt('dl.expiry', int(time.time()) + int(response['expires_in']))
             self.headers['Authorization'] = 'Bearer {0}'.format(self.token)
-        return True
+            return True
+        return False
 
     def auth(self):
         url = '{0}/oauth/device/code'.format(self.api_url[:-3])
@@ -66,8 +67,11 @@ class DebridLink:
             auth_done = self.auth_loop()
 
         premium = self.get_info()
-        if not premium:
+        if premium:
+            control.setSetting('debridlink.auth.status', 'Premium')
+        else:
             control.ok_dialog(control.ADDON_NAME, control.lang(30024))
+            control.setSetting('debridlink.auth.status', 'Expired')
 
     def get_info(self):
         url = f"{self.api_url[:-3]}/account/infos"

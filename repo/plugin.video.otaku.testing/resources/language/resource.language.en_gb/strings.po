@@ -774,6 +774,10 @@ msgctxt "#30122"
 msgid "Debrid-Link Username"
 msgstr ""
 
+msgctxt "#30123"
+msgid "Debrid-Link Status"
+msgstr ""
+
 msgctxt "#30124"
 msgid "Authorize Debrid-Link..."
 msgstr ""
@@ -1410,7 +1414,7 @@ msgid "TorBox Status"
 msgstr ""
 
 msgctxt "#30622"
-msgid "Authorize TorBox..."
+msgid "TorBox API Key"
 msgstr ""
 
 msgctxt "#30623"

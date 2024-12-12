@@ -8,20 +8,20 @@ from resources.lib.ui import control, database_sync, database
 
 def refresh_apis():
     control.log("### Refreshing API's")
-    rd_token = control.getSetting('rd.auth')
-    dl_token = control.getSetting('dl.auth')
+    rd_token = control.getSetting('realdebrid.token')
+    dl_token = control.getSetting('debridlink.token')
 
     kitsu_token = control.getSetting('kitsu.token')
     mal_token = control.getSetting('mal.token')
 
     if rd_token != '':
-        rd_expiry = control.getInt('rd.expiry')
+        rd_expiry = control.getInt('realdebrid.expiry')
         if time.time() > (rd_expiry - 600):
             from resources.lib.debrid import real_debrid
             real_debrid.RealDebrid().refreshToken()
 
     if dl_token != '':
-        dl_expiry = control.getInt('dl.expiry')
+        dl_expiry = control.getInt('debridlink.expiry')
         if time.time() > (dl_expiry - 600):
             from resources.lib.debrid import debrid_link
             debrid_link.DebridLink().refreshToken()

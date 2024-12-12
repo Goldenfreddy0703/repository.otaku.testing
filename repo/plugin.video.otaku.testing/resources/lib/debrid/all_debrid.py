@@ -44,7 +44,7 @@ class AllDebrid:
         user_information = res.get('user')
         if user_information:
             control.setSetting('alldebrid.username', user_information['username'])
-            control.setSetting('alldebrid.auth.status', 'Premium' if user_information['isPremium'] else 'expired')
+            control.setSetting('alldebrid.auth.status', 'Premium' if user_information['isPremium'] else 'Expired')
             if auth_complete:
                 control.ok_dialog(control.ADDON_NAME, f'AllDebrid {control.lang(30023)}')
         else:

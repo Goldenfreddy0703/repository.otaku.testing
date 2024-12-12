@@ -1,3 +1,9 @@
+Changelog v5.1.31 (2024-12-12):
+- Fix Debrid Auth
+- Fix bug with Debrd Link
+- Added Api Setting for TorBox
+- Added Debrid-Link Status
+
 Changelog v5.1.30 (2024-12-12):
 - Removed addon content_type from menus
 - Added TorBox
