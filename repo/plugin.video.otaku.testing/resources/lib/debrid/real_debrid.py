@@ -116,32 +116,32 @@ class RealDebrid:
         postData = {
             'magnet': magnet
         }
-        response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers(), data=postData).json()
+        response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers, data=postData).json()
         return response
 
     def list_torrents(self):
-        response = requests.get(f'{self.BaseUrl}/torrents', headers=self.headers()).json()
+        response = requests.get(f'{self.BaseUrl}/torrents', headers=self.headers).json()
         return response
 
     def torrentInfo(self, torrent_id):
-        return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers()).json()
+        return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers).json()
 
     def torrentSelect(self, torrentid, fileid='all'):
         postData = {
             'files': fileid
         }
-        r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers(), data=postData)
+        r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers, data=postData)
         return r.ok
 
     def resolve_hoster(self, link):
         postData = {
             'link': link
         }
-        response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.headers(), data=postData).json()
+        response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.headers, data=postData).json()
         return response['download']
 
     def deleteTorrent(self, torrent_id):
-        requests.delete(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.headers(), timeout=10)
+        requests.delete(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.headers, timeout=10)
 
     def resolve_single_magnet(self, hash_, magnet, episode='', pack_select=False):
         pass
