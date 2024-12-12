@@ -8,33 +8,31 @@ from resources.lib.ui import source_utils, control
 class Premiumize:
     def __init__(self):
         self.client_id = "855400527"
-        self.headers = {
-            'Authorization': 'Bearer {}'.format(control.getSetting('premiumize.token'))
-        }
+        self.headers = {'Authorization': 'Bearer {}'.format(control.getSetting('premiumize.token'))}
+
 
     def auth(self):
         data = {'client_id': self.client_id, 'response_type': 'device_code'}
-        token = requests.post('https://www.premiumize.me/token', data=data)
-        token = token.json()
-        expiry = token['expires_in']
-        token_ttl = token['expires_in']
-        control.copy2clip(token['user_code'])
-        control.progressDialog.create(
-            control.ADDON_NAME,
-            control.lang(30020).format(control.colorstr(token['verification_uri'])) + '[CR]'
-            + control.lang(30021).format(control.colorstr(token['user_code'])) + '[CR]'
-            + control.lang(30022)
-        )
-        control.progressDialog.update(0)
+        r = requests.post('https://www.premiumize.me/token', data=data)
+        resp = r.json()
+        expiry = resp['expires_in']
+        token_ttl = resp['expires_in']
+        copied = control.copy2clip(resp['user_code'])
+        display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['verification_uri']))}[CR]"
+                          f"{control.lang(30021).format(control.colorstr(resp['user_code']))}")
+        if copied:
+            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+        control.progressDialog.create(f'{control.ADDON_NAME}: Premiumize', display_dialog)
+        control.progressDialog.update(-1)
 
         poll_again = True
         success = False
         while poll_again and not token_ttl <= 0 and not control.progressDialog.iscanceled():
-            poll_again, success = self.poll_token(token['device_code'])
+            poll_again, success = self.poll_token(resp['device_code'])
             progress_percent = 100 - int((float((expiry - token_ttl) / expiry) * 100))
             control.progressDialog.update(progress_percent)
-            xbmc.sleep(token['interval'])
-            token_ttl -= int(token['interval'])
+            xbmc.sleep(resp['interval'])
+            token_ttl -= int(resp['interval'])
         control.progressDialog.close()
 
         if success:

@@ -74,36 +74,21 @@ def log(msg, level="info"):
     xbmc.log(f'{ADDON_NAME.upper()} ({HANDLE}): {msg}', level)
 
 
-def real_debrid_enabled():
-    return True if getSetting('rd.auth') != '' and getBool('rd.enabled') else False
+def enabled_debrid():
+    debrids = ['realdebrid', 'debridlink', 'alldebrid', 'premiumize', 'torbox']
+    enabled_debrids = {}
+    for debrid in debrids:
+        enabled_debrids[debrid] = getSetting(f'{debrid}.token') != '' and getBool(f'{debrid}.enabled')
+    return enabled_debrids
 
 
-def debrid_link_enabled():
-    return True if getSetting('dl.auth') != '' and getBool('dl.enabled') else False
-
-
-def all_debrid_enabled():
-    return True if getSetting('alldebrid.apikey') != '' and getBool('alldebrid.enabled') else False
-
-
-def premiumize_enabled():
-    return True if getSetting('premiumize.token') != '' and getBool('premiumize.enabled') else False
-
-
-def myanimelist_enabled():
-    return True if getSetting('mal.token') != '' and getBool('mal.enabled') else False
-
-
-def kitsu_enabled():
-    return True if getSetting('kitsu.token') != '' and getBool('kitsu.enabled') else False
-
-
-def anilist_enabled():
-    return True if getSetting('anilist.token') != '' and getBool('anilist.enabled') else False
-
-
-def simkl_enabled():
-    return True if getSetting('simkl.token') != '' and getBool('simkl.enabled') else False
+def enabled_watchlists():
+    watchlists = ['mal', 'kitsu', 'anilist', 'simkl']
+    enabled_watchlists = []
+    for watchlist in watchlists:
+        if getSetting(f'{watchlist}.token') != '' and getBool(f'{watchlist}.enabled'):
+            enabled_watchlists.append(watchlist)
+    return enabled_watchlists
 
 
 def watchlist_to_update():
@@ -124,14 +109,12 @@ def copy2clip(txt):
     return False
 
 
-def colorstr(text, color=None):
-    if color == 'default' or color == '' or color is None:
-        color = 'deepskyblue'
+def colorstr(text, color='deepskyblue'):
     return f"[COLOR {color}]{text}[/COLOR]"
 
 
 def refresh():
-    return execute('Container.Refresh')
+    execute('Container.Refresh')
 
 
 def getSetting(key):
@@ -151,19 +134,19 @@ def getStr(key):
 
 
 def setSetting(settingid, value):
-    return ADDON.setSetting(settingid, value)
+    ADDON.setSetting(settingid, value)
 
 
 def setBool(settingid, value):
-    return ADDON.setSettingBool(settingid, value)
+    ADDON.setSettingBool(settingid, value)
 
 
 def setInt(settingid, value):
-    return ADDON.setSettingInt(settingid, value)
+    ADDON.setSettingInt(settingid, value)
 
 
 def setStr(settingid, value):
-    return ADDON.setSettingString(settingid, value)
+    ADDON.setSettingString(settingid, value)
 
 
 def lang(x):
@@ -193,6 +176,7 @@ def keyboard(title, text=''):
     keyboard_.doModal()
     if keyboard_.isConfirmed():
         return keyboard_.getText()
+    return keyboard_.getText() if keyboard_.isConfirmed() else ""
 
 
 def closeAllDialogs():
@@ -204,7 +188,7 @@ def ok_dialog(title, text):
 
 
 def textviewer_dialog(title, text):
-    return xbmcgui.Dialog().textviewer(title, text)
+    xbmcgui.Dialog().textviewer(title, text)
 
 
 def yesno_dialog(title, text, nolabel=None, yeslabel=None):
@@ -216,7 +200,7 @@ def yesnocustom_dialog(title, text, customlabel='', nolabel='', yeslabel='', aut
 
 
 def notify(title, text, icon=OTAKU_LOGO3_PATH, time=5000, sound=True):
-    return xbmcgui.Dialog().notification(title, text, icon, time, sound)
+    xbmcgui.Dialog().notification(title, text, icon, time, sound)
 
 
 def multiselect_dialog(title, dialog_list):
@@ -313,20 +297,18 @@ def xbmc_add_dir(name, url, art, info, draw_cm, bulk_add, isfolder, isplayable):
     return u, liz, isfolder if bulk_add else xbmcplugin.addDirectoryItem(HANDLE, u, liz, isfolder)
 
 
-def bulk_draw_items(video_data, draw_cm):
-    list_items = [xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], draw_cm, True, vid['isfolder'], vid['isplayable']) for vid in video_data if vid]
-    xbmcplugin.addDirectoryItems(HANDLE, list_items)
+def bulk_draw_items(video_data):
+    list_items = [xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], vid['cm'], True, vid['isfolder'], vid['isplayable']) for vid in video_data if vid]
+    return xbmcplugin.addDirectoryItems(HANDLE, list_items)
 
 
-def draw_items(video_data, content_type=None, draw_cm=None):
-    if not draw_cm:
-        draw_cm = []
+def draw_items(video_data, content_type=''):
     if len(video_data) > 99:
-        bulk_draw_items(video_data, draw_cm)
+        bulk_draw_items(video_data)
     else:
         for vid in video_data:
             if vid:
-                xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], draw_cm, False, vid['isfolder'], vid['isplayable'])
+                xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], vid['cm'], False, vid['isfolder'], vid['isplayable'])
     if content_type:
         xbmcplugin.setContent(HANDLE, content_type)
     if content_type == 'episodes':
@@ -343,7 +325,7 @@ def draw_items(video_data, content_type=None, draw_cm=None):
     if getBool('interface.viewtype'):
         if getBool('interface.viewidswitch'):
             # Use integer view types
-            if content_type == 'addons':
+            if content_type == '':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.addon.view.id')))
             elif content_type == 'tvshows':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.show.view.id')))
@@ -351,7 +333,7 @@ def draw_items(video_data, content_type=None, draw_cm=None):
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.episode.view.id')))
         else:
             # Use optional view types
-            if content_type == 'addons':
+            if content_type == '':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % get_view_type(getSetting('interface.addon.view')))
             elif content_type == 'tvshows':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % get_view_type(getSetting('interface.show.view')))
@@ -396,11 +378,6 @@ def get_view_type(viewtype):
         'List': 0
     }
     return viewTypes[viewtype]
-
-
-def title_lang(title_key):
-    title_lang_dict = ["romaji", 'english']
-    return title_lang_dict[title_key]
 
 
 def exit_(code):
@@ -448,16 +425,6 @@ def print(string, *args):
         string = f'{string} {i}'
     textviewer_dialog('print', f'{string}')
     del args, string
-
-
-# def print_(string, *args):
-#     for i in list(args):
-#         string = f'{string} {i}'
-#
-#     from resources.lib.windows.textviewer import TextViewerXML
-#     windows = TextViewerXML('textviewer.xml', ADDON_PATH, heading=ADDON_NAME, text=f'{string}')
-#     windows.run()
-#     del windows
 
 
 class SettingIDs:

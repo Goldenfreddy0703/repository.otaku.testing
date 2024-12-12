@@ -8,11 +8,12 @@ import os
 from bs4 import BeautifulSoup
 from functools import partial
 from resources.lib.ui import database, get_meta, utils, control, client
+from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.ui.divide_flavors import div_flavor
 
 
-class AniListBrowser:
-    _URL = "https://graphql.anilist.co"
+class AniListBrowser(BrowserBase):
+    _BASE_URL = "https://graphql.anilist.co"
 
     def __init__(self):
         self._TITLE_LANG = ["romaji", 'english'][control.getInt("titlelanguage")]
@@ -44,14 +45,6 @@ class AniListBrowser:
                 settings = json.load(f)
                 return tuple(settings.get('selected_tags', []))
         return ()
-
-    @staticmethod
-    def handle_paging(hasnextpage, base_url, page):
-        if not hasnextpage or not control.is_addon_visible() and control.getBool('widget.hide.nextpage'):
-            return []
-        next_page = page + 1
-        name = "Next Page (%d)" % next_page
-        return [utils.allocate_item(name, base_url % next_page, True, False, 'next.png', {'plot': name}, 'next.png')]
 
     def get_season_year(self, period='current'):
         import datetime
@@ -1402,7 +1395,7 @@ class AniListBrowser:
         }
         '''
 
-        result = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        result = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(result)
 
         if "errors" in results.keys():
@@ -1494,7 +1487,7 @@ class AniListBrowser:
         }
         '''
 
-        result = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        result = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(result)
 
         if "errors" in results.keys():
@@ -1582,7 +1575,7 @@ class AniListBrowser:
         }
         '''
 
-        result = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        result = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(result)
 
         if "errors" in results.keys():
@@ -1663,7 +1656,7 @@ class AniListBrowser:
         }
         '''
 
-        r = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(r)
 
         if "errors" in results.keys():
@@ -1738,7 +1731,7 @@ class AniListBrowser:
         }
         '''
 
-        r = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(r)
 
         if "errors" in results.keys():
@@ -1797,7 +1790,7 @@ class AniListBrowser:
         }
         '''
 
-        r = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(r)
 
         if "errors" in results.keys():
@@ -1867,7 +1860,7 @@ class AniListBrowser:
             }
         }
         '''
-        r = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(r)
 
         if "errors" in results.keys():
@@ -2124,7 +2117,7 @@ class AniListBrowser:
         }
         '''
 
-        r = client.request(self._URL, post={'query': query}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query}, jpost=True)
         results = json.loads(r)
         if not results:
             # genres_list = ['Action', 'Adventure', 'Comedy', 'Drama', 'Ecchi', 'Fantasy', 'Hentai', "Horror", 'Mahou Shoujo', 'Mecha', 'Music', 'Mystery', 'Psychological', 'Romance', 'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller']
@@ -2248,7 +2241,7 @@ class AniListBrowser:
         return self.process_genre_view(query, variables, f"genres/{genre_list}/{tag_list}?page=%d", page)
 
     def process_genre_view(self, query, variables, base_plugin_url, page):
-        r = client.request(self._URL, post={'query': query, 'variables': variables}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query, 'variables': variables}, jpost=True)
         results = json.loads(r)
         anime_res = results['data']['Page']['ANIME']
         hasNextPage = results['data']['Page']['pageInfo']['hasNextPage']
@@ -2269,7 +2262,7 @@ class AniListBrowser:
         }
         '''
 
-        r = client.request(self._URL, post={'query': query}, jpost=True)
+        r = client.request(self._BASE_URL, post={'query': query}, jpost=True)
         results = json.loads(r)
         if not results:
             genres_list = ['Action', 'Adventure', 'Comedy', 'Drama', 'Ecchi', 'Fantasy', 'Hentai', "Horror", 'Mahou Shoujo', 'Mecha', 'Music', 'Mystery', 'Psychological', 'Romance', 'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller']
@@ -2298,12 +2291,3 @@ class AniListBrowser:
                 selected_tags.append(selected_tag)
 
         return selected_genres_mal, selected_genres_anilist, selected_tags
-
-    @staticmethod
-    def open_completed():
-        try:
-            with open(control.completed_json) as file:
-                completed = json.load(file)
-        except FileNotFoundError:
-            completed = {}
-        return completed

@@ -1,6 +1,5 @@
 import time
 import requests
-import threading
 import xbmc
 
 from resources.lib.ui import control, source_utils
@@ -9,22 +8,16 @@ from resources.lib.ui import control, source_utils
 class RealDebrid:
     def __init__(self):
         self.ClientID = control.getSetting('rd.client_id')
-        if self.ClientID == '':
-            self.ClientID = 'X245A4XAIBGVM'
-        self.OauthUrl = 'https://api.real-debrid.com/oauth/v2'
-        self.token = control.getSetting('rd.auth')
+        self.ClientSecret = control.getSetting('rd.secret')
+        self.token = control.getSetting('realdebrid.token')
         self.refresh = control.getSetting('rd.refresh')
         self.DeviceCode = ''
-        self.ClientSecret = control.getSetting('rd.secret')
         self.OauthTimeout = 0
         self.OauthTimeStep = 0
+        self.OauthUrl = 'https://api.real-debrid.com/oauth/v2'
         self.BaseUrl = "https://api.real-debrid.com/rest/1.0"
-        self.cache_check_results = {}
+        self.headers = {'Authorization': f"Bearer {self.token}"}
 
-    def __headers(self):
-        return {
-            'Authorization': 'Bearer {}'.format(self.token)
-        }
 
     def auth_loop(self):
         if control.progressDialog.iscanceled():
@@ -51,25 +44,24 @@ class RealDebrid:
             'client_id': self.ClientID,
             'new_credentials': 'yes'
         }
-        response = requests.get(f'{self.OauthUrl}/device/code', params=params).json()
-        control.copy2clip(response['user_code'])
-        control.progressDialog.create('Real-Debrid Auth')
-        control.progressDialog.update(
-            -1,
-            control.lang(30020).format(control.colorstr('https://real-debrid.com/device')) + '[CR]'
-            + control.lang(30021).format(control.colorstr(response['user_code'])) + '[CR]'
-            + control.lang(30022)
-        )
-        self.OauthTimeout = int(response['expires_in'])
-        self.OauthTimeStep = int(response['interval'])
-        self.DeviceCode = response['device_code']
+        resp = requests.get(f'{self.OauthUrl}/device/code', params=params).json()
+        copied = control.copy2clip(resp['user_code'])
+        display_dialog = (f"{control.lang(30020).format(control.colorstr('https://real-debrid.com/device'))}[CR]"
+                          f"{control.lang(30021).format(control.colorstr(resp['user_code']))}")
+        if copied:
+            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+        control.progressDialog.create(f'{control.ADDON_NAME}: Real-Debrid Auth')
+        control.progressDialog.update(-1, display_dialog)
+        self.OauthTimeout = int(resp['expires_in'])
+        self.OauthTimeStep = int(resp['interval'])
+        self.DeviceCode = resp['device_code']
 
         while self.ClientSecret == '':
             self.auth_loop()
 
         self.token_request()
 
-        user_information = requests.get(f'{self.BaseUrl}/user', headers=self.__headers()).json()
+        user_information = requests.get(f'{self.BaseUrl}/user', headers=self.headers).json()
         if user_information['type'] != 'premium':
             control.ok_dialog(control.ADDON_NAME, control.lang(30024))
 
@@ -87,14 +79,14 @@ class RealDebrid:
         response = requests.post(f'{self.OauthUrl}/token', data=postData)
         response = response.json()
 
-        control.setSetting('rd.auth', response['access_token'])
+        control.setSetting('realdebrid.token', response['access_token'])
         control.setSetting('rd.refresh', response['refresh_token'])
+        control.setInt('rd.expiry', int(time.time()) + int(response['expires_in']))
         self.token = response['access_token']
         self.refresh = response['refresh_token']
-        control.setInt('rd.expiry', int(time.time()) + int(response['expires_in']))
-        user_info = requests.get(f'{self.BaseUrl}/user', headers=self.__headers()).json()
-        control.setSetting('rd.username', user_info['username'])
-        control.setSetting('rd.auth.status', user_info['type'])
+        user_info = requests.get(f'{self.BaseUrl}/user', headers=self.headers).json()
+        control.setSetting('realdebrid.username', user_info['username'])
+        control.setSetting('realdebrid.auth.status', user_info['type'])
         control.ok_dialog(control.ADDON_NAME, 'Real Debrid %s' % control.lang(30023))
 
     def refreshToken(self):
@@ -104,81 +96,65 @@ class RealDebrid:
             'client_secret': self.ClientSecret,
             'client_id': self.ClientID
         }
-        url = '%s/token' % self.OauthUrl
-        r = requests.post(url, data=postData)
+        r = requests.post(f"{self.OauthUrl}/token", data=postData)
         if r.ok:
             response = r.json()
             self.token = response['access_token']
             self.refresh = response['refresh_token']
-            control.setSetting('rd.auth', self.token)
+            self.headers['Authorization'] = f"Bearer {self.token}"
+            control.setSetting('realdebrid.token', self.token)
             control.setSetting('rd.refresh', self.refresh)
             control.setInt('rd.expiry', int(time.time()) + int(response['expires_in']))
-            user_info = requests.get(f'{self.BaseUrl}/user', headers=self.__headers()).json()
-            control.setSetting('rd.username', user_info['username'])
-            control.setSetting('rd.auth.status', user_info['type'])
+            user_info = requests.get(f'{self.BaseUrl}/user', headers=self.headers).json()
+            control.setSetting('realdebrid.username', user_info['username'])
+            control.setSetting('realdebrid.auth.status', user_info['type'])
+            control.log('refreshed rd.token')
+        else:
+            control.log(repr(r), 'warning')
 
     def addMagnet(self, magnet):
         postData = {
             'magnet': magnet
         }
-        response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.__headers(), data=postData).json()
+        response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers(), data=postData).json()
         return response
 
     def list_torrents(self):
-        response = requests.get(f'{self.BaseUrl}/torrents', headers=self.__headers()).json()
+        response = requests.get(f'{self.BaseUrl}/torrents', headers=self.headers()).json()
         return response
 
     def torrentInfo(self, torrent_id):
-        return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.__headers()).json()
+        return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers()).json()
 
     def torrentSelect(self, torrentid, fileid='all'):
         postData = {
             'files': fileid
         }
-        r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.__headers(), data=postData)
+        r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers(), data=postData)
         return r.ok
 
     def resolve_hoster(self, link):
         postData = {
             'link': link
         }
-        response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.__headers(), data=postData).json()
+        response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.headers(), data=postData).json()
         return response['download']
 
     def deleteTorrent(self, torrent_id):
-        requests.delete(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.__headers(), timeout=10)
+        requests.delete(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.headers(), timeout=10)
 
     def resolve_single_magnet(self, hash_, magnet, episode='', pack_select=False):
-        hashCheck = requests.get(f'{self.BaseUrl}/torrents/instantAvailability/{hash_}', headers=self.__headers()).json()
-        stream_link = None
-        for _ in hashCheck[hash_]['rd']:
-            torrent = self.addMagnet(magnet)
-            self.torrentSelect(torrent['id'])
-            files = self.torrentInfo(torrent['id'])
+        pass
 
-            selected_files = [(idx, i) for idx, i in enumerate([i for i in files['files'] if i['selected'] == 1])]
-            if pack_select:
-                best_match = source_utils.get_best_match('path', [i[1] for i in selected_files], episode, pack_select)
-                if best_match:
-                    try:
-                        file_index = [i[0] for i in selected_files if i[1]['path'] == best_match['path']][0]
-                        link = files['links'][file_index]
-                        stream_link = self.resolve_hoster(link)
-                    except IndexError:
-                        pass
-            elif len(selected_files) == 1:
-                stream_link = self.resolve_hoster(files['links'][0])
-            elif len(selected_files) > 1:
-                best_match = source_utils.get_best_match('path', [i[1] for i in selected_files], episode)
-                if best_match:
-                    try:
-                        file_index = [i[0] for i in selected_files if i[1]['path'] == best_match['path']][0]
-                        link = files['links'][file_index]
-                        stream_link = self.resolve_hoster(link)
-                    except IndexError:
-                        pass
-            self.deleteTorrent(torrent['id'])
-            return stream_link
+    @staticmethod
+    def resolve_cloud(source, pack_select):
+        if source['torrent_files']:
+            best_match = source_utils.get_best_match('path', source['torrent_files'], source['episode'], pack_select)
+            if not best_match or not best_match['path']:
+                return
+            for f_index, torrent_file in enumerate(source['torrent_files']):
+                if torrent_file['path'] == best_match['path']:
+                    return source['torrent_info']['links'][f_index]
 
     def resolve_uncached_source(self, source, runinbackground, silent):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
@@ -211,8 +187,11 @@ class RealDebrid:
         control.progressDialog.close()
         if torrent['status'] == 'downloaded':
             torrent_files = [selected for selected in torrent['files'] if selected['selected'] == 1]
-            best_match = source_utils.get_best_match('path', torrent_files, source['episode_re'])
-            if not best_match['path']:
+            if len(torrent['files']) == 1:
+                best_match = torrent_files[0]
+            else:
+                best_match = source_utils.get_best_match('path', torrent_files, source['episode_re'])
+            if not best_match or not best_match['path']:
                 return
             for f_index, torrent_file in enumerate(torrent_files):
                 if torrent_file['path'] == best_match['path']:
@@ -222,5 +201,7 @@ class RealDebrid:
             if not silent:
                 control.ok_dialog(heading, f'Finished Caching Source\nThe source has been added to your cloud')
         else:
+            self.deleteTorrent(torrent['id'])
+        if silent:
             self.deleteTorrent(torrent['id'])
         return stream_link

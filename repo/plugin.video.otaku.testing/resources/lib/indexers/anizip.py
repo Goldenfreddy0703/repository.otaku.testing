@@ -60,7 +60,7 @@ class ANIZIPAPI:
             filler = code = control.colorstr(filler, color="red") if filler == 'Filler' else filler
         info['code'] = code
 
-        parsed = utils.allocate_item(title, f"play/{url}", False, True, image, info, fanart, poster)
+        parsed = utils.allocate_item(title, f"play/{url}", False, True, [], image, info, fanart, poster)
         kodi_meta = pickle.dumps(parsed)
 
         if not episodes or kodi_meta != episodes[episode - 1]['kodi_meta']:

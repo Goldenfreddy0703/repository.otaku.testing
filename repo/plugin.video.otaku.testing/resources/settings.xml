@@ -740,12 +740,12 @@
 
             <!-- Cloud Scrapping -->
             <group id="4" label="30541" help="">
-                <setting id="rd.cloudInspection" type="boolean" label="30190" help="">
+                <setting id="realdebrid.cloudInspection" type="boolean" label="30190" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                     <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
                 <setting id="premiumize.cloudInspection" type="boolean" label="30191" help="">
@@ -764,6 +764,14 @@
                         <dependency type="visible" setting="alldebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
+                <setting id="torbox.cloudInspection" type="boolean" label="30624" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
+                    </dependencies>
+				</setting>
             </group>
 
             <!-- Local Scrapping -->
@@ -1392,12 +1400,12 @@
         <category id="Accounts" label="30365" help="">
             <!-- Real-Debrid -->
             <group id="1" label="30100" help="">
-                <setting id="rd.enabled" type="boolean" label="30101" help="">
+                <setting id="realdebrid.enabled" type="boolean" label="30101" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="rd.username" type="string" label="30102" help="">
+                <setting id="realdebrid.username" type="string" label="30102" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1406,10 +1414,10 @@
                         <control type="edit" format="string"/>
                     <enable>false</enable>
                     <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
-                    <setting id="rd.auth.status" type="string" label="30103" help="">
+                    <setting id="realdebrid.auth.status" type="string" label="30103" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1418,27 +1426,27 @@
                     <control type="edit" format="string"/>
                     <enable>false</enable>
                     <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
-                <setting id="rd.auth_start" type="action" label="30104" help="">
+                <setting id="realdebrid.auth_start" type="action" label="30104" help="">
                     <level>0</level>
                     <data>RunPlugin(plugin://plugin.video.otaku.testing/auth/realdebrid)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
                     <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
-                <setting id="rd.refresh.token" type="action" label="30105" help="">
+                <setting id="realdebrid.refresh.token" type="action" label="30105" help="">
                     <level>0</level>
                     <data>RunPlugin(plugin://plugin.video.otaku.testing/refresh/realdebrid)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
                     <dependencies>
-                        <dependency type="visible" setting="rd.enabled">true</dependency>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
             </group>
@@ -1551,12 +1559,12 @@
 
             <!-- Debrid-Link -->
             <group id="4" label="30120" help="">
-                <setting id="dl.enabled" type="boolean" label="30121" help="">
+                <setting id="debridlink.enabled" type="boolean" label="30121" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="dl.username" type="string" label="30122" help="">
+                <setting id="debridlink.username" type="string" label="30122" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1565,7 +1573,7 @@
                         <control type="edit" format="string"/>
                     <enable>false</enable>
                     <dependencies>
-                        <dependency type="visible" setting="dl.enabled">true</dependency>
+                        <dependency type="visible" setting="debridlink.enabled">true</dependency>
                     </dependencies>
                 </setting>
 <!--                <setting id="dl.auth.status" type="string" label="30123" help="">-->
@@ -1577,7 +1585,7 @@
 <!--                    <control type="edit" format="string"/>-->
 <!--                    <enable>false</enable>-->
 <!--                    <dependencies>-->
-<!--                        <dependency type="visible" setting="dl.enabled">true</dependency>-->
+<!--                        <dependency type="visible" setting="debridlink.enabled">true</dependency>-->
 <!--                    </dependencies>-->
 <!--                </setting>-->
                 <setting id="dl.auth_start" type="action" label="30124" help="">
@@ -1587,7 +1595,7 @@
                         <close>true</close>
                     </control>
                     <dependencies>
-                        <dependency type="visible" setting="dl.enabled">true</dependency>
+                        <dependency type="visible" setting="debridlink.enabled">true</dependency>
                     </dependencies>
                 </setting>
                 <setting id="dl.refresh.token" type="action" label="30125" help="">
@@ -1597,7 +1605,60 @@
                         <close>true</close>
                     </control>
                     <dependencies>
-                        <dependency type="visible" setting="dl.enabled">true</dependency>
+                        <dependency type="visible" setting="debridlink.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+            </group>
+
+            <!-- TorBox -->
+            <group id="5" label="30618" help="">
+                <setting id="torbox.enabled" type="boolean" label="30619" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="torbox.username" type="string" label="30620" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                        <control type="edit" format="string"/>
+                    <enable>false</enable>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="torbox.auth.status" type="string" label="30621" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string"/>
+                    <enable>false</enable>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="torbox.auth_start" type="action" label="30622" help="">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/auth/torbox)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="torbox.refresh.token" type="action" label="30623" help="">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/refresh/torbox)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
                     </dependencies>
                 </setting>
             </group>

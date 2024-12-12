@@ -83,7 +83,7 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
             ("Plan to Watch", "plantowatch", 'want_to_watch.png'),
             ("All Anime", "ALL", 'all_anime.png')
         ]
-        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]
+        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, [], res[2], {}) for res in statuses]
 
     @staticmethod
     def action_statuses():
@@ -101,7 +101,7 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
 
     def _base_watchlist_view(self, res):
         url = f'watchlist_status_type/{self._NAME}/{res[1]}'
-        return [utils.allocate_item(res[0], url, True, False, f'{res[0].lower()}.png')]
+        return [utils.allocate_item(res[0], url, True, False, [], f'{res[0].lower()}.png', {})]
 
     def get_watchlist_status(self, status, next_up, offset, page):
         results = self.get_all_items(status)
@@ -133,7 +133,7 @@ Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["in
 
         mal_id = show_ids.get('mal')
         if not mal_id:
-            control.log(f"Simkl ID not found for {show_ids}", 'warning')
+            control.log(f"Mal ID not found for {show_ids}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         show = database.get_show(mal_id)

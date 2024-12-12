@@ -13,9 +13,11 @@ from resources.lib.ui import control
 def get(function, duration, *args, **kwargs):
     """
     Gets cached value for provided function with optional arguments, or executes and stores the result
+
     :param function: Function to be executed
     :param duration: Duration of validity of cache in hours
     :param args: Optional arguments for the provided function
+    :param kwargs: Optional keyword arguments for the provided function
     """
     key = hash_function(function, args, kwargs)
     if 'key' in kwargs:
@@ -25,7 +27,7 @@ def get(function, duration, *args, **kwargs):
         try:
             return_data = ast.literal_eval(cache_result['value'])
         except Exception as e:
-            control.log(e, 'warning')
+            control.log(repr(e), 'warning')
             return_data = None
         return return_data
 
@@ -49,7 +51,7 @@ def generate_md5(*args):
 
 
 def cache_get(key):
-    with Cursor(control.cacheFile) as cursor:
+    with SQL(control.cacheFile) as cursor:
         cursor.execute('SELECT * FROM cache WHERE key=?', (key,))
         results = cursor.fetchone()
         return results
@@ -57,7 +59,7 @@ def cache_get(key):
 
 def cache_insert(key, value):
     now = int(time.time())
-    with Cursor(control.cacheFile) as cursor:
+    with SQL(control.cacheFile) as cursor:
         cursor.execute('CREATE TABLE IF NOT EXISTS cache (key TEXT, value TEXT, date INTEGER, UNIQUE(key))')
         cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_cache ON cache (key)')
         cursor.execute('REPLACE INTO cache (key, value, date) VALUES (?, ?, ?)', (key, value, now))
@@ -65,7 +67,7 @@ def cache_insert(key, value):
 
 
 def cache_clear():
-    with Cursor(control.cacheFile) as cursor:
+    with SQL(control.cacheFile) as cursor:
         cursor.execute("DROP TABLE IF EXISTS cache")
         cursor.execute("VACUUM")
         cursor.connection.commit()
@@ -79,7 +81,7 @@ def is_cache_valid(cached_time, cache_timeout):
 
 
 def update_show(mal_id, kodi_meta, anime_schedule_route=''):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('PRAGMA foreign_keys=OFF')
         cursor.execute('REPLACE INTO shows (mal_id, kodi_meta, anime_schedule_route) VALUES (?, ?, ?)', (mal_id, kodi_meta, anime_schedule_route))
         cursor.execute('PRAGMA foreign_keys=ON')
@@ -87,11 +89,9 @@ def update_show(mal_id, kodi_meta, anime_schedule_route=''):
 
 
 def update_show_meta(mal_id, meta_ids, art):
-    if isinstance(meta_ids, dict):
-        meta_ids = pickle.dumps(meta_ids)
-    if isinstance(art, dict):
-        art = pickle.dumps(art)
-    with Cursor(control.malSyncDB) as cursor:
+    meta_ids = pickle.dumps(meta_ids)
+    art = pickle.dumps(art)
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('PRAGMA foreign_keys=OFF')
         cursor.execute("REPLACE INTO shows_meta (mal_id, meta_ids, art) VALUES (?, ?, ?)", (mal_id, meta_ids, art))
         cursor.execute('PRAGMA foreign_keys=ON')
@@ -99,21 +99,21 @@ def update_show_meta(mal_id, meta_ids, art):
 
 
 def add_mapping_id(mal_id, column, value):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('UPDATE shows SET %s=? WHERE mal_id=?' % column, (value, mal_id))
         cursor.connection.commit()
 
 
 def update_kodi_meta(mal_id, kodi_meta):
     kodi_meta = pickle.dumps(kodi_meta)
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('UPDATE shows SET kodi_meta=? WHERE mal_id=?', (kodi_meta, mal_id))
         cursor.connection.commit()
 
 
 def update_show_data(mal_id, data, last_updated=''):
     data = pickle.dumps(data)
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('PRAGMA foreign_keys=OFF')
         cursor.execute("REPLACE INTO show_data (mal_id, data, last_updated) VALUES (?, ?, ?)", (mal_id, data, last_updated))
         cursor.execute('PRAGMA foreign_keys=ON')
@@ -121,13 +121,13 @@ def update_show_data(mal_id, data, last_updated=''):
 
 
 def update_episode(mal_id, season, number, update_time, kodi_meta, filler=''):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('REPLACE INTO episodes (mal_id, season, kodi_meta, last_updated, number, filler) VALUES (?, ?, ?, ?, ?, ?)', (mal_id, season, kodi_meta, update_time, number, filler))
         cursor.connection.commit()
 
 
 def get_show_data(mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         db_query = 'SELECT * FROM show_data WHERE mal_id IN (%s)' % mal_id
         cursor.execute(db_query)
         show_data = cursor.fetchone()
@@ -135,48 +135,48 @@ def get_show_data(mal_id):
 
 
 def get_episode_list(mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('SELECT* FROM episodes WHERE mal_id=?', (mal_id,))
         episodes = cursor.fetchall()
         return episodes
 
 
 def get_episode(mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('SELECT* FROM episodes WHERE mal_id=?', (mal_id,))
         episode = cursor.fetchone()
         return episode
 
 
 def get_show(mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('SELECT * FROM shows WHERE mal_id IN (%s)' % mal_id)
         shows = cursor.fetchone()
         return shows
 
 
 def get_show_meta(mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute('SELECT * FROM shows_meta WHERE mal_id IN (%s)' % mal_id)
         shows = cursor.fetchone()
         return shows
 
 
 def remove_from_database(table, mal_id):
-    with Cursor(control.malSyncDB) as cursor:
+    with SQL(control.malSyncDB) as cursor:
         cursor.execute(f"DELETE FROM {table} WHERE mal_id=?", (mal_id,))
         cursor.connection.commit()
 
 
 def get_mappings(anime_id, send_id):
-    with Cursor(control.mappingDB) as cursor:
+    with SQL(control.mappingDB) as cursor:
         cursor.execute(f'SELECT * FROM anime WHERE {send_id}=?', (anime_id,))
         mappings = cursor.fetchall()
         return mappings[0] if mappings else {}
 
 
 def getSearchHistory(media_type='show'):
-    with Cursor(control.searchHistoryDB) as cursor:
+    with SQL(control.searchHistoryDB) as cursor:
         cursor.execute('CREATE TABLE IF NOT EXISTS show (value TEXT)')
         cursor.execute('CREATE TABLE IF NOT EXISTS movie (value TEXT)')
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON movie (value)")
@@ -193,7 +193,7 @@ def getSearchHistory(media_type='show'):
 
 
 def addSearchHistory(search_string, media_type):
-    with Cursor(control.searchHistoryDB) as cursor:
+    with SQL(control.searchHistoryDB) as cursor:
         cursor.execute('CREATE TABLE IF NOT EXISTS show (value TEXT)')
         cursor.execute('CREATE TABLE IF NOT EXISTS movie (value TEXT)')
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON movie (value)")
@@ -206,7 +206,7 @@ def clearSearchHistory():
     confirmation = control.yesno_dialog(control.ADDON_NAME, "Clear search history?")
     if not confirmation:
         return
-    with Cursor(control.searchHistoryDB) as cursor:
+    with SQL(control.searchHistoryDB) as cursor:
         cursor.execute("DROP TABLE IF EXISTS movie")
         cursor.execute("DROP TABLE IF EXISTS show")
         cursor.execute("VACCUM")
@@ -216,7 +216,7 @@ def clearSearchHistory():
 
 
 def remove_search(table, value):
-    with Cursor(control.searchHistoryDB) as cursor:
+    with SQL(control.searchHistoryDB) as cursor:
         cursor.execute(f'DELETE FROM {table} WHERE value=?', (value,))
         cursor.connection.commit()
         control.refresh()
@@ -229,7 +229,7 @@ def dict_factory(cursor, row):
     return d
 
 
-class Cursor:
+class SQL:
     def __init__(self, path, timeout=60):
         self.lock = threading.Lock()
         self.path = path
@@ -249,6 +249,8 @@ class Cursor:
         if self.lock.locked():
             self.lock.release()
         if exc_type is OperationalError:
+            control.log(f'{exc_type} | {exc_val}', 'error')
             return True
         elif exc_type is not None:
             control.log(f'{exc_type} | {exc_val}', 'error')
+            return False

@@ -74,7 +74,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         next_page = page + 1
         name = "Next Page (%d)" % next_page
         offset = (re.compile("offset=(.+?)&").findall(hasnextpage))[0]
-        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}?page={next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
+        return [utils.allocate_item(name, f'{base_url}/{offset}?page={next_page}', True, False, [], 'next.png', {'plot': name}, fanart='next.png')]
 
     def __get_sort(self):
         sort_types = ['list_score', 'list_updated_at', 'anime_start_date', 'anime_title']
@@ -90,7 +90,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             ("Plan to Watch", "plan_to_watch", 'want_to_watch.png'),
             ("All Anime", "", 'all_anime.png')
         ]
-        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]
+        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, [], res[2], {}) for res in statuses]
 
     @staticmethod
     def action_statuses():

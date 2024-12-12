@@ -1,13 +1,54 @@
 # -*- coding: utf-8 -*-
 import base64
-
+import re
 import six
-from resources.lib.ui import client
+
+from resources.lib.ui import client, control, utils
 from six.moves import urllib_parse
 
 
 class BrowserBase(object):
     _BASE_URL = None
+
+    @staticmethod
+    def handle_paging(hasnextpage, base_url, page):
+        if not hasnextpage or not control.is_addon_visible() and control.getBool('widget.hide.nextpage'):
+            return []
+        next_page = page + 1
+        name = "Next Page (%d)" % next_page
+        return [utils.allocate_item(name, base_url % next_page, True, False, [], 'next.png', {'plot': name}, 'next.png')]
+
+    @staticmethod
+    def open_completed():
+        import json
+        try:
+            with open(control.completed_json) as file:
+                completed = json.load(file)
+        except FileNotFoundError:
+            completed = {}
+        return completed
+
+    @staticmethod
+    def duration_to_seconds(duration_str):
+        # Regular expressions to match hours, minutes, and seconds
+        hours_pattern = re.compile(r'(\d+)\s*hr')
+        minutes_pattern = re.compile(r'(\d+)\s*min')
+        seconds_pattern = re.compile(r'(\d+)\s*sec')
+
+        # Extract hours, minutes, and seconds
+        hours_match = hours_pattern.search(duration_str)
+        minutes_match = minutes_pattern.search(duration_str)
+        seconds_match = seconds_pattern.search(duration_str)
+
+        # Convert to integers, default to 0 if not found
+        hours = int(hours_match.group(1)) if hours_match else 0
+        minutes = int(minutes_match.group(1)) if minutes_match else 0
+        seconds = int(seconds_match.group(1)) if seconds_match else 0
+
+        # Calculate total duration in seconds
+        total_seconds = hours * 3600 + minutes * 60 + seconds
+
+        return total_seconds
 
     @staticmethod
     def _clean_title(text):

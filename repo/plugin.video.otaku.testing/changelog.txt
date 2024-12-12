@@ -1,3 +1,12 @@
+Changelog v5.1.30 (2024-12-12):
+- Removed addon content_type from menus
+- Added TorBox
+- Added Context Menus for Calendar
+- Added Context Menus for Last Watched
+- Fixed Search Context Menus
+- Moved a few functions around
+- Alot of relabeling
+
 Changelog v5.1.29 (2024-12-07):
 - Fix Database Stuff Again
 

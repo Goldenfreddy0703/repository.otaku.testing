@@ -36,15 +36,29 @@ if control.ADDON_VERSION != control.getSetting('version'):
     control.setSetting('version', control.ADDON_VERSION)
 
 
+
 def add_last_watched(items):
     mal_id = control.getSetting("addon.last_watched")
     try:
         kodi_meta = pickle.loads(database.get_show(mal_id)['kodi_meta'])
-        last_watched = "%s[I]%s[/I]" % (control.lang(30900), kodi_meta.get('title_userPreferred'))
-        items.append((last_watched, f'animes/{mal_id}/', kodi_meta['poster']))
+        last_watched = "%s[I]%s[/I]" % (control.lang(30000), kodi_meta['title_userPreferred'])
+        info = {
+            'UniqueIDs': {'mal_id': mal_id},
+            'title': kodi_meta['title_userPreferred'],
+            'plot': kodi_meta['plot'],
+            # 'mpaa': kodi_meta[''],
+            # 'duration': self.duration_to_seconds(res.get('duration')),
+            # 'genre': [x['name'] for x in res.get('genres', [])],
+            # 'studio': [x['name'] for x in res.get('studios', [])],
+            # 'status': res.get('status'),
+            'mediatype': 'tvshow',
+            'rating': kodi_meta['rating']
+        }
+        items.append((last_watched, f'animes/{mal_id}/', kodi_meta['poster'], info))
     except TypeError:
         pass
     return items
+
 
 
 @Route('animes/*')
@@ -377,8 +391,7 @@ def GENRE_THRILLER(payload, params):
 def SEARCH_HISTORY(payload, params):
     history = database.getSearchHistory('show')
     if control.getInt('searchhistory') == 0:
-        draw_cm = [('Remove from Item', 'remove_search_item'), ("Edit Search Item...", "edit_search_item")]
-        control.draw_items(OtakuBrowser.search_history(history), 'addons', draw_cm)
+        control.draw_items(utils.search_history(history), 'addons')
     else:
         SEARCH(payload, params)
 
@@ -393,9 +406,7 @@ def SEARCH(payload, params):
             return control.draw_items([], 'tvshows')
         if control.getInt('searchhistory') == 0:
             database.addSearchHistory(query, 'show')
-        control.draw_items(BROWSER.get_search(query), 'tvshows')
-    else:
-        control.draw_items(BROWSER.get_search(query, page), 'tvshows')
+    control.draw_items(BROWSER.get_search(query, page), 'tvshows')
 
 
 @Route('remove_search_item/*')
@@ -507,28 +518,34 @@ def DELETE_ANIME_DATABASE(payload, params):
 
 @Route('auth/*')
 def AUTH(payload, params):
-    if payload == 'realdebrid':
+    if payload == 'Real-Debrid':
         from resources.lib.debrid.real_debrid import RealDebrid
         RealDebrid().auth()
-    elif payload == 'alldebrid':
+    elif payload == 'Alldebrid':
         from resources.lib.debrid.all_debrid import AllDebrid
         AllDebrid().auth()
-    elif payload == 'premiumize':
+    elif payload == 'Premiumize':
         from resources.lib.debrid.premiumize import Premiumize
         Premiumize().auth()
-    elif payload == 'debridlink':
+    elif payload == 'Debrid-Link':
         from resources.lib.debrid.debrid_link import DebridLink
         DebridLink().auth()
+    elif payload == 'TorBox':
+        from resources.lib.debrid.torbox import TorBox
+        TorBox().auth()
 
 
 @Route('refresh/*')
 def REFRESH(payload, params):
-    if payload == 'realdebrid':
+    if payload == 'Real-Debrid':
         from resources.lib.debrid.real_debrid import RealDebrid
         RealDebrid().refreshToken()
-    elif payload == 'debridlink':
+    elif payload == 'Debrid-Link':
         from resources.lib.debrid.debrid_link import DebridLink
         DebridLink().refreshToken()
+    elif payload == 'TorBox':
+        from resources.lib.debrid.torbox import TorBox
+        TorBox().refreshToken()
 
 
 @Route('fanart_select/*')
@@ -538,9 +555,9 @@ def FANART_SELECT(payload, params):
         OtakuBrowser.get_anime_init(mal_id)
         episode = database.get_episode(mal_id)
     fanart = pickle.loads(episode['kodi_meta'])['image']['fanart'] or []
-    fanart_display = fanart + ["None", "Random (Defualt)"]
+    fanart_display = fanart + ["None", "Random (Default)"]
     fanart += ["None", ""]
-    control.draw_items([utils.allocate_item(f, f'fanart/{mal_id}/{i}', False, False, f, fanart=f, landscape=f) for i, f in enumerate(fanart_display)], '')
+    control.draw_items([utils.allocate_item(f, f'fanart/{mal_id}/{i}', False, False, [], f, {}, fanart=f, landscape=f) for i, f in enumerate(fanart_display)], '')
 
 
 @Route('fanart/*')
@@ -563,45 +580,45 @@ def FANART(payload, params):
 @Route('')
 def LIST_MENU(payload, params):
     MENU_ITEMS = [
-        (control.lang(30957), "airing_calendar", 'airing_anime_calendar.png'),
-        (control.lang(30901), "airing_last_season", 'airing_anime.png'),
-        (control.lang(30902), "airing_this_season", 'airing_anime.png'),
-        (control.lang(30903), "airing_next_season", 'airing_anime.png'),
-        # (control.lang(30904), "movies", 'movies.png'),
-        # (control.lang(30905), "tv_shows", 'tv_shows.png'),
-        (control.lang(30906), "trending", 'trending.png'),
-        (control.lang(30907), "popular", 'popular.png'),
-        (control.lang(30908), "voted", 'voted.png'),
-        (control.lang(30909), "favourites", 'favourites.png'),
-        (control.lang(30910), "top_100", 'top_100_anime.png'),
-        (control.lang(30911), "genres", 'genres_&_tags.png'),
-        (control.lang(30912), "search_history", 'search.png'),
-        (control.lang(30913), "tools", 'tools.png')
+        (control.lang(30957), "airing_calendar", 'airing_anime_calendar.png', {}),
+        (control.lang(30901), "airing_last_season", 'airing_anime.png', {}),
+        (control.lang(30902), "airing_this_season", 'airing_anime.png', {}),
+        (control.lang(30903), "airing_next_season", 'airing_anime.png', {}),
+        # (control.lang(30904), "movies", 'movies.png', {}),
+        # (control.lang(30905), "tv_shows", 'tv_shows.png', {}),
+        (control.lang(30906), "trending", 'trending.png', {}),
+        (control.lang(30907), "popular", 'popular.png', {}),
+        (control.lang(30908), "voted", 'voted.png', {}),
+        (control.lang(30909), "favourites", 'favourites.png', {}),
+        (control.lang(30910), "top_100", 'top_100_anime.png', {}),
+        (control.lang(30911), "genres", 'genres_&_tags.png', {}),
+        (control.lang(30912), "search_history", 'search.png', {}),
+        (control.lang(30913), "tools", 'tools.png', {}),
     ]
 
-    final_menu_items = []
-    final_menu_items = add_watchlist(final_menu_items)
+    enabled_menu_items = []
+    enabled_menu_items = add_watchlist(enabled_menu_items)
     if control.getBool('menu.lastwatched'):
-        final_menu_items = add_last_watched(final_menu_items)
+        enabled_menu_items = add_last_watched(enabled_menu_items)
     for i in MENU_ITEMS:
         if control.getBool(i[1]):
-            final_menu_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in final_menu_items], 'addons')
+            enabled_menu_items.append(i)
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_menu_items])
 
 
 # @Route('movies')
 # def MOVIES_MENU(payload, params):
 #     MOVIES_ITEMS = [
-#         (control.lang(30901), "airing_last_season", 'airing_anime.png'),
-#         (control.lang(30902), "airing_this_season", 'airing_anime.png'),
-#         (control.lang(30903), "airing_next_season", 'airing_anime.png'),
-#         (control.lang(30906), "trending", 'trending.png'),
-#         (control.lang(30907), "popular", 'popular.png'),
-#         (control.lang(30908), "voted", 'voted.png'),
-#         (control.lang(30909), "favourites", 'favourites.png'),
-#         (control.lang(30910), "top_100", 'top_100_anime.png'),
-#         (control.lang(30911), "genres", 'genres_&_tags.png'),
-#         (control.lang(30912), "search_history_movie", 'search.png')
+#         (control.lang(30901), "airing_last_season", 'airing_anime.png', {}),
+#         (control.lang(30902), "airing_this_season", 'airing_anime.png', {}),
+#         (control.lang(30903), "airing_next_season", 'airing_anime.png', {}),
+#         (control.lang(30906), "trending", 'trending.png', {}),
+#         (control.lang(30907), "popular", 'popular.png', {}),
+#         (control.lang(30908), "voted", 'voted.png', {}),
+#         (control.lang(30909), "favourites", 'favourites.png', {}),
+#         (control.lang(30910), "top_100", 'top_100_anime.png', {}),
+#         (control.lang(30911), "genres", 'genres_&_tags.png', {}),
+#         (control.lang(30912), "search_history_movie", 'search.png', {}),
 #     ]
 
 #     if control.getBool('menu.lastwatched'):
@@ -612,22 +629,22 @@ def LIST_MENU(payload, params):
 #     for i in MOVIES_ITEMS:
 #         if control.getSetting(i[1]) == 'false':
 #             MOVIES_ITEMS_.remove(i)
-#     control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in MOVIES_ITEMS_], 'addons')
+#     control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in MOVIES_ITEMS_])
 
 
 # @Route('tv_shows')
 # def TV_SHOWS_MENU(payload, params):
 #     TV_SHOWS_ITEMS = [
-#         (control.lang(30901), "airing_last_season", 'airing_anime.png'),
-#         (control.lang(30902), "airing_this_season", 'airing_anime.png'),
-#         (control.lang(30903), "airing_next_season", 'airing_anime.png'),
-#         (control.lang(30906), "trending", 'trending.png'),
-#         (control.lang(30907), "popular", 'popular.png'),
-#         (control.lang(30908), "voted", 'voted.png'),
-#         (control.lang(30909), "favourites", 'favourites.png'),
-#         (control.lang(30910), "top_100", 'top_100_anime.png'),
-#         (control.lang(30911), "genres", 'genres_&_tags.png'),
-#         (control.lang(30912), "search_history_tvshow", 'search.png')
+#         (control.lang(30901), "airing_last_season", 'airing_anime.png', {}),
+#         (control.lang(30902), "airing_this_season", 'airing_anime.png', {}),
+#         (control.lang(30903), "airing_next_season", 'airing_anime.png', {}),
+#         (control.lang(30906), "trending", 'trending.png', {}),
+#         (control.lang(30907), "popular", 'popular.png', {}),
+#         (control.lang(30908), "voted", 'voted.png', {}),
+#         (control.lang(30909), "favourites", 'favourites.png', {}),
+#         (control.lang(30910), "top_100", 'top_100_anime.png', {}),
+#         (control.lang(30911), "genres", 'genres_&_tags.png', {}),
+#         (control.lang(30912), "search_history_tvshow", 'search.png', {}),
 #     ]
 
 #     if control.getBool('menu.lastwatched'):
@@ -638,135 +655,135 @@ def LIST_MENU(payload, params):
 #     for i in TV_SHOWS_ITEMS:
 #         if control.getSetting(i[1]) == 'false':
 #             TV_SHOWS_ITEMS_.remove(i)
-#     control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in TV_SHOWS_ITEMS_], 'addons')
+#     control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in TV_SHOWS_ITEMS_])
 
 
 @Route('trending')
 def TRENDING_MENU(payload, params):
     TRENDING_ITEMS = [
-        (control.lang(30914), "trending_last_year", 'trending.png'),
-        (control.lang(30915), "trending_this_year", 'trending.png'),
-        (control.lang(30916), "trending_last_season", 'trending.png'),
-        (control.lang(30917), "trending_this_season", 'trending.png'),
-        (control.lang(30918), "all_time_trending", 'trending.png')
+        (control.lang(30914), "trending_last_year", 'trending.png', {}),
+        (control.lang(30915), "trending_this_year", 'trending.png', {}),
+        (control.lang(30916), "trending_last_season", 'trending.png', {}),
+        (control.lang(30917), "trending_this_season", 'trending.png', {}),
+        (control.lang(30918), "all_time_trending", 'trending.png', {}),
     ]
 
     enabled_trending_items = []
     for i in TRENDING_ITEMS:
         if control.getBool(i[1]):
             enabled_trending_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_trending_items], 'addons')
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_trending_items])
 
 
 @Route('popular')
 def POPULAR_MENU(payload, params):
     POPULAR_ITEMS = [
-        (control.lang(30919), "popular_last_year", 'popular.png'),
-        (control.lang(30920), "popular_this_year", 'popular.png'),
-        (control.lang(30921), "popular_last_season", 'popular.png'),
-        (control.lang(30922), "popular_this_season", 'popular.png'),
-        (control.lang(30923), "all_time_popular", 'popular.png')
+        (control.lang(30919), "popular_last_year", 'popular.png', {}),
+        (control.lang(30920), "popular_this_year", 'popular.png', {}),
+        (control.lang(30921), "popular_last_season", 'popular.png', {}),
+        (control.lang(30922), "popular_this_season", 'popular.png', {}),
+        (control.lang(30923), "all_time_popular", 'popular.png', {}),
     ]
 
     enabled_popular_items = []
     for i in POPULAR_ITEMS:
         if control.getBool(i[1]):
             enabled_popular_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_popular_items], 'addons')
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_popular_items])
 
 
 @Route('voted')
 def VOTED_MENU(payload, params):
     VOTED_ITEMS = [
-        (control.lang(30924), "voted_last_year", 'voted.png'),
-        (control.lang(30925), "voted_this_year", 'voted.png'),
-        (control.lang(30926), "voted_last_season", 'voted.png'),
-        (control.lang(30927), "voted_this_season", 'voted.png'),
-        (control.lang(30928), "all_time_voted", 'voted.png')
+        (control.lang(30924), "voted_last_year", 'voted.png', {}),
+        (control.lang(30925), "voted_this_year", 'voted.png', {}),
+        (control.lang(30926), "voted_last_season", 'voted.png', {}),
+        (control.lang(30927), "voted_this_season", 'voted.png', {}),
+        (control.lang(30928), "all_time_voted", 'voted.png', {}),
     ]
 
     enabled_voted_items = []
     for i in VOTED_ITEMS:
         if control.getBool(i[1]):
             enabled_voted_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_voted_items], 'addons')
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_voted_items])
 
 
 @Route('favourites')
 def FAVOURITES_MENU(payload, params):
     FAVOURITES_ITEMS = [
-        (control.lang(30929), "favourites_last_year", 'favourites.png'),
-        (control.lang(30930), "favourites_this_year", 'favourites.png'),
-        (control.lang(30931), "favourites_last_season", 'favourites.png'),
-        (control.lang(30932), "favourites_this_season", 'favourites.png'),
-        (control.lang(30933), "all_time_favourites", 'favourites.png')
+        (control.lang(30929), "favourites_last_year", 'favourites.png', {}),
+        (control.lang(30930), "favourites_this_year", 'favourites.png', {}),
+        (control.lang(30931), "favourites_last_season", 'favourites.png', {}),
+        (control.lang(30932), "favourites_this_season", 'favourites.png', {}),
+        (control.lang(30933), "all_time_favourites", 'favourites.png', {}),
     ]
 
     enabled_favourites_items = []
     for i in FAVOURITES_ITEMS:
         if control.getBool(i[1]):
             enabled_favourites_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_favourites_items], 'addons')
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_favourites_items])
 
 
 @Route('genres')
 def GENRES_MENU(payload, params):
     GENRES_ITEMS = [
-        (control.lang(30934), "genres//", 'genre_multi.png'),
-        (control.lang(30935), "genre_action", 'genre_action.png'),
-        (control.lang(30936), "genre_adventure", 'genre_adventure.png'),
-        (control.lang(30937), "genre_comedy", 'genre_comedy.png'),
-        (control.lang(30938), "genre_drama", 'genre_drama.png'),
-        (control.lang(30939), "genre_ecchi", 'genre_ecchi.png'),
-        (control.lang(30940), "genre_fantasy", 'genre_fantasy.png'),
-        (control.lang(30941), "genre_hentai", 'genre_hentai.png'),
-        (control.lang(30942), "genre_horror", 'genre_horror.png'),
-        (control.lang(30943), "genre_shoujo", 'genre_shoujo.png'),
-        (control.lang(30944), "genre_mecha", 'genre_mecha.png'),
-        (control.lang(30945), "genre_music", 'genre_music.png'),
-        (control.lang(30946), "genre_mystery", 'genre_mystery.png'),
-        (control.lang(30947), "genre_psychological", 'genre_psychological.png'),
-        (control.lang(30948), "genre_romance", 'genre_romance.png'),
-        (control.lang(30949), "genre_sci_fi", 'genre_sci-fi.png'),
-        (control.lang(30950), "genre_slice_of_life", 'genre_slice_of_life.png'),
-        (control.lang(30951), "genre_sports", 'genre_sports.png'),
-        (control.lang(30952), "genre_supernatural", 'genre_supernatural.png'),
-        (control.lang(30953), "genre_thriller", 'genre_thriller.png')
+        (control.lang(30934), "genres//", 'genre_multi.png', {}),
+        (control.lang(30935), "genre_action", 'genre_action.png', {}),
+        (control.lang(30936), "genre_adventure", 'genre_adventure.png', {}),
+        (control.lang(30937), "genre_comedy", 'genre_comedy.png', {}),
+        (control.lang(30938), "genre_drama", 'genre_drama.png', {}),
+        (control.lang(30939), "genre_ecchi", 'genre_ecchi.png', {}),
+        (control.lang(30940), "genre_fantasy", 'genre_fantasy.png', {}),
+        (control.lang(30941), "genre_hentai", 'genre_hentai.png', {}),
+        (control.lang(30942), "genre_horror", 'genre_horror.png', {}),
+        (control.lang(30943), "genre_shoujo", 'genre_shoujo.png', {}),
+        (control.lang(30944), "genre_mecha", 'genre_mecha.png', {}),
+        (control.lang(30945), "genre_music", 'genre_music.png', {}),
+        (control.lang(30946), "genre_mystery", 'genre_mystery.png', {}),
+        (control.lang(30947), "genre_psychological", 'genre_psychological.png', {}),
+        (control.lang(30948), "genre_romance", 'genre_romance.png', {}),
+        (control.lang(30949), "genre_sci_fi", 'genre_sci-fi.png', {}),
+        (control.lang(30950), "genre_slice_of_life", 'genre_slice_of_life.png', {}),
+        (control.lang(30951), "genre_sports", 'genre_sports.png', {}),
+        (control.lang(30952), "genre_supernatural", 'genre_supernatural.png', {}),
+        (control.lang(30953), "genre_thriller", 'genre_thriller.png', {}),
     ]
 
     enabled_genres_items = []
     for i in GENRES_ITEMS:
         if control.getBool(i[1]):
             enabled_genres_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in enabled_genres_items], 'addons')
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_genres_items])
 
 
 # @Route('search')
 # def SEARCH_MENU(payload, params):
 #     SEARCH_ITEMS = [
-#         (control.lang(30954), "search_history", 'search.png'),
-#         (control.lang(30955), "search_history_movie", 'search.png'),
-#         (control.lang(30956), "search_history_tvshow", 'search.png')
+#         (control.lang(30954), "search_history", 'search.png', {}),
+#         (control.lang(30955), "search_history_movie", 'search.png', {}),
+#         (control.lang(30956), "search_history_tvshow", 'search.png', {}),
 #     ]
 
-#     control.draw_items([utils.allocate_item(name, url, True, False, image) for name, url, image in SEARCH_ITEMS], 'addons')
+#     control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in SEARCH_ITEMS])
 
 
 @Route('tools')
 def TOOLS_MENU(payload, params):
     TOOLS_ITEMS = [
-        (control.lang(30010), "change_log", {'plot': "View Changelog"}, 'changelog.png'),
-        (control.lang(30011), "settings", {'plot': "Open Settings"}, 'open_settings_menu.png'),
-        (control.lang(30012), "clear_cache", {'plot': "Clear Cache"}, 'clear_cache.png'),
-        (control.lang(30013), "clear_search_history", {'plot': "Clear Search History"}, 'clear_search_history.png'),
-        (control.lang(30014), "rebuild_database", {'plot': "Rebuild Database"}, 'rebuild_database.png'),
-        (control.lang(30015), "completed_sync", {'plot': "Sync Completed Anime with Otaku"}, "sync_completed.png"),
-        (control.lang(30016), 'download_manager', {'plot': "Open Download Manager"}, 'download_manager.png'),
-        (control.lang(30017), 'sort_select', {'plot': "Choose Sorting..."}, 'sort_select.png'),
-        (control.lang(30018), 'clear_selected_fanart', {'plot': "Clear All Selected Fanart"}, 'wipe_addon_data.png')
+        (control.lang(30010), "change_log", 'changelog.png', {}),
+        (control.lang(30011), "settings", 'open_settings_menu.png', {}),
+        (control.lang(30012), "clear_cache", 'clear_cache.png', {}),
+        (control.lang(30013), "clear_search_history", 'clear_search_history.png', {}),
+        (control.lang(30014), "rebuild_database", 'rebuild_database.png', {}),
+        (control.lang(30015), "completed_sync", "sync_completed.png", {}),
+        (control.lang(30016), 'download_manager', 'download_manager.png', {}),
+        (control.lang(30017), 'sort_select', 'sort_select.png', {}),
+        (control.lang(30018), 'clear_selected_fanart', 'wipe_addon_data.png', {}),
     ]
 
-    control.draw_items([utils.allocate_item(name, url, False, False, image, info) for name, url, info, image in TOOLS_ITEMS], 'addons')
+    control.draw_items([utils.allocate_item(name, url, False, False, [], image, info) for name, url, image, info in TOOLS_ITEMS])
 
 
 # def update_menu_paths(menu_items, base_path):
@@ -929,7 +946,12 @@ def INPUTSTREAMHELPER(payload, params):
 
 
 if __name__ == "__main__":
-    router_process(control.get_plugin_url(), control.get_plugin_params())
+    try:
+        router_process(control.get_plugin_url(), control.get_plugin_params())
+    except:
+        import traceback
+        traceback.print_exc()
+    # router_process(control.get_plugin_url(), control.get_plugin_params())
     if len(control.playList) > 0:
         import xbmc
         if not xbmc.Player().isPlaying():

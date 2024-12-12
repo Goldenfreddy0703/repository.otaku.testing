@@ -49,7 +49,6 @@ class Sources(GetSources):
         duration = args['duration']
         rescrape = args['rescrape']
         # source_select = args['source_select']
-        get_backup = args['get_backup']
 
         self.setProperty('process_started', 'true')
 
@@ -69,7 +68,8 @@ class Sources(GetSources):
         control.setInt('aniwave.skipoutro.start', -1)
         control.setInt('aniwave.skipoutro.end', -1)
 
-        if control.real_debrid_enabled() or control.all_debrid_enabled() or control.debrid_link_enabled() or control.premiumize_enabled():
+        enabled_debrids = control.enabled_debrid()
+        if any(enabled_debrids.values()):
             t = threading.Thread(target=self.user_cloud_inspection, args=(query, mal_id, episode))
             t.start()
             self.threads.append(t)
@@ -123,7 +123,7 @@ class Sources(GetSources):
             self.remainingProviders.remove('aniwave')
 
         if control.getBool('provider.gogo'):
-            t = threading.Thread(target=self.gogo_worker, args=(mal_id, episode, rescrape, get_backup))
+            t = threading.Thread(target=self.gogo_worker, args=(mal_id, episode, rescrape))
             t.start()
             self.threads.append(t)
         else:
@@ -154,7 +154,7 @@ class Sources(GetSources):
 
             if (
                 self.canceled or
-                (len(self.remainingProviders) < 1 and runtime > 7) or
+                (len(self.remainingProviders) < 1 and runtime > 5) or
                 (control.settingids.terminateoncloud and len(self.cloud_files) > 0) or
                 (control.settingids.terminateonlocal and len(self.local_files) > 0)
             ):
@@ -206,8 +206,8 @@ class Sources(GetSources):
                 control.setInt('aniwave.skipoutro.end', int(x['skip']['outro']['end']))
         self.remainingProviders.remove('aniwave')
 
-    def gogo_worker(self, mal_id, episode, rescrape, get_backup):
-        self.embedSources += database.get(gogoanime.Sources().get_sources, 8, mal_id, episode, get_backup, key='gogoanime')
+    def gogo_worker(self, mal_id, episode, rescrape):
+        self.embedSources += database.get(gogoanime.Sources().get_sources, 8, mal_id, episode, key='gogoanime')
         self.remainingProviders.remove('gogo')
 
     def hianime_worker(self, mal_id, episode, rescrape):
@@ -229,12 +229,12 @@ class Sources(GetSources):
 
     def user_cloud_inspection(self, query, mal_id, episode):
         debrid = {}
-        if control.real_debrid_enabled() and control.getBool('rd.cloudInspection'):
-            debrid['real_debrid'] = True
-        if control.premiumize_enabled() and control.getBool('premiumize.cloudInspection'):
-            debrid['premiumize'] = True
-        if control.all_debrid_enabled() and control.getBool('alldebrid.cloudInspection'):
-            debrid['all_debrid'] = True
+        enabled_debrids = control.enabled_debrid()
+
+        for debrid_name, is_enabled in enabled_debrids.items():
+            if is_enabled and control.getBool(f'{debrid_name}.cloudInspection'):
+                debrid[debrid_name.capitalize()] = True
+
         self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode)
         self.remainingProviders.remove('Cloud Inspection')
 

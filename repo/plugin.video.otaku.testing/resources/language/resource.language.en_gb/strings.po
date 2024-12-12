@@ -1392,3 +1392,31 @@ msgstr ""
 msgctxt "#30617"
 msgid "Run All UnCached Sources in Forground"
 msgstr ""
+
+msgctxt "#30618"
+msgid "TorBox"
+msgstr ""
+
+msgctxt "#30619"
+msgid "Enable TorBox"
+msgstr ""
+
+msgctxt "#30620"
+msgid "TorBox Username"
+msgstr ""
+
+msgctxt "#30621"
+msgid "TorBox Status"
+msgstr ""
+
+msgctxt "#30622"
+msgid "Authorize TorBox..."
+msgstr ""
+
+msgctxt "#30623"
+msgid "Refresh TorBox Token"
+msgstr ""
+
+msgctxt "#30624"
+msgid "Scrape TorBox Cloud"
+msgstr ""

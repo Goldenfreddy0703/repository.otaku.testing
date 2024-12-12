@@ -5,15 +5,24 @@ import re
 
 from functools import partial
 from bs4 import BeautifulSoup
-from resources.lib.ui import control, database, source_utils
+from resources.lib.ui import control, client, database, source_utils
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.indexers import malsync
+
+
+def get_backup(mal_id, source):
+    params = {
+        "type": "myanimelist",
+        "id": mal_id
+    }
+    r = client.request("https://arm2.vercel.app/api/kaito-b", params=params)
+    return json.loads(r.content).get('Pages', {}).get(source, {}) if r.ok else {}
 
 
 class Sources(BrowserBase):
     _BASE_URL = 'https://anitaku.to/' if control.getBool('provider.gogoalt') else 'https://gogoanime3.cc/'
 
-    def get_sources(self, mal_id, episode, get_backup):
+    def get_sources(self, mal_id, episode):
         show = database.get_show(mal_id)
         kodi_meta = pickle.loads(show.get('kodi_meta'))
         title = kodi_meta.get('name')

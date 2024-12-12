@@ -7,25 +7,24 @@ from resources.lib.ui import control, source_utils
 
 class AllDebrid:
     def __init__(self):
-        self.apikey = control.getSetting('alldebrid.apikey')
+        self.apikey = control.getSetting('alldebrid.token')
         self.agent_identifier = 'Otaku'
         self.base_url = 'https://api.alldebrid.com/v4'
         self.cache_check_results = []
 
     def auth(self):
-        params = {
-            'agent': self.agent_identifier
-        }
+        params = {'agent': self.agent_identifier}
         resp = requests.get(f'{self.base_url}/pin/get', params=params).json()['data']
         expiry = pin_ttl = int(resp['expires_in'])
         auth_complete = False
         control.copy2clip(resp['pin'])
-        control.progressDialog.create(
-            control.ADDON_NAME + ': AllDebrid Auth',
-            control.lang(30020).format(control.colorstr(resp['base_url'])) + '[CR]'
-            + control.lang(30021).format(control.colorstr(resp['pin'])) + '[CR]'
-            + control.lang(30022)
-        )
+        copied = control.copy2clip(resp['pin'])
+        display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['base_url']))}[CR]"
+                          f"{control.lang(30021).format(control.colorstr(resp['pin']))}")
+        if copied:
+            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+        control.progressDialog.create(f'{control.ADDON_NAME}: AllDebrid Auth', display_dialog)
+
         # Seems the All Debrid servers need some time do something with the pin before polling
         # Polling too early will cause an invalid pin error
         xbmc.sleep(5000)
@@ -56,7 +55,7 @@ class AllDebrid:
         r = requests.get(f'{self.base_url}/pin/check', params=params)
         resp = r.json()['data']
         if resp['activated']:
-            control.setSetting('alldebrid.apikey', resp['apikey'])
+            control.setSetting('alldebrid.token', resp['apikey'])
             self.apikey = resp['apikey']
             return True, 0
         return False, int(resp['expires_in'])

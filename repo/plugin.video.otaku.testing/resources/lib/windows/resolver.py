@@ -6,7 +6,7 @@ import xbmc
 from urllib import parse
 from resources.lib import OtakuBrowser
 from resources.lib.WatchlistIntegration import watchlist_update_episode
-from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid
+from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid, torbox
 from resources.lib.ui import control, source_utils, player
 from resources.lib.windows.base_window import BaseWindow
 
@@ -43,10 +43,11 @@ class Resolver(BaseWindow):
         self.sources = None
         self.args = None
         self.resolvers = {
-            'all_debrid': all_debrid.AllDebrid,
-            'debrid_link': debrid_link.DebridLink,
-            'premiumize': premiumize.Premiumize,
-            'real_debrid': real_debrid.RealDebrid
+            'Alldebrid': all_debrid.AllDebrid,
+            'Debrid-Link': debrid_link.DebridLink,
+            'Premiumize': premiumize.Premiumize,
+            'Real-Debrid': real_debrid.RealDebrid,
+            'TorBox': torbox.TorBox
         }
         self.source_select = source_select
         self.pack_select = False
@@ -133,7 +134,7 @@ class Resolver(BaseWindow):
                     break
 
             elif i['type'] == 'cloud' or i['type'] == 'hoster':
-                if i['type'] == 'cloud' and i['debrid_provider'] in ['premiumize', 'all_debrid']:
+                if i['type'] == 'cloud' and i['debrid_provider'] in ['Premiumize', 'Alldebrid', 'TorBox']:
                     stream_link = i['hash']
                 else:
                     stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i)

@@ -14,28 +14,13 @@ class WatchlistFlavor:
     @staticmethod
     def get_enabled_watchlists():
         enabled_watchlists = []
-        if control.myanimelist_enabled():
-            enabled_watchlists.append(WatchlistFlavor.__instance_flavor('mal'))
-        if control.kitsu_enabled():
-            enabled_watchlists.append(WatchlistFlavor.__instance_flavor('kitsu'))
-        if control.anilist_enabled():
-            enabled_watchlists.append(WatchlistFlavor.__instance_flavor('anilist'))
-        if control.simkl_enabled():
-            enabled_watchlists.append(WatchlistFlavor.__instance_flavor('simkl'))
+        for watchlist in control.enabled_watchlists():
+            enabled_watchlists.append(WatchlistFlavor.__instance_flavor(watchlist))
         return enabled_watchlists
 
     @staticmethod
     def get_enabled_watchlist_list():
-        enabled_watchlists = []
-        if control.myanimelist_enabled():
-            enabled_watchlists.append('mal')
-        if control.kitsu_enabled():
-            enabled_watchlists.append('kitsu')
-        if control.anilist_enabled():
-            enabled_watchlists.append('anilist')
-        if control.simkl_enabled():
-            enabled_watchlists.append('simkl')
-        return enabled_watchlists
+        return control.enabled_watchlists()
 
     @staticmethod
     def get_update_flavor():

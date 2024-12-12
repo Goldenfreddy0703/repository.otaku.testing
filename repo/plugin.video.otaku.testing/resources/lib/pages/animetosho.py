@@ -146,7 +146,7 @@ class Sources(BrowserBase):
             else:
                 filtered_list.append(torrent)
 
-        cache_list, uncashed_list_ = debrid.TorrentCacheCheck().torrentCacheCheck(filtered_list)
+        cache_list, uncashed_list_ = debrid.torrentCacheCheck(filtered_list)
         uncashed_list = [i for i in uncashed_list_ if i['seeders'] > 0]
 
         uncashed_list = sorted(uncashed_list, key=lambda k: k['seeders'], reverse=True)

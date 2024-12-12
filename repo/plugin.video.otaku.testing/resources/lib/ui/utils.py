@@ -1,9 +1,10 @@
 import os
 
+from functools import partial
 from resources.lib.ui import control
 
 
-def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=None, poster=None, landscape=None, banner=None, clearart=None, clearlogo=None):
+def allocate_item(name, url, isfolder, isplayable, cm, image='', info=None, fanart=None, poster=None, landscape=None, banner=None, clearart=None, clearlogo=None):
     if image and '/' not in image:
         genre_image = os.path.join(control.OTAKU_GENRE_PATH, image)
         art_image = os.path.join(control.OTAKU_ICONS_PATH, image)
@@ -16,12 +17,13 @@ def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=N
         genre_poster = os.path.join(control.OTAKU_GENRE_PATH, poster)
         art_poster = os.path.join(control.OTAKU_ICONS_PATH, poster)
         poster = genre_poster if os.path.exists(genre_poster) else art_poster
-    new_res = {
+    return {
         'isfolder': isfolder,
         'isplayable': isplayable,
         'name': name,
         'url': url,
         'info': info,
+        'cm': cm,
         'image': {
                 'poster': poster,
                 'icon': image,
@@ -33,14 +35,26 @@ def allocate_item(name, url, isfolder, isplayable, image='', info=None, fanart=N
                 'clearlogo': clearlogo
         }
     }
-    return new_res
+
+
+def parse_history_view(res, cm):
+    return allocate_item(res, f'search/{res}', True, False, cm, '', {})
+
+
+def search_history(search_array):
+    cm = [('Remove from Item', 'remove_search_item'), ("Edit Search Item...", "edit_search_item")]
+    result = [allocate_item("New Search", "search/", True, False, [], 'new_search.png', {})]
+    mapfun = partial(parse_history_view, cm=cm)
+    result += list(map(mapfun, search_array))
+    result.append(allocate_item("Clear Search History...", "clear_search_history", False, False, [], 'clear_search_history.png', {}))
+    return result
 
 
 def parse_view(base, isfolder, isplayable, dub=False):
     if control.settingids.showdub and dub:
         base['name'] += ' [COLOR blue](Dub)[/COLOR]'
         base['info']['title'] = base['name']
-    parsed_view = allocate_item(base["name"], base["url"], isfolder, isplayable, base["image"], base["info"], fanart=base.get("fanart"), poster=base["image"], landscape=base.get("landscape"), banner=base.get("banner"), clearart=base.get("clearart"), clearlogo=base.get("clearlogo"))
+    parsed_view = allocate_item(base["name"], base["url"], isfolder, isplayable, [], base["image"], base["info"], fanart=base.get("fanart"), poster=base["image"], landscape=base.get("landscape"), banner=base.get("banner"), clearart=base.get("clearart"), clearlogo=base.get("clearlogo"))
     if control.settingids.dubonly and not dub:
         parsed_view = None
     return parsed_view

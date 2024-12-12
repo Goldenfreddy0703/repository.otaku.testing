@@ -4,7 +4,7 @@ import threading
 
 from resources.lib.ui import source_utils
 from resources.lib.ui.BrowserBase import BrowserBase
-from resources.lib.debrid import real_debrid, premiumize, all_debrid
+from resources.lib.debrid import real_debrid, premiumize, all_debrid, torbox
 
 
 class Sources(BrowserBase):
@@ -13,16 +13,20 @@ class Sources(BrowserBase):
         self.threads = []
 
     def get_sources(self, debrid, query, episode):
-        if debrid.get('real_debrid'):
+        if debrid.get('Real-Debrid'):
             t = threading.Thread(target=self.rd_cloud_inspection, args=(query, episode,))
             t.start()
             self.threads.append(t)
-        if debrid.get('premiumize'):
+        if debrid.get('Premiumize'):
             t = threading.Thread(target=self.premiumize_cloud_inspection, args=(query, episode,))
             t.start()
             self.threads.append(t)
-        if debrid.get('all_debrid'):
+        if debrid.get('Alldebrid'):
             t = threading.Thread(target=self.alldebrid_cloud_inspection, args=(query, episode,))
+            t.start()
+            self.threads.append(t)
+        if debrid.get('TorBox'):
+            t = threading.Thread(target=self.torbox_cloud_inspection, args=(query, episode,))
             t.start()
             self.threads.append(t)
         for i in self.threads:
@@ -60,7 +64,7 @@ class Sources(BrowserBase):
                     'type': 'cloud',
                     'release_title': torrent['filename'],
                     'info': source_utils.getInfo(torrent_files[0]['path']),
-                    'debrid_provider': 'real_debrid',
+                    'debrid_provider': 'Real-Debrid',
                     'size': source_utils.get_size(torrent['bytes']),
                     'byte_size': torrent['bytes'],
                     'torrent': torrent,
@@ -123,9 +127,42 @@ class Sources(BrowserBase):
                     'type': 'cloud',
                     'release_title': torrent['filename'],
                     'info': source_utils.getInfo(torrent['filename']),
-                    'debrid_provider': 'all_debrid',
+                    'debrid_provider': 'Alldebrid',
                     'size': source_utils.get_size(torrent['size']),
                     'byte_size': torrent['size'],
+                    'episode': episode
+                }
+            )
+
+    def torbox_cloud_inspection(self, query, episode):
+        cloud_items = torbox.TorBox().list_torrents()
+
+        filenames = [re.sub(r'\[.*?]\s*', '', i['name'].replace(',', '')) for i in cloud_items]
+        filenames_query = ','.join(filenames)
+        r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
+        resp = r.json()
+        for i in resp:
+            torrent = cloud_items[i]
+            # filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
+            if torrent['cached'] is not True or torrent['download_finished'] is not True or len(torrent['files'] < 1):
+                continue
+
+            if not any(source_utils.is_file_ext_valid(tor_file['short_name'].lower()) for tor_file in torrent['files']):
+                continue
+
+            self.cloud_files.append(
+                {
+                    'quality': source_utils.getQuality(torrent[0]['short_name']),
+                    'lang': source_utils.getAudio_lang(torrent[0]['short_name']),
+                    'hash': torrent['files'],
+                    'provider': 'Cloud',
+                    'type': 'cloud',
+                    'release_title': torrent['filename'],
+                    'info': source_utils.getInfo(torrent[0]['short_name']),
+                    'debrid_provider': 'TorBox',
+                    'size': source_utils.get_size(torrent['bytes']),
+                    'byte_size': torrent['bytes'],
+                    'torrent': torrent,
                     'episode': episode
                 }
             )
@@ -139,7 +176,7 @@ class Sources(BrowserBase):
             'type': 'cloud',
             'release_title': item['name'],
             'info': source_utils.getInfo(item['name']),
-            'debrid_provider': 'premiumize',
+            'debrid_provider': 'Premiumize',
             'size': source_utils.get_size(int(item['size'])),
             'byte_size': int(item['size'])
         })

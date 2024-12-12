@@ -74,7 +74,7 @@ class KitsuWLF(WatchlistFlavorBase):
         name = "Next Page (%d)" % next_page
         parsed = parse.urlparse(hasnextpage)
         offset = parse.parse_qs(parsed.query)['page[offset]'][0]
-        return [utils.parse_view({'name': name, 'url': f'{base_url}/{offset}?page={next_page}', 'image': 'next.png', 'info': {'plot': name}, 'fanart': 'next.png'}, True, False)]
+        return [utils.allocate_item(name, f'{base_url}/{offset}?page={next_page}', True, False, [], 'next.png', {'plot': name}, fanart='next.png')]
 
     def __get_sort(self):
         sort_types = ['-progressed_at', '-progress', f"anime.titles.{self.__get_title_lang()}"]
@@ -96,7 +96,7 @@ class KitsuWLF(WatchlistFlavorBase):
             ("On Hold", "on_hold", 'on_hold.png'),
             ("Dropped", "dropped", 'dropped.png')
         ]
-        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, res[2]) for res in statuses]
+        return [utils.allocate_item(res[0], f'watchlist_status_type/{self._NAME}/{res[1]}', True, False, [], res[2], {}) for res in statuses]
 
     @staticmethod
     def action_statuses():
@@ -152,10 +152,10 @@ class KitsuWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_watchlist_view(self, res, eres, mal_dub=None):
         kitsu_id = eres['id']
-        
+
         mal_id = self.mapping_mal(kitsu_id)
         if not mal_id:
-            control.log(f"Kitsu ID not found for {kitsu_id}", 'warning')
+            control.log(f"Mal ID not found for {kitsu_id}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         info = {
@@ -203,7 +203,6 @@ class KitsuWLF(WatchlistFlavorBase):
             base['url'] = f'play_movie/{mal_id}/'
             base['info']['mediatype'] = 'movie'
             return utils.parse_view(base, False, True, dub)
-
         return utils.parse_view(base, True, False, dub)
 
     @div_flavor

@@ -83,7 +83,8 @@ class DownloadManager(BaseWindow):
                 menu_item = create_menu_item(download)
                 self.display_list.addItem(menu_item)
 
-    def set_menu_item_properties(self, menu_item, download_info):
+    @staticmethod
+    def set_menu_item_properties(menu_item, download_info):
         menu_item.setProperty('item.info.speed', download_info['speed'])
         menu_item.setProperty('item.info.progress', str(download_info['progress']))
         menu_item.setProperty('item.info.filename', download_info['filename'])

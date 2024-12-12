@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import time
+
 from resources.lib.ui import control
 from resources.lib.windows.anichart_window import BaseWindow
+from resources.lib import OtakuBrowser, WatchlistIntegration
+
+BROWSER = OtakuBrowser.BROWSER
 
 
 class Anichart(BaseWindow):
@@ -69,6 +73,32 @@ class Anichart(BaseWindow):
 
         if actionID in [7, 92, 10]:
             self.handle_action(actionID)
+
+        if actionID == 117:
+            context = control.context_menu(
+                [
+                    "Find Recommendations",
+                    "Find Relations",
+                    "Get Watch Order",
+                    "WatchList Manager",
+                ]
+            )
+            self.position = self.display_list.getSelectedPosition()
+            anime = self.anime_items[self.position]['id']
+            page = 1
+            if context == 0:  # Find Recommendations
+                control.draw_items(BROWSER.get_recommendations(anime, page), 'tvshows')
+                self.close()
+            elif context == 1:  # Find Relations
+                control.draw_items(BROWSER.get_relations(anime), 'tvshows')
+                self.close()
+            elif context == 2:  # Get Watch Order
+                control.draw_items(BROWSER.get_watch_order(anime), 'tvshows')
+                self.close()
+            elif context == 3:  # WatchList Manager
+                payload = f"some_path/{anime}/0"  # Construct the payload, replace 'some/path' with actual path if needed
+                params = {}  # Construct the params if needed
+                WatchlistIntegration.CONTEXT_MENU(payload, params)
 
     def resolve_item(self):
         anime = self.anime_items[self.position]['id']

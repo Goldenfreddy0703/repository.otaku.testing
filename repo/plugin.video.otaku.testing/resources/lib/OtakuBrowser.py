@@ -1,5 +1,4 @@
 import pickle
-import requests
 
 from resources.lib import indexers
 from resources.lib.indexers import simkl, anizip, jikanmoe
@@ -11,17 +10,6 @@ if control.settingids.browser_api == 'mal':
 else:
     from resources.lib.AniListBrowser import AniListBrowser
     BROWSER = AniListBrowser()
-
-
-def parse_history_view(res):
-    return utils.allocate_item(res, f'search/{res}', True, False)
-
-
-def search_history(search_array):
-    result = [utils.allocate_item("New Search", "search/", True, False, 'new_search.png')]
-    result += list(map(parse_history_view, search_array))
-    result.append(utils.allocate_item("Clear Search History...", "clear_search_history", False, False, 'clear_search_history.png'))
-    return result
 
 
 def get_episodeList(mal_id, pass_idx):
@@ -37,7 +25,7 @@ def get_episodeList(mal_id, pass_idx):
             'premiered': str(kodi_meta['start_date']),
             'year': int(str(kodi_meta['start_date'])[:4])
         }
-        items = [utils.allocate_item(title, 'null', False, True, info=info, poster=kodi_meta['poster'])]
+        items = [utils.allocate_item(title, 'null', False, True, [], info=info, poster=kodi_meta['poster'])]
 
     else:
         episodes = database.get_episode_list(mal_id)
@@ -46,15 +34,6 @@ def get_episodeList(mal_id, pass_idx):
         for i in playlist:
             control.playList.add(url=i[0], listitem=i[1])
     return items
-
-
-def get_backup(mal_id, source):
-    params = {
-        "type": "myanimelist",
-        "id": mal_id
-    }
-    r = requests.get("https://arm2.vercel.app/api/kaito-b", params=params)
-    return r.json().get('Pages', {}).get(source, {}) if r.ok else {}
 
 
 def get_anime_init(mal_id):
@@ -99,7 +78,6 @@ def get_sources(mal_id, episode, media_type, rescrape=False, source_select=False
         'duration': kodi_meta['duration'],
         'media_type': media_type,
         'rescrape': rescrape,
-        'get_backup': get_backup,
         'source_select': source_select,
         'silent': silent
     }

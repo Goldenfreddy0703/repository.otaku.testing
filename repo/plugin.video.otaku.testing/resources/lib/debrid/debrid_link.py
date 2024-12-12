@@ -9,25 +9,25 @@ from resources.lib.ui import control, source_utils
 class DebridLink:
     def __init__(self):
         self.ClientID = 'sdpBuYFQo6L53s3B4apluw'
-        self.USER_AGENT = 'Otaku for Kodi'
-        self.token = control.getSetting('dl.auth')
+        self.USER_AGENT = 'Otaku'
+        self.token = control.getSetting('debridlink.token')
         self.refresh = control.getSetting('dl.refresh')
         self.headers = {
             'User-Agent': self.USER_AGENT,
-            'Authorization': 'Bearer {0}'.format(self.token)
+            'Authorization': f"Bearer {self.token}"
         }
-        self.api_url = "https://debrid-link.fr/api/v2"
+        self.api_url = "https://debrid-link.com/api/v2"
         self.cache_check_results = {}
-        self.DeviceCode = None
-        self.OauthTimeStep = None
-        self.OauthTimeout = None
+        self.DeviceCode = ''
+        self.OauthTimeStep = 0
+        self.OauthTimeout = 0
 
     def auth_loop(self):
         if control.progressDialog.iscanceled():
             control.progressDialog.close()
-            return
+            return False
         xbmc.sleep(self.OauthTimeStep)
-        url = '{0}/oauth/token'.format(self.api_url[:-3])
+        url = f"{self.api_url[:-3]}/oauth/token"
         data = {
             'client_id': self.ClientID,
             'code': self.DeviceCode,
@@ -39,7 +39,7 @@ class DebridLink:
             control.progressDialog.close()
             self.token = response.get('access_token')
             self.refresh = response.get('refresh_token')
-            control.setSetting('dl.auth', self.token)
+            control.setSetting('debridlink.token', self.token)
             control.setSetting('dl.refresh', self.refresh)
             control.setInt('dl.expiry', int(time.time()) + int(response['expires_in']))
             self.headers['Authorization'] = 'Bearer {0}'.format(self.token)
@@ -49,19 +49,18 @@ class DebridLink:
         url = '{0}/oauth/device/code'.format(self.api_url[:-3])
         data = {'client_id': self.ClientID,
                 'scope': 'get.post.delete.seedbox get.account'}
-        response = requests.post(url, data=data, headers={'User-Agent': self.USER_AGENT}).json()
-        self.OauthTimeout = response.get('expires_in')
-        self.OauthTimeStep = response.get('interval')
-        self.DeviceCode = response.get('device_code')
+        resp = requests.post(url, data=data, headers={'User-Agent': self.USER_AGENT}).json()
+        self.OauthTimeout = resp.get('expires_in')
+        self.OauthTimeStep = resp.get('interval')
+        self.DeviceCode = resp.get('device_code')
 
-        control.copy2clip(response.get('user_code'))
-        control.progressDialog.create('Debrid-Link Auth')
-        control.progressDialog.update(
-            -1,
-            control.lang(30020).format(control.colorstr(response.get('verification_url'))) + '[CR]'
-            + control.lang(30021).format(control.colorstr(response.get('user_code'))) + '[CR]'
-            + control.lang(30022)
-        )
+        copied = control.copy2clip(resp.get('user_code'))
+        display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['verification_url']))}[CR]"
+                          f"{control.lang(30021).format(control.colorstr(resp['user_code']))}")
+        if copied:
+            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+        control.progressDialog.create(f'{control.ADDON_NAME}: Debrid-Link Auth')
+        control.progressDialog.update(-1, display_dialog)
         auth_done = False
         while not auth_done:
             auth_done = self.auth_loop()
@@ -71,10 +70,10 @@ class DebridLink:
             control.ok_dialog(control.ADDON_NAME, control.lang(30024))
 
     def get_info(self):
-        url = '{0}/account/infos'.format(self.api_url[:-3])
+        url = f"{self.api_url[:-3]}/account/infos"
         response = requests.get(url, headers=self.headers).json()
         username = response['value'].get('pseudo')
-        control.setSetting('dl.username', username)
+        control.setSetting('debridlink.username', username)
         control.ok_dialog(control.ADDON_NAME, 'Debrid-Link ' + control.lang(30023))
         return response['value'].get('premiumLeft') > 3600
 
@@ -84,12 +83,13 @@ class DebridLink:
             'refresh_token': self.refresh,
             'client_id': self.ClientID
         }
-        url = '{0}/oauth/token'.format(self.api_url[:-3])
+        url = f"{self.api_url[:-3]}/oauth/token"
         response = requests.post(url, data=postData, headers={'User-Agent': self.USER_AGENT}).json()
-        if 'access_token' in response:
-            self.token = response.get('access_token')
-            control.setSetting('dl.auth', self.token)
-            control.setInt('dl.expiry', int(time.time()) + response.get('expires_in'))
+        if response.get('access_token'):
+            self.token = response['access_token']
+            self.headers['Authorization'] = f"Bearer {self.token}"
+            control.setSetting('debridlink.token', self.token)
+            control.setInt('dl.expiry', int(time.time()) + response['expires_in'])
 
     def check_hash(self, hashlist):
         if isinstance(hashlist, list):
@@ -120,7 +120,7 @@ class DebridLink:
             'url': magnet,
             'async': 'true'
         }
-        url = '{0}/seedbox/add'.format(self.api_url)
+        url = f"{self.api_url}/seedbox/add"
         response = requests.post(url, data=postData, headers=self.headers).json()
         return response.get('value')
 
