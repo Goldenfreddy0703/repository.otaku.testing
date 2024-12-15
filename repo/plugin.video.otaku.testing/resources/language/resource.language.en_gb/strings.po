@@ -1418,7 +1418,7 @@ msgid "TorBox Status"
 msgstr ""
 
 msgctxt "#30622"
-msgid "TorBox API Key"
+msgid "Authorize TorBox..."
 msgstr ""
 
 msgctxt "#30623"

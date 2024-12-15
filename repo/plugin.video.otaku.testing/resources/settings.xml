@@ -728,7 +728,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="uncached.runinforground" type="boolean" label="30617" help="" parent="show.uncached">
+                <setting id="uncached.autoruninforground" type="boolean" label="30617" help="" parent="show.uncached">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
