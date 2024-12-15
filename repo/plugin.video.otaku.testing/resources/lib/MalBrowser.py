@@ -19,7 +19,7 @@ class MalBrowser(BrowserBase):
     _BASE_URL = "https://api.jikan.moe/v4"
 
     def __init__(self):
-        self._TITLE_LANG = ['title', 'title_english'][control.getInt("titlelanguage")]
+        self.title_lang = ['title', 'title_english'][control.getInt("titlelanguage")]
         self.perpage = control.getInt('interface.perpage.general.mal')
         self.year_type = control.getInt('contentyear.menu') if control.getBool('contentyear.bool') else 0
         self.season_type = control.getInt('contentseason.menu') if control.getBool('contentseason.bool') else ''
@@ -1501,7 +1501,7 @@ class MalBrowser(BrowserBase):
         show_meta = database.get_show_meta(mal_id)
         kodi_meta = pickle.loads(show_meta.get('art')) if show_meta else {}
 
-        title = res[self._TITLE_LANG] or res['title']
+        title = res[self.title_lang] or res['title']
         rating = res.get('rating')
         if rating == 'Rx - Hentai':
             title += ' - ' + control.colorstr("Adult", 'red')
@@ -1631,7 +1631,7 @@ class MalBrowser(BrowserBase):
         except TypeError:
             start_date = None
 
-        title_userPreferred = res[self._TITLE_LANG] or res['title']
+        title_userPreferred = res[self.title_lang] or res['title']
 
         name = res['title']
         ename = res['title_english']

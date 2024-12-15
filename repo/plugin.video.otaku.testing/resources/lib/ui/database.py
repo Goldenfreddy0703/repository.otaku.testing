@@ -71,6 +71,7 @@ def cache_clear():
         cursor.execute("DROP TABLE IF EXISTS cache")
         cursor.execute("VACUUM")
         cursor.connection.commit()
+        cursor.execute('CREATE TABLE IF NOT EXISTS cache (key TEXT, value TEXT, date INTEGER, UNIQUE(key))')
         control.notify(f'{control.ADDON_NAME}: {control.lang(30030)}', control.lang(30031), time=5000, sound=False)
 
 
@@ -248,9 +249,9 @@ class SQL:
         self.cursor.close()
         if self.lock.locked():
             self.lock.release()
+        if exc_type:
+            import traceback
+            control.log('database error')
+            control.log(f"{''.join(traceback.format_exception(exc_type, exc_val, exc_tb))}", 'error')
         if exc_type is OperationalError:
-            control.log(f'{exc_type} | {exc_val}', 'error')
             return True
-        elif exc_type is not None:
-            control.log(f'{exc_type} | {exc_val}', 'error')
-            return False

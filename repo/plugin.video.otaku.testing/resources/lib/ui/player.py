@@ -48,6 +48,9 @@ class WatchlistPlayer(player):
         self.episode = episode
         self.resume_time = resume_time
 
+        # Set the audio and subtitle preferences
+        self.set_audio_and_subtitle_preferences()
+
         # process skip times
         self.process_hianime()
         if not self.skipintro_aniskip or not self.skipoutro_aniskip:
@@ -134,8 +137,6 @@ class WatchlistPlayer(player):
                         self.showSubtitles(True)
 
     def onPlayBackStarted(self):
-        self.set_audio_and_subtitle_preferences()
-
         if self._build_playlist and playList.size() == 1:
             self._build_playlist(self.mal_id, self.episode)
 

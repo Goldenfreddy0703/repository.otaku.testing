@@ -6,14 +6,14 @@ from resources.lib.ui import control
 
 premiumizeCached = []
 realdebridCached = []
-all_debridCached = []
-debrid_linkCached = []
+alldebridCached = []
+debridlinkCached = []
 torboxCached = []
 
 premiumizeUnCached = []
 realdebridUnCached = []
-all_debridUnCached = []
-debrid_linkUnCached = []
+alldebridUnCached = []
+debridlinkUnCached = []
 torboxUnCached = []
 threads = []
 
@@ -48,23 +48,16 @@ def torrentCacheCheck(torrent_list):
     for i in threads:
         i.join()
 
-    cached_list = realdebridCached + premiumizeCached + all_debridCached + debrid_linkCached
-    uncached_list = realdebridUnCached + premiumizeUnCached + all_debridUnCached + debrid_linkUnCached
+    cached_list = realdebridCached + premiumizeCached + alldebridCached + debridlinkCached + torboxCached
+    uncached_list = realdebridUnCached + premiumizeUnCached + alldebridUnCached + debridlinkUnCached + torboxUnCached
     return cached_list, uncached_list
 
 
 def all_debrid_worker(torrent_list):
     if len(torrent_list) != 0:
-        cache_check = all_debrid.AllDebrid().check_hash([i['hash'] for i in torrent_list])
-        if cache_check:
-            cached_items = [m.get('hash') for m in cache_check if m.get('instant') is True]
-
-            for i in torrent_list:
-                i['debrid_provider'] = 'Alldebrid'
-                if i['hash'] in cached_items:
-                    all_debridCached.append(i)
-                else:
-                    all_debridUnCached.append(i)
+        for i in torrent_list:
+            i['debrid_provider'] = 'Alldebrid'
+            alldebridUnCached.append(i)
 
 
 def debrid_link_worker(torrent_list):
@@ -74,9 +67,9 @@ def debrid_link_worker(torrent_list):
             for i in torrent_list:
                 i['debrid_provider'] = 'Debrid-Link'
                 if i['hash'] in list(cache_check.keys()):
-                    debrid_linkCached.append(i)
+                    debridlinkCached.append(i)
                 else:
-                    debrid_linkUnCached.append(i)
+                    debridlinkUnCached.append(i)
 
 
 def real_debrid_worker(torrent_list):
@@ -104,11 +97,10 @@ def premiumize_worker(torrent_list):
 def torbox_worker(torrent_list):
     hash_list = [i['hash'] for i in torrent_list]
     if len(hash_list) != 0:
-        cache_check = torbox.TorBox().hash_check(hash_list)
-        if cache_check:
-            for index, torrent in enumerate(torrent_list):
-                torrent['debrid_provider'] = 'TorBox'
-                if cache_check['hash'] in hash_list:
-                    torboxCached.append(torrent)
-                else:
-                    torboxUnCached.append(torrent)
+        cache_check = [i['hash'] for i in torbox.TorBox().hash_check(hash_list)]
+        for torrent in torrent_list:
+            torrent['debrid_provider'] = 'TorBox'
+            if torrent['hash'] in cache_check:
+                torboxCached.append(torrent)
+            else:
+                torboxUnCached.append(torrent)

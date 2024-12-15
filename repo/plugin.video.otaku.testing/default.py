@@ -530,20 +530,20 @@ def AUTH(payload, params):
     elif payload == 'debridlink':
         from resources.lib.debrid.debrid_link import DebridLink
         DebridLink().auth()
-    # elif payload == 'torbox':
-    #     from resources.lib.debrid.torbox import TorBox
-    #     TorBox().auth()
+    elif payload == 'torbox':
+        from resources.lib.debrid.torbox import TorBox
+        TorBox().auth()
 
 
 @Route('refresh/*')
 def REFRESH(payload, params):
-    if payload == 'Real-Debrid':
+    if payload == 'realdebrid':
         from resources.lib.debrid.real_debrid import RealDebrid
         RealDebrid().refreshToken()
-    elif payload == 'Debrid-Link':
+    elif payload == 'debridlink':
         from resources.lib.debrid.debrid_link import DebridLink
         DebridLink().refreshToken()
-    # elif payload == 'TorBox':
+    # elif payload == 'torbox':
     #     from resources.lib.debrid.torbox import TorBox
     #     TorBox().refreshToken()
 

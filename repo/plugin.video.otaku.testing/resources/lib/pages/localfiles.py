@@ -39,7 +39,7 @@ class Sources(BrowserBase):
             'provider': 'Local',
             'type': 'local',
             'quality': source_utils.getQuality(f),
-            'debrid_provider': 'local_debrid',
+            'debrid_provider': 'Local-Debrid',
             'episode_re': episode,
             'size': source_utils.get_size(os.path.getsize(full_path)),
             'byte_size': os.path.getsize(full_path),

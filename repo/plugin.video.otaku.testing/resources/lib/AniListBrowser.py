@@ -16,7 +16,7 @@ class AniListBrowser(BrowserBase):
     _BASE_URL = "https://graphql.anilist.co"
 
     def __init__(self):
-        self._TITLE_LANG = ["romaji", 'english'][control.getInt("titlelanguage")]
+        self.title_lang = ["romaji", 'english'][control.getInt("titlelanguage")]
         self.perpage = control.getInt('interface.perpage.general.anilist')
         self.year_type = control.getInt('contentyear.menu') if control.getBool('contentyear.bool') else 0
         self.season_type = control.getInt('contentseason.menu') if control.getBool('contentseason.bool') else -1
@@ -108,8 +108,7 @@ class AniListBrowser(BrowserBase):
 
         results = list(map(self.process_airing_view, list_))
         results = list(itertools.chain(*results))
-        airing = database.get(lambda x: results, 24, page)
-        return airing
+        return results
 
 
     def get_airing_last_season(self, page):
@@ -1936,7 +1935,7 @@ class AniListBrowser(BrowserBase):
         show_meta = database.get_show_meta(mal_id)
         kodi_meta = pickle.loads(show_meta.get('art')) if show_meta else {}
 
-        title = res['title'][self._TITLE_LANG] or res['title']['romaji']
+        title = res['title'][self.title_lang] or res['title']['romaji']
 
         if res.get('relationType'):
             title += ' [I]%s[/I]' % control.colorstr(res['relationType'], 'limegreen')
@@ -2037,7 +2036,7 @@ class AniListBrowser(BrowserBase):
             genres = ' | '.join(genres[:3])
         else:
             genres = 'Genres Not Found'
-        title = res['media']['title'][self._TITLE_LANG]
+        title = res['media']['title'][self.title_lang]
         if not title:
             title = res['media']['title']['userPreferred']
 
@@ -2072,7 +2071,7 @@ class AniListBrowser(BrowserBase):
         except (KeyError, TypeError):
             duration = 0
 
-        title_userPreferred = res['title'][self._TITLE_LANG] or res['title']['romaji']
+        title_userPreferred = res['title'][self.title_lang] or res['title']['romaji']
 
         name = res['title']['romaji']
         ename = res['title']['english']

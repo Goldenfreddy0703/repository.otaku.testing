@@ -32,12 +32,11 @@ class Sources(GetSources):
         self.progress = 1
         self.threads = []
 
-        self.cloud_files = []
         self.torrentSources = []
         self.torrentCacheSources = []
         self.torrentUnCacheSources = []
         self.embedSources = []
-        self.usercloudSources = []
+        self.cloud_files = []
         self.local_files = []
 
     def getSources(self, args):
@@ -233,7 +232,7 @@ class Sources(GetSources):
 
         for debrid_name, is_enabled in enabled_debrids.items():
             if is_enabled and control.getBool(f'{debrid_name}.cloudInspection'):
-                debrid[debrid_name.capitalize()] = True
+                debrid[debrid_name] = True
 
         self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode)
         self.remainingProviders.remove('Cloud Inspection')

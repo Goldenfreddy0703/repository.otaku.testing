@@ -15,7 +15,7 @@ class Route:
         return func
 
 
-def router_process(url: str, params: dict = None) -> None:
+def router_process(url, params=None):
     if not params:
         params = {}
     payload = "/".join(url.split("/")[1:])

@@ -1470,7 +1470,7 @@
                         <dependency type="visible" setting="premiumize.enabled">true</dependency>
                     </dependencies>
                 </setting>
-                <!-- <setting id="premiumize.auth.status" type="string" label="30133" help="">
+                <setting id="premiumize.auth.status" type="string" label="30133" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1481,7 +1481,7 @@
                     <dependencies>
                         <dependency type="visible" setting="premiumize.enabled">true</dependency>
                     </dependencies>
-                </setting> -->
+                </setting>
                 <setting id="premiumize.auth_start" type="action" label="30134" help="">
                     <level>0</level>
                     <data>RunPlugin(plugin://plugin.video.otaku.testing/auth/premiumize)</data>
@@ -1617,7 +1617,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <!-- <setting id="torbox.username" type="string" label="30620" help="">
+                <setting id="torbox.username" type="string" label="30620" help="">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -1651,7 +1651,7 @@
                         <dependency type="visible" setting="torbox.enabled">true</dependency>
                     </dependencies>
                 </setting>
-                <setting id="torbox.refresh.token" type="action" label="30623" help="">
+                <!-- <setting id="torbox.refresh.token" type="action" label="30623" help="">
                     <level>0</level>
                     <data>RunPlugin(plugin://plugin.video.otaku.testing/refresh/torbox)</data>
                     <control type="button" format="action">
@@ -1661,19 +1661,6 @@
                         <dependency type="visible" setting="torbox.enabled">true</dependency>
                     </dependencies>
                 </setting> -->
-				<setting id="torbox.apikey" type="string" label="30622" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-                    <dependencies>
-                        <dependency type="visible" setting="torbox.enabled">true</dependency>
-                    </dependencies>
-					<control type="edit" format="string">
-						<heading>30622</heading>
-					</control>
-				</setting>
             </group>
         </category>
 

@@ -1,4 +1,3 @@
-import threading
 import requests
 import xbmc
 
@@ -7,86 +6,74 @@ from resources.lib.ui import control, source_utils
 
 class AllDebrid:
     def __init__(self):
-        self.apikey = control.getSetting('alldebrid.token')
+        self.token = control.getSetting('alldebrid.token')
         self.agent_identifier = 'Otaku'
         self.base_url = 'https://api.alldebrid.com/v4'
         self.cache_check_results = []
+        self.OauthTimeStep = 1
+        self.OauthTimeout = 0
+        self.OauthTotalTimeout = 0
 
     def auth(self):
         params = {'agent': self.agent_identifier}
         resp = requests.get(f'{self.base_url}/pin/get', params=params).json()['data']
-        expiry = pin_ttl = int(resp['expires_in'])
-        auth_complete = False
-        control.copy2clip(resp['pin'])
+        self.OauthTotalTimeout = self.OauthTimeout = int(resp['expires_in'])
+        control.log(self.OauthTimeout)
         copied = control.copy2clip(resp['pin'])
         display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['base_url']))}[CR]"
                           f"{control.lang(30021).format(control.colorstr(resp['pin']))}")
         if copied:
             display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
-        control.progressDialog.create(f'{control.ADDON_NAME}: AllDebrid Auth', display_dialog)
-
+        control.progressDialog.create(f'{control.ADDON_NAME}: Alldebrid Auth', display_dialog)
+        control.progressDialog.update(100)
         # Seems the All Debrid servers need some time do something with the pin before polling
         # Polling too early will cause an invalid pin error
+
         xbmc.sleep(5000)
-        control.progressDialog.update(100)
-        while not auth_complete and not expiry <= 0 and not control.progressDialog.iscanceled():
-            xbmc.sleep(1000)
-            auth_complete, expiry = self.poll_auth(check=resp['check'], pin=resp['pin'])
-            progress_percent = 100 - int((float(pin_ttl - expiry) / pin_ttl) * 100)
-            control.progressDialog.update(progress_percent)
+        auth_done = False
+        while not auth_done and self.OauthTimeout > 0:
+            self.OauthTimeout -= self.OauthTimeStep
+            xbmc.sleep(self.OauthTimeStep * 1000)
+            auth_done = self.auth_loop(check=resp['check'], pin=resp['pin'])
         control.progressDialog.close()
+        if auth_done:
+            self.status()
+
+    def status(self):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey
+            'apikey': self.token
         }
         r = requests.get(f'{self.base_url}/user', params=params)
-        res = r.json().get('data', {})
-        user_information = res.get('user')
-        if user_information:
-            control.setSetting('alldebrid.username', user_information['username'])
-            control.setSetting('alldebrid.auth.status', 'Premium' if user_information['isPremium'] else 'Expired')
-            if auth_complete:
-                control.ok_dialog(control.ADDON_NAME, f'AllDebrid {control.lang(30023)}')
+        res = r.json()['data']
+        user_information = res['user']
+        premium = user_information['isPremium']
+        control.setSetting('alldebrid.username', user_information['username'])
+        control.ok_dialog(control.ADDON_NAME, f'Alldebrid {control.lang(30023)}')
+        if not premium:
+            control.setSetting('alldebrid.auth.status', 'Expired')
+            control.ok_dialog(f'{control.ADDON_NAME}: AllDebrid', control.lang(30024))
         else:
-            control.ok_dialog(control.ADDON_NAME, 'AllDebrid Failed to login')
+            control.setSetting('alldebrid.auth.status', 'Premium')
 
-    def poll_auth(self, **params):
+    def auth_loop(self, **params):
+        if control.progressDialog.iscanceled():
+            self.OauthTimeout = 0
+            return False
+        control.progressDialog.update(int(self.OauthTimeout / self.OauthTotalTimeout * 100))
         params['agent'] = self.agent_identifier
         r = requests.get(f'{self.base_url}/pin/check', params=params)
         resp = r.json()['data']
         if resp['activated']:
-            control.setSetting('alldebrid.token', resp['apikey'])
-            self.apikey = resp['apikey']
-            return True, 0
-        return False, int(resp['expires_in'])
-
-    def check_hash(self, hashlist):
-        self.cache_check_results = []
-        hashlist = [hashlist[x: x + 10] for x in range(0, len(hashlist), 10)]
-        threads = []
-        for hash_ in hashlist:
-            thread = threading.Thread(target=self._check_hash_thread, args=[hash_])
-            threads.append(thread)
-            thread.start()
-        for i in threads:
-            i.join()
-        return self.cache_check_results
-
-    def _check_hash_thread(self, hashes):
-        params = {
-            'agent': self.agent_identifier,
-            'apikey': self.apikey,
-            'magnets[]': hashes
-        }
-        r = requests.post(f'{self.base_url}/magnet/instant', params=params)
-
-        response = r.json()['data']
-        self.cache_check_results += response.get('magnets')
+            self.token = resp['apikey']
+            control.setSetting('alldebrid.token', self.token)
+            return True
+        return False
 
     def addMagnet(self, magnet_hash):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey,
+            'apikey': self.token,
             'magnets': magnet_hash
         }
         r = requests.get(f'{self.base_url}/magnet/upload', params=params)
@@ -95,7 +82,7 @@ class AllDebrid:
     def resolve_hoster(self, url):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey,
+            'apikey': self.token,
             'link': url
         }
         r = requests.get(f'{self.base_url}/link/unlock', params=params)
@@ -105,7 +92,7 @@ class AllDebrid:
     def magnet_status(self, magnet_id):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey,
+            'apikey': self.token,
             'id': magnet_id
         }
         r = requests.get(f'{self.base_url}/magnet/status', params=params)
@@ -114,7 +101,7 @@ class AllDebrid:
     def list_torrents(self):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey
+            'apikey': self.token
         }
         r = requests.get(f'{self.base_url}/user/links', params=params)
         return r.json()['data']
@@ -122,19 +109,19 @@ class AllDebrid:
     def link_info(self, link):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey,
+            'apikey': self.token,
             'link[]': link
         }
         r = requests.get(f'{self.base_url}/link/infos', params=params)
         return r.json()['data']
 
-    def resolve_single_magnet(self, hash_, magnet, episode='', pack_select=False):
+    def resolve_single_magnet(self, hash_, magnet, episode, pack_select):
         magnet_id = self.addMagnet(magnet)['magnets'][0]['id']
         folder_details = self.magnet_status(magnet_id)['magnets']['links']
         folder_details = [{'link': x['link'], 'path': x['filename']} for x in folder_details]
 
         if episode:
-            selected_file = source_utils.get_best_match('path', folder_details, episode, pack_select)
+            selected_file = source_utils.get_best_match('path', folder_details, str(episode), pack_select)
             self.delete_magnet(magnet_id)
             if selected_file is not None:
                 return self.resolve_hoster(selected_file['link'])
@@ -147,10 +134,13 @@ class AllDebrid:
         self.delete_magnet(magnet_id)
         return self.resolve_hoster(selected_file)
 
+    def resolve_cloud(self, source, pack_select):
+        pass
+
     def delete_magnet(self, magnet_id):
         params = {
             'agent': self.agent_identifier,
-            'apikey': self.apikey,
+            'apikey': self.token,
             'id': magnet_id
         }
         r = requests.get(f'{self.base_url}/magnet/delete', params=params)
@@ -159,4 +149,4 @@ class AllDebrid:
     @staticmethod
     def resolve_uncached_source(source, runinbackground):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
-        control.ok_dialog(heading, 'Cache Reolver Has not been added for AllDebrid')
+        control.ok_dialog(heading, 'Cache Reolver Has not been added for Alldebrid')

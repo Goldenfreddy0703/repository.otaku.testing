@@ -8,14 +8,14 @@ from resources.lib.ui.divide_flavors import div_flavor
 
 
 class AniListWLF(WatchlistFlavorBase):
+    _NAME = "anilist"
     _URL = "https://graphql.anilist.co"
     _TITLE = "AniList"
-    _NAME = "anilist"
     _IMAGE = "anilist.png"
 
     def __headers(self):
         headers = {
-            'Authorization': f'Bearer {self._token}',
+            'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -31,7 +31,7 @@ class AniListWLF(WatchlistFlavorBase):
         '''
 
         variables = {
-            "name": self._username
+            "name": self.username
         }
 
         r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
@@ -48,7 +48,7 @@ class AniListWLF(WatchlistFlavorBase):
 
     def __get_sort(self):
         sort_types = ['MEDIA_TITLE_ENGLISH_DESC', 'MEDIA_TITLE_ROMAJI_DESC', 'SCORE', 'PROGRESS', 'UPDATED_TIME', 'ADDED_TIME']
-        return sort_types[int(self._sort)]
+        return sort_types[int(self.sort)]
 
     def watchlist(self):
         statuses = [
@@ -164,8 +164,8 @@ class AniListWLF(WatchlistFlavorBase):
         '''
 
         variables = {
-            'userId': int(self._user_id),
-            'username': self._username,
+            'userId': int(self.user_id),
+            'username': self.username,
             'status': status,
             'type': 'ANIME',
             'sort': self.__get_sort(),
@@ -199,7 +199,7 @@ class AniListWLF(WatchlistFlavorBase):
             control.log(f"Mal ID not found for {anilist_id}", 'warning')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
-        title = res['title'].get(self._title_lang) or res['title'].get('userPreferred')
+        title = res['title'].get(self.title_lang) or res['title'].get('userPreferred')
 
         info = {
             'title': title,
@@ -284,7 +284,7 @@ class AniListWLF(WatchlistFlavorBase):
 
         next_up = progress + 1
         episode_count = res['episodes'] if res['episodes'] else 0
-        base_title = res['title'].get(self._title_lang) or res['title'].get('userPreferred')
+        base_title = res['title'].get(self.title_lang) or res['title'].get('userPreferred')
         title = f"{base_title} - {next_up}/{episode_count}"
         poster = image = res['coverImage']['extraLarge']
 
@@ -412,8 +412,8 @@ class AniListWLF(WatchlistFlavorBase):
         '''
 
         variables = {
-            'userId': int(self._user_id),
-            'username': self._username,
+            'userId': int(self.user_id),
+            'username': self.username,
             'status': status,
             'type': 'ANIME',
             'sort': self.__get_sort()

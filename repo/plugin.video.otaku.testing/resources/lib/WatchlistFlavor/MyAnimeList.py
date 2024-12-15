@@ -10,21 +10,21 @@ from resources.lib.ui.divide_flavors import div_flavor
 
 
 class MyAnimeListWLF(WatchlistFlavorBase):
+    _NAME = "mal"
     _URL = "https://api.myanimelist.net/v2"
     _TITLE = "MyAnimeList"
-    _NAME = "mal"
     _IMAGE = "myanimelist.png"
 
     def __headers(self):
         headers = {
-            'Authorization': f'Bearer {self._token}',
+            'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
         return headers
 
     def login(self):
         from urllib import parse
-        parsed = parse.urlparse(self._auth_var)
+        parsed = parse.urlparse(self.auth_var)
         params = dict(parse.parse_qsl(parsed.query))
         code = params.get('code')
         code_verifier = params.get('state')
@@ -41,7 +41,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             return
         res = r.json()
 
-        self._token = res['access_token']
+        self.token = res['access_token']
         user = requests.get(f'{self._URL}/users/@me', headers=self.__headers(), params={'fields': 'name'})
         user = user.json()
 
@@ -78,7 +78,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
 
     def __get_sort(self):
         sort_types = ['list_score', 'list_updated_at', 'anime_start_date', 'anime_title']
-        return sort_types[int(self._sort)]
+        return sort_types[int(self.sort)]
 
     def watchlist(self):
         statuses = [
@@ -151,7 +151,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         title = res['node'].get('title')
-        if self._title_lang == 'english':
+        if self.title_lang == 'english':
             title = res['node']['alternative_titles'].get('en') or title
 
         eps_watched = res['list_status']["num_episodes_watched"]
@@ -214,7 +214,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             return
 
         base_title = res['node']['title']
-        if self._title_lang == 'english':
+        if self.title_lang == 'english':
             base_title = res['node']['alternative_titles'].get('en') or base_title
 
         title = f"{base_title} - {next_up}/{eps_total}"

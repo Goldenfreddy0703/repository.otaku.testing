@@ -76,19 +76,12 @@ def log(msg, level="info"):
 
 def enabled_debrid():
     debrids = ['realdebrid', 'debridlink', 'alldebrid', 'premiumize', 'torbox']
-    enabled_debrids = {}
-    for debrid in debrids:
-        enabled_debrids[debrid] = getSetting(f'{debrid}.token') != '' and getBool(f'{debrid}.enabled')
-    return enabled_debrids
+    return {x: getSetting(f'{x}.token') != '' and getBool(f'{x}.enabled') for x in debrids}
 
 
 def enabled_watchlists():
-    watchlists = ['mal', 'kitsu', 'anilist', 'simkl']
-    enabled_watchlists = []
-    for watchlist in watchlists:
-        if getSetting(f'{watchlist}.token') != '' and getBool(f'{watchlist}.enabled'):
-            enabled_watchlists.append(watchlist)
-    return enabled_watchlists
+    watchlists = ['mal', 'anilist', 'kitsu', 'simkl']
+    return [x for x in watchlists if getSetting(f'{x}.token') != '' and getBool(f'{x}.enabled')]
 
 
 def watchlist_to_update():
@@ -201,6 +194,10 @@ def yesnocustom_dialog(title, text, customlabel='', nolabel='', yeslabel='', aut
 
 def notify(title, text, icon=OTAKU_LOGO3_PATH, time=5000, sound=True):
     xbmcgui.Dialog().notification(title, text, icon, time, sound)
+
+
+def input_dialog(title, input_):
+    return xbmcgui.Dialog().input(title, input_)
 
 
 def multiselect_dialog(title, dialog_list):

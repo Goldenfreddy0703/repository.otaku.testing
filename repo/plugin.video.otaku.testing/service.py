@@ -54,7 +54,7 @@ def sync_watchlist(silent=False):
 
         flavor = WatchlistFlavor.get_update_flavor()
         if flavor:
-            if flavor.flavor_name in WatchlistFlavor.get_enabled_watchlist_list():
+            if flavor.flavor_name in control.enabled_watchlists():
                 flavor.save_completed()
                 if not silent:
                     notify_string = f'Completed Sync [B]{flavor.flavor_name.capitalize()}[/B]'
