@@ -2,6 +2,7 @@ import xbmc
 import xbmcgui
 import pickle
 import service
+import json
 
 from resources.lib.ui import control, database
 from resources.lib.indexers import aniskip, anime_skip
@@ -48,9 +49,6 @@ class WatchlistPlayer(player):
         self.episode = episode
         self.resume_time = resume_time
 
-        # Set the audio and subtitle preferences
-        self.set_audio_and_subtitle_preferences()
-
         # process skip times
         self.process_hianime()
         if not self.skipintro_aniskip or not self.skipoutro_aniskip:
@@ -64,77 +62,6 @@ class WatchlistPlayer(player):
 
     # def onPlayBackStarted(self):
     #     pass
-
-    def set_audio_and_subtitle_preferences(self):
-        if control.getSetting('general.kodi_language') == 'false':
-            # Subtitle Preferences
-            subtitle_lang = self.getAvailableSubtitleStreams()
-            subtitles = [
-                "none", "eng", "jpn", "spa", "fre", "ger",
-                "ita", "dut", "rus", "por", "kor", "chi",
-                "ara", "hin", "tur", "pol", "swe", "nor",
-                "dan", "fin"
-            ]
-            preferred_subtitle_setting = control.getInt('general.subtitles')
-
-            if 0 <= preferred_subtitle_setting < len(subtitles):
-                preferred_subtitle = subtitles[preferred_subtitle_setting]
-            else:
-                preferred_subtitle = "eng"
-
-            try:
-                subtitle_int = subtitle_lang.index(preferred_subtitle)
-                self.setSubtitleStream(subtitle_int)
-            except ValueError:
-                subtitle_int = 0
-                self.setSubtitleStream(subtitle_int)
-
-            # Audio Preferences
-            audio_lang = self.getAvailableAudioStreams()
-            audios = ['jpn', 'eng']
-            preferred_audio_setting = control.getInt('general.audio')
-
-            if 0 <= preferred_audio_setting < len(audios):
-                preferred_audio = audios[preferred_audio_setting]
-
-            try:
-                audio_int = audio_lang.index(preferred_audio)
-                self.setAudioStream(audio_int)
-            except ValueError:
-                audio_int = 0
-                self.setAudioStream(audio_int)
-
-            if len(audio_lang) == 1:
-                if "jpn" not in audio_lang:
-                    if control.getBool('general.dubsubtitles'):
-                        if preferred_subtitle == "none":
-                            self.showSubtitles(False)
-                        else:
-                            self.showSubtitles(True)
-                    else:
-                        self.showSubtitles(False)
-
-                if "eng" not in audio_lang:
-                    if preferred_subtitle == "none":
-                        self.showSubtitles(False)
-                    else:
-                        self.showSubtitles(True)
-
-            if len(audio_lang) > 1:
-                if preferred_audio == "eng":
-                    if control.getBool('general.dubsubtitles'):
-                        if preferred_subtitle == "none":
-                            self.showSubtitles(False)
-                        else:
-                            self.showSubtitles(True)
-                    else:
-                        self.showSubtitles(False)
-
-                if preferred_audio == "jpn":
-                    if preferred_subtitle == "none":
-                        self.showSubtitles(False)
-                    else:
-                        self.showSubtitles(True)
 
     def onPlayBackStarted(self):
         if self._build_playlist and playList.size() == 1:
@@ -209,6 +136,98 @@ class WatchlistPlayer(player):
         control.closeAllDialogs()
         if self.resume_time:
             player().seekTime(self.resume_time)
+
+        if control.getSetting('general.kodi_language') == 'false':
+            # Subtitle Preferences
+            response = xbmc.executeJSONRPC(json.dumps({
+                "jsonrpc": "2.0",
+                "method": "Player.GetProperties",
+                "params": {
+                    "playerid": 1,
+                    "properties": ["subtitles"]
+                },
+                "id": 1
+            }))
+
+            subtitles = [
+                "none", "eng", "jpn", "spa", "fre", "ger",
+                "ita", "dut", "rus", "por", "kor", "chi",
+                "ara", "hin", "tur", "pol", "swe", "nor",
+                "dan", "fin"
+            ]
+
+            response = json.loads(response)
+            subtitle_lang = self.getAvailableSubtitleStreams()
+            preferred_subtitle_setting = int(control.getSetting('general.subtitles'))
+            preferred_subtitle = subtitles[preferred_subtitle_setting]
+
+            if preferred_subtitle == "none":
+                self.showSubtitles(False)
+            else:
+                # Check if preferred subtitle is available, else default to English
+                if preferred_subtitle not in subtitle_lang:
+                    preferred_subtitle = "eng"
+
+                subtitle_int = -1
+                for index, sub in enumerate(response['result']['subtitles']):
+                    if sub['language'] == preferred_subtitle and 'dialogue' in sub['name'].lower():
+                        subtitle_int = index
+                        break
+                    
+                if subtitle_int == -1:
+                    try:
+                        subtitle_int = subtitle_lang.index(preferred_subtitle)
+                    except ValueError:
+                        subtitle_int = 0
+
+                self.setSubtitleStream(subtitle_int)
+
+            # Audio Preferences
+            audio_lang = self.getAvailableAudioStreams()
+            audios = ['jpn', 'eng']
+            preferred_audio_setting = int(control.getSetting('general.audio'))
+
+            if 0 <= preferred_audio_setting < len(audios):
+                preferred_audio = audios[preferred_audio_setting]
+
+            try:
+                audio_int = audio_lang.index(preferred_audio)
+                self.setAudioStream(audio_int)
+            except ValueError:
+                audio_int = 0
+                self.setAudioStream(audio_int)
+
+            if len(audio_lang) == 1:
+                if "jpn" not in audio_lang:
+                    if control.getSetting('general.dubsubtitles') == 'true':
+                        if preferred_subtitle == "none":
+                            self.showSubtitles(False)
+                        else:
+                            self.showSubtitles(True)
+                    else:
+                        self.showSubtitles(False)
+
+                if "eng" not in audio_lang:
+                    if preferred_subtitle == "none":
+                        self.showSubtitles(False)
+                    else:
+                        self.showSubtitles(True)
+
+            if len(audio_lang) > 1:
+                if preferred_audio == "eng":
+                    if control.getSetting('general.dubsubtitles') == 'true':
+                        if preferred_subtitle == "none":
+                            self.showSubtitles(False)
+                        else:
+                            self.showSubtitles(True)
+                    else:
+                        self.showSubtitles(False)
+
+                if preferred_audio == "jpn":
+                    if preferred_subtitle == "none":
+                        self.showSubtitles(False)
+                    else:
+                        self.showSubtitles(True)
 
         if self.media_type == 'movie':
             return self.onWatchedPercent()
