@@ -2015,7 +2015,7 @@ class AniListBrowser(BrowserBase):
             base['clearart'] = random.choice(kodi_meta['clearart'])
         if kodi_meta.get('clearlogo'):
             base['clearlogo'] = random.choice(kodi_meta['clearlogo'])
-        if res['format'] in ['MOVIE', 'ONA', 'SPECIAL'] and res['episodes'] == 1:
+        if res['format'] in ['MOVIE', 'ONA', 'OVA', 'SPECIAL'] and res['episodes'] == 1:
             base['url'] = f'play_movie/{mal_id}/'
             base['info']['mediatype'] = 'movie'
             return utils.parse_view(base, False, True, dub)
@@ -2023,6 +2023,11 @@ class AniListBrowser(BrowserBase):
 
     def base_airing_view(self, res, ts):
         import datetime
+
+        mal_id = res['media']['idMal']
+        if not mal_id:
+            return
+
         airingAt = datetime.datetime.fromtimestamp(res['airingAt'])
         airingAt_day = airingAt.strftime('%A')
         airingAt_time = airingAt.strftime('%I:%M %p')

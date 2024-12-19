@@ -235,8 +235,9 @@
                     <constraints>
                         <options>
                             <option label="simkl">simkl</option>
-                            <option label="jikanmoa">jikanmoa</option>
                             <option label="anizip">anizip</option>
+                            <option label="jikanmoe">jikanmoe</option>
+                            <option label="kitsu">kitsu</option>
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>
@@ -1998,11 +1999,13 @@
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
                 </setting>
                 <setting id="tv_shows" type="boolean" label="30905" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                    <visible>false</visible>
                 </setting>
                 <setting id="trending" type="boolean" label="30906" help="">
                     <level>0</level>

@@ -120,9 +120,7 @@ class RealDebrid:
             control.log(f"realdebrid.refresh: {repr(r)}", 'warning')
 
     def addMagnet(self, magnet):
-        postData = {
-            'magnet': magnet
-        }
+        postData = {'magnet': magnet}
         response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers(), data=postData).json()
         return response
 
@@ -134,16 +132,12 @@ class RealDebrid:
         return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers()).json()
 
     def torrentSelect(self, torrentid, fileid='all'):
-        postData = {
-            'files': fileid
-        }
+        postData = {'files': fileid}
         r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers(), data=postData)
         return r.ok
 
     def resolve_hoster(self, link):
-        postData = {
-            'link': link
-        }
+        postData = {'link': link}
         response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.headers(), data=postData).json()
         return response['download']
 

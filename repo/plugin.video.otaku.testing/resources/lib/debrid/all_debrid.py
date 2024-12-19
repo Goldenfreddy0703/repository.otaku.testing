@@ -18,7 +18,6 @@ class AllDebrid:
         params = {'agent': self.agent_identifier}
         resp = requests.get(f'{self.base_url}/pin/get', params=params).json()['data']
         self.OauthTotalTimeout = self.OauthTimeout = int(resp['expires_in'])
-        control.log(self.OauthTimeout)
         copied = control.copy2clip(resp['pin'])
         display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['base_url']))}[CR]"
                           f"{control.lang(30021).format(control.colorstr(resp['pin']))}")
@@ -26,10 +25,12 @@ class AllDebrid:
             display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
         control.progressDialog.create(f'{control.ADDON_NAME}: Alldebrid Auth', display_dialog)
         control.progressDialog.update(100)
+        
         # Seems the All Debrid servers need some time do something with the pin before polling
         # Polling too early will cause an invalid pin error
 
         xbmc.sleep(5000)
+
         auth_done = False
         while not auth_done and self.OauthTimeout > 0:
             self.OauthTimeout -= self.OauthTimeStep

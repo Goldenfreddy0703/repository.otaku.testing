@@ -196,8 +196,8 @@ def notify(title, text, icon=OTAKU_LOGO3_PATH, time=5000, sound=True):
     xbmcgui.Dialog().notification(title, text, icon, time, sound)
 
 
-def input_dialog(title, input_):
-    return xbmcgui.Dialog().input(title, input_)
+def input_dialog(title, input_='', option=0):
+    return xbmcgui.Dialog().input(title, input_, option)
 
 
 def multiselect_dialog(title, dialog_list):

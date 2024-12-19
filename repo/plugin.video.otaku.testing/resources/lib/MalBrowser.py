@@ -1558,7 +1558,7 @@ class MalBrowser(BrowserBase):
         if kodi_meta.get('clearlogo'):
             base['clearlogo'] = random.choice(kodi_meta['clearlogo'])
 
-        if res.get('type') in ['Movie', 'ONA', 'Special', 'TV Special'] and res['episodes'] == 1:
+        if res.get('type') in ['Movie', 'ONA', 'OVA', 'Special', 'TV Special'] and res['episodes'] == 1:
             base['url'] = f'play_movie/{mal_id}/'
             base['info']['mediatype'] = 'movie'
             return utils.parse_view(base, False, True, dub)

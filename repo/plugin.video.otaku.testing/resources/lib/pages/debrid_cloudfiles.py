@@ -2,7 +2,7 @@ import re
 import requests
 import threading
 
-from resources.lib.ui import source_utils, control
+from resources.lib.ui import source_utils
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.debrid import real_debrid, premiumize, all_debrid, torbox
 
@@ -74,19 +74,16 @@ class Sources(BrowserBase):
                 }
             )
 
-    def premiumize_cloud_inspection(self, query, episode):
-        cloud_items = premiumize.Premiumize().list_folder('')
-        filenames = [re.sub(r'\[.*?]\s*', '', i['name'].replace(',', '')) for i in cloud_items]
-        filenames_query = ','.join(filenames)
-        r = requests.get('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
-        resp = r.json()
-        for i in resp:
-            torrent = cloud_items[i]
+    def premiumize_cloud_inspection(self, query: str, episode) -> None:
+        query1, query2 = query.replace('(', '').replace(')', '').rsplit('|', 1)
+        cloud_items = premiumize.Premiumize().search_folder(query1)
+        cloud_items += premiumize.Premiumize().search_folder(query2)
+        unique_cloud_items = []
+        [unique_cloud_items.append(i) for i in cloud_items if i not in unique_cloud_items]
+        for torrent in unique_cloud_items:
             filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
 
             if torrent['type'] == 'file':
-                if torrent['transcode_status'] != 'finished':
-                    continue
                 if source_utils.is_file_ext_valid(filename) and episode not in filename.rsplit('-', 1)[1]:
                     continue
 
@@ -116,10 +113,9 @@ class Sources(BrowserBase):
         resp = r.json()
         for i in resp:
             torrent = cloud_items[i]
-            # filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
-            if not torrent['cached'] or not torrent['download_finished'] or len(torrent['files']) < 1:
+            filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
+            if not torrent['cached'] or not torrent['download_finished'] or len(torrent['files']) < 1 or episode not in filename:
                 continue
-
             if not any(source_utils.is_file_ext_valid(tor_file['short_name'].lower()) for tor_file in torrent['files']):
                 continue
 

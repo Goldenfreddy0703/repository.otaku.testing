@@ -804,58 +804,52 @@ def SETTINGS(payload, params):
 def CHANGE_LOG(payload, params):
     import service
     service.getChangeLog()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('fs_inst')
 def FS_INST(payload, params):
     import service
     service.getInstructions()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('clear_cache')
 def CLEAR_CACHE(payload, params):
     database.cache_clear()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('clear_search_history')
 def CLEAR_SEARCH_HISTORY(payload, params):
     database.clearSearchHistory()
     control.refresh()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('clear_selected_fanart')
 def CLEAR_SELECTED_FANART(payload, params):
+    silent = False
+
+    if not silent:
+        confirm = control.yesno_dialog(control.ADDON_NAME, control.lang(30033))
+    if confirm == 0:
+        return
+
     fanart_all = control.getSetting(f'fanart.all').split(',')
     for i in fanart_all:
         control.setSetting(f'fanart.select.{i}', '')
     control.setSetting('fanart.all', '')
-    control.ok_dialog(control.ADDON_NAME, "Completed")
-    if params.get('setting'):
-        control.exit_code()
+    if not silent:
+        control.notify(f'{control.ADDON_NAME}: Fanart', 'Fanart Successfully Cleared', sound=False)
 
 
 @Route('rebuild_database')
 def REBUILD_DATABASE(payload, params):
     from resources.lib.ui.database_sync import SyncDatabase
     SyncDatabase().re_build_database()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('completed_sync')
 def COMPLETED_SYNC(payload, params):
     import service
     service.sync_watchlist()
-    if params.get('setting'):
-        control.exit_code()
 
 
 @Route('sort_select')

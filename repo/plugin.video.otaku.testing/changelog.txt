@@ -1,3 +1,12 @@
+Changelog v5.1.37 (2024-12-19):
+- Added Kitsu Episode Meta
+- Improved Animetosho Scraping
+- Improved Debrid Cloud Searching
+- Improved Season Search
+- Fixed Playback Issues
+- Fixed Router
+- Fixed Anime Calendar
+
 Changelog v5.1.36 (2024-12-17):
 - Discovered JSONRPC
 - Improved Subtitle Code

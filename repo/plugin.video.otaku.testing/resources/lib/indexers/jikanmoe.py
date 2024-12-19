@@ -90,20 +90,25 @@ class JikanAPI:
 
     def process_episode_view(self, mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data):
         update_time = datetime.date.today().isoformat()
-
         result = self.get_anime_info(mal_id)
         if not result:
             return []
 
         title_list = [name['title'] for name in result['titles']]
+        season = utils.get_season(title_list, mal_id)
 
-        season = utils.get_season(title_list)
         result_ep = self.get_episode_meta(mal_id)
+        # kodi_episodes = kodi_meta['episodes']
+        # if kodi_episodes:
+        #     control.print(f"Kodi Episodes: {kodi_episodes}, Jikan Episodes: {len(result_ep)}")
+        #     if len(result_ep) != kodi_episodes:
+        #         return []
+
         mapfunc = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data)
         all_results = sorted(list(map(mapfunc, result_ep)), key=lambda x: x['info']['episode'])
 
         if control.getBool('override.meta.api') and control.getBool('override.meta.notify'):
-            control.notify("Jikanmoa", f'{tvshowtitle} Added to Database', icon=poster)
+            control.notify("Jikanmoe", f'{tvshowtitle} Added to Database', icon=poster)
         return all_results
 
     def append_episodes(self, mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data=None, dub_data=None):
@@ -115,7 +120,7 @@ class JikanAPI:
             season = episodes[0]['season']
             mapfunc2 = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data, episodes=episodes)
             all_results = list(map(mapfunc2, result))
-            control.notify("Jikanmoa", f'{tvshowtitle} Appended to Database', icon=poster)
+            control.notify("Jikanmoe", f'{tvshowtitle} Appended to Database', icon=poster)
         else:
             mapfunc1 = partial(indexers.parse_episodes, eps_watched=eps_watched, dub_data=dub_data)
             all_results = list(map(mapfunc1, episodes))
@@ -141,15 +146,15 @@ class JikanAPI:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
                 from resources.jz import anime_filler
                 filler_data = anime_filler.get_data(kodi_meta['ename'])
-                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data, dub_data), 'episodes'
-            return indexers.process_episodes(episodes, eps_watched, dub_data), 'episodes'
+                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data, dub_data)
+            return indexers.process_episodes(episodes, eps_watched, dub_data)
 
         if kodi_meta['episodes'] is None or kodi_meta['episodes'] > 99:
             from resources.jz import anime_filler
             filler_data = anime_filler.get_data(kodi_meta['ename'])
         else:
             filler_data = None
-        return self.process_episode_view(mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data), 'episodes'
+        return self.process_episode_view(mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data)
 
     def get_anime(self, filter_type, page):
         perpage = 25

@@ -1,7 +1,7 @@
 import pickle
 
 from resources.lib import indexers
-from resources.lib.indexers import simkl, anizip, jikanmoe
+from resources.lib.indexers import simkl, anizip, jikanmoe, kitsu
 from resources.lib.ui import control, database, utils
 
 if control.settingids.browser_api == 'mal':
@@ -50,18 +50,22 @@ def get_anime_init(mal_id):
             data = simkl.SIMKLAPI().get_episodes(mal_id, show_meta)
         elif meta_api == 'anizip':
             data = anizip.ANIZIPAPI().get_episodes(mal_id, show_meta)
-        else:
+        elif meta_api == 'jikanmoe':
             data = jikanmoe.JikanAPI().get_episodes(mal_id, show_meta)
+        elif meta_api == 'kitsu':
+            data = kitsu.KitsuAPI().get_episodes(mal_id, show_meta)
 
     else:
         data = simkl.SIMKLAPI().get_episodes(mal_id, show_meta)
-        if not data[0]:
+        if not data:
             data = anizip.ANIZIPAPI().get_episodes(mal_id, show_meta)
-        if not data[0]:
+        if not data:
             data = jikanmoe.JikanAPI().get_episodes(mal_id, show_meta)
-        if not data[0]:
-            data = [], 'episodes'
-    return data
+        if not data:
+            data = kitsu.KitsuAPI().get_episodes(mal_id, show_meta)
+        if not data:
+            data = []
+    return data, 'episodes'
 
 
 def get_sources(mal_id, episode, media_type, rescrape=False, source_select=False, silent=False):

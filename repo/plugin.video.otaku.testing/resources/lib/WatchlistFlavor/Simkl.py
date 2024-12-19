@@ -35,39 +35,32 @@ class SimklWLF(WatchlistFlavorBase):
         r = requests.get(f'{self._URL}/oauth/pin', params=params)
         device_code = r.json()
 
-        control.copy2clip(device_code["user_code"])
-        control.progressDialog.create('SIMKL Auth')
-        f_string = f'''
-{control.lang(30020).format(control.colorstr('https://simkl.com/pin'))}
-{control.lang(30021).format(control.colorstr(device_code['user_code']))}
-{control.lang(30022)}
-'''
-        control.progressDialog.update(100, f_string)
+        copied = control.copy2clip(device_code["user_code"])
+        display_dialog = (f"{control.lang(30020).format(control.colorstr('https://simkl.com/pin'))}[CR]"
+                          f"{control.lang(30021).format(control.colorstr(device_code['user_code']))}")
+        if copied:
+            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+        control.progressDialog.create('SIMKL Auth', display_dialog)
+        control.progressDialog.update(100)
         inter = int(device_code['expires_in'] / device_code['interval'])
         for i in range(inter):
             if control.progressDialog.iscanceled():
                 control.progressDialog.close()
                 return
+            xbmc.sleep(device_code['interval'] * 1000)
+
             r = requests.get(f'{self._URL}/oauth/pin/{device_code["user_code"]}', params=params)
             r = r.json()
             if r['result'] == 'OK':
                 self.token = r['access_token']
-                login_data = {
-                    'token': self.token
-                }
+                login_data = {'token': self.token}
                 r = requests.post(f'{self._URL}/users/settings', headers=self.__headers())
                 if r.ok:
                     user = r.json()['user']
                     login_data['username'] = user['name']
                 return login_data
-            f_string = f'''
-{control.lang(30020).format(control.colorstr('https://simkl.com/pin'))}
-{control.lang(30021).format(control.colorstr(device_code['user_code']))}
-{control.lang(30022)}
-Code Valid for {control.colorstr(device_code["expires_in"] - i * device_code["interval"])} Seconds
-'''
-            control.progressDialog.update(int((inter - i) / inter * 100), f_string)
-            xbmc.sleep(device_code['interval'] * 1000)
+            new_display_dialog = f"{display_dialog}[CR]Code Valid for {control.colorstr(device_code['expires_in'] - i * device_code['interval'])} Seconds"
+            control.progressDialog.update(int((inter - i) / inter * 100), new_display_dialog)
 
     def __get_sort(self):
         sort_types = ['anime_title', 'list_updated_at', 'last_added', 'user_rating']

@@ -120,7 +120,7 @@ class WatchlistPlayer(player):
             xbmc.sleep(5000)
 
     def keepAlive(self):
-        for inx in range(30):
+        for _ in range(40):
             if self.isPlayingVideo() and self.getTotalTime() != 0:
                 break
             xbmc.sleep(250)

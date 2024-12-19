@@ -71,11 +71,16 @@ class Premiumize:
             if token.get('error') == 'slow_down':
                 xbmc.sleep(1000)
         return False
+    
+    def search_folder(self, query):
+        params = {'q': query}
+        r = requests.get(f'{self.base_url}/folder/search', headers=self.headers(), params=params)
+        return r.json()['content']
 
     def list_folder(self, folderid):
         params = {'id': folderid} if folderid else None
-        response = requests.get(f"{self.base_url}/folder/list", headers=self.headers(), params=params).json()
-        return response['content']
+        r = requests.get(f"{self.base_url}/folder/list", headers=self.headers(), params=params)
+        return r.json()['content']
 
     def hash_check(self, hashlist):
         params = {'items[]': hashlist}
@@ -85,7 +90,6 @@ class Premiumize:
     def direct_download(self, src):
         postData = {'src': src}
         r = requests.post(f'{self.base_url}/transfer/directdl', headers=self.headers(), data=postData)
-        control.log(r.json())
         return r.json()
 
     def addMagnet(self, src):

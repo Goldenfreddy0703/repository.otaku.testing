@@ -39,7 +39,6 @@ class SourceSelect(BaseWindow):
                 self.setProperty('item.info.year', year)
             except ValueError:
                 pass
-
         else:
             show = database.get_show(actionArgs.get('mal_id'))
             if show:

@@ -26,8 +26,9 @@ def get(function, duration, *args, **kwargs):
     if cache_result and is_cache_valid(cache_result['date'], duration):
         try:
             return_data = ast.literal_eval(cache_result['value'])
-        except Exception as e:
-            control.log(repr(e), 'warning')
+        except:
+            import traceback
+            control.log(traceback.format_exc(), 'error')
             return_data = None
         return return_data
 

@@ -73,15 +73,21 @@ class ANIZIPAPI:
 
     def process_episode_view(self, mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data):
         update_time = datetime.date.today().isoformat()
-
         result = self.get_anime_info(mal_id)
         if not result:
             return []
+
         result_ep = [result['episodes'][res] for res in result['episodes'] if res.isdigit()]
+        # kodi_episodes = kodi_meta['episodes']
+        # if kodi_episodes:
+        #     control.print(f"Kodi Episodes: {kodi_episodes}, ANIZIP Episodes: {len(result_ep)}")
+        #     if len(result_ep) != kodi_episodes:
+        #         return []
+
         if not result_ep:
             return []
-        season = result_ep[0].get('seasonNumber', 1)
 
+        season = result_ep[0].get('seasonNumber', 1)
         mapfunc = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data)
         all_results = list(map(mapfunc, result_ep))
 
@@ -124,11 +130,11 @@ class ANIZIPAPI:
 
         if episodes:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
-                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, dub_data), 'episodes'
-            return indexers.process_episodes(episodes, eps_watched, dub_data), 'episodes'
+                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, dub_data)
+            return indexers.process_episodes(episodes, eps_watched, dub_data)
         if kodi_meta['episodes'] is None or kodi_meta['episodes'] > 99:
             from resources.jz import anime_filler
             filler_data = anime_filler.get_data(kodi_meta['ename'])
         else:
             filler_data = None
-        return self.process_episode_view(mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data), 'episodes'
+        return self.process_episode_view(mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data)

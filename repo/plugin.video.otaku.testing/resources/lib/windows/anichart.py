@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import default
 
 from resources.lib.ui import control
 from resources.lib.windows.anichart_window import BaseWindow
@@ -75,27 +76,37 @@ class Anichart(BaseWindow):
             self.handle_action(actionID)
 
         if actionID == 117:
-            context = control.context_menu(
-                [
-                    "Find Recommendations",
-                    "Find Relations",
-                    "Get Watch Order",
-                    "WatchList Manager",
-                ]
-            )
+            context_menu_options = []
+            if control.getBool('context.otaku.testing.findrecommendations'):
+                context_menu_options.append("Find Recommendations")
+            if control.getBool('context.otaku.testing.findrelations'):
+                context_menu_options.append("Find Relations")
+            if control.getBool('context.otaku.testing.getwatchorder'):
+                context_menu_options.append("Get Watch Order")
+            if control.getBool('context.otaku.testing.deletefromdatabase'):
+                context_menu_options.append("Delete From Database")
+            if control.getBool('context.otaku.testing.watchlist'):
+                context_menu_options.append("WatchList Manager")
+        
+            context = control.context_menu(context_menu_options)
             self.position = self.display_list.getSelectedPosition()
             anime = self.anime_items[self.position]['id']
             page = 1
-            if context == 0:  # Find Recommendations
+        
+            if context == 0 and control.getBool('context.otaku.testing.findrecommendations'):  # Find Recommendations
                 control.draw_items(BROWSER.get_recommendations(anime, page), 'tvshows')
                 self.close()
-            elif context == 1:  # Find Relations
+            elif context == 1 and control.getBool('context.otaku.testing.findrelations'):  # Find Relations
                 control.draw_items(BROWSER.get_relations(anime), 'tvshows')
                 self.close()
-            elif context == 2:  # Get Watch Order
+            elif context == 2 and control.getBool('context.otaku.testing.getwatchorder'):  # Get Watch Order
                 control.draw_items(BROWSER.get_watch_order(anime), 'tvshows')
                 self.close()
-            elif context == 3:  # WatchList Manager
+            elif context == 3 and control.getBool('context.otaku.testing.deletefromdatabase'):  # Delete From Database
+                payload = f"some_path/{anime}/0"
+                params = {}
+                default.DELETE_ANIME_DATABASE(payload, params)
+            elif context == 4 and control.getBool('context.otaku.testing.watchlist'):  # WatchList Manager
                 payload = f"some_path/{anime}/0"  # Construct the payload, replace 'some/path' with actual path if needed
                 params = {}  # Construct the params if needed
                 WatchlistIntegration.CONTEXT_MENU(payload, params)

@@ -21,4 +21,4 @@ def router_process(url, params=None):
     payload = "/".join(url.split("/")[1:])
     for route_obj in ROUTES:
         if url == route_obj.path or (route_obj.wildcard and url.startswith(route_obj.path)):
-            route_obj.func(payload, params)
+            return route_obj.func(payload, params)

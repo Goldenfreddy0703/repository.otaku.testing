@@ -1,7 +1,7 @@
 import os
 
 from functools import partial
-from resources.lib.ui import control
+from resources.lib.ui import control, database
 
 
 def allocate_item(name, url, isfolder, isplayable, cm, image='', info=None, fanart=None, poster=None, landscape=None, banner=None, clearart=None, clearlogo=None):
@@ -60,39 +60,45 @@ def parse_view(base, isfolder, isplayable, dub=False):
     return parsed_view
 
 
-def get_season(titles_list):
+def get_season(titles_list, mal_id):
     import re
-    regexes = [r'season\s(\d+)', r'\s(\d+)st\sseason\s', r'\s(\d+)nd\sseason\s', r'\s(\d+)rd\sseason\s', r'\s(\d+)th\sseason\s']
-    s_ids = []
-    for regex in regexes:
-        s_ids += [re.findall(regex, name, re.IGNORECASE) for name in titles_list]
-    s_ids = [s[0] for s in s_ids if s]
-    if not s_ids:
-        regex = r'\s(\d+)$'
-        cour = False
-        for name in titles_list:
-            if name is not None and (' part ' in name.lower() or ' cour ' in name.lower()):
-                cour = True
-                break
-        if not cour:
+    meta_ids = database.get_mappings(mal_id, 'mal_id')
+    if meta_ids.get('thetvdb_season'):
+        if meta_ids['thetvdb_season'] == '0' or meta_ids['thetvdb_season'] == 'a':
+            return 1
+        return int(meta_ids['thetvdb_season'])
+    else:
+        regexes = [r'season\s(\d+)', r'\s(\d+)st\sseason\s', r'\s(\d+)nd\sseason\s', r'\s(\d+)rd\sseason\s', r'\s(\d+)th\sseason\s']
+        s_ids = []
+        for regex in regexes:
             s_ids += [re.findall(regex, name, re.IGNORECASE) for name in titles_list]
-    s_ids = [s[0] for s in s_ids if s]
-    if not s_ids:
-        seasonnum = 1
-        try:
-            for title in titles_list:
-                try:
-                    seasonnum = re.search(r' (\d)[ rnt][ sdh(]', f' {title[1]}  ').group(1)
+        s_ids = [s[0] for s in s_ids if s]
+        if not s_ids:
+            regex = r'\s(\d+)$'
+            cour = False
+            for name in titles_list:
+                if name is not None and (' part ' in name.lower() or ' cour ' in name.lower()):
+                    cour = True
                     break
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
-        s_ids = [seasonnum]
-    season = int(s_ids[0])
-    if season > 10:
-        season = 1
-    return season
+            if not cour:
+                s_ids += [re.findall(regex, name, re.IGNORECASE) for name in titles_list]
+        s_ids = [s[0] for s in s_ids if s]
+        if not s_ids:
+            seasonnum = 1
+            try:
+                for title in titles_list:
+                    try:
+                        seasonnum = re.search(r' (\d)[ rnt][ sdh(]', f' {title[1]}  ').group(1)
+                        break
+                    except AttributeError:
+                        pass
+            except AttributeError:
+                pass
+            s_ids = [seasonnum]
+        season = int(s_ids[0])
+        if season > 10:
+            season = 1
+        return season
 
 
 def format_time(seconds):
