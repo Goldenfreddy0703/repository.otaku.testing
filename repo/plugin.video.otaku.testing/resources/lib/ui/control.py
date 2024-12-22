@@ -6,6 +6,7 @@ import xbmcplugin
 import xbmcvfs
 import os
 import sys
+import json
 
 from urllib import parse
 
@@ -375,6 +376,31 @@ def get_view_type(viewtype):
         'List': 0
     }
     return viewTypes[viewtype]
+
+
+def jsonrpc_get_setting(setting):
+    value = xbmc.executeJSONRPC(json.dumps({
+        'jsonrpc': '2.0',
+        'method': 'Settings.GetSettingValue',
+        'params': {
+            'setting': setting
+        },
+        'id': 1
+    }))
+
+    setSetting(setting, value)
+
+
+def jsonrpc_set_setting(setting, value):
+    return xbmc.executeJSONRPC(json.dumps({
+        'jsonrpc': '2.0',
+        'method': 'Settings.SetSettingValue',
+        'params': {
+            'setting': setting,
+            'value': value
+        },
+        'id': 1
+    }))
 
 
 def exit_(code):

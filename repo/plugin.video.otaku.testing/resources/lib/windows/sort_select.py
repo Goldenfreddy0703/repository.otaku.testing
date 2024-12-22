@@ -64,8 +64,8 @@ class SortSelect(BaseWindow):
             # BACKSPACE /ESCAPE / STOP / BACK
             self.close()
 
-        if actionID == 7:
-            self.handle_action(7)
+        # if actionID == 7:
+        #     self.handle_action(7)
 
     def onClick(self, control_id):
         self.handle_action(control_id)

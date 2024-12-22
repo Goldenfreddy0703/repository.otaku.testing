@@ -84,7 +84,7 @@ class Sources(BrowserBase):
             filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
 
             if torrent['type'] == 'file':
-                if source_utils.is_file_ext_valid(filename) and episode not in filename.rsplit('-', 1)[1]:
+                if source_utils.is_file_ext_valid(filename) and episode.zfill(2) not in filename.rsplit('-', 1)[1]:
                     continue
 
             self.cloud_files.append(

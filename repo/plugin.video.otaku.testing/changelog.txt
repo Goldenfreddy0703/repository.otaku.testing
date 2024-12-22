@@ -1,3 +1,8 @@
+Changelog v5.1.38 (2024-12-22):
+- Fixed Premiumize Cloud Files
+- Used JSONRPC to set Player Setting
+- Fixed Button Error with Sort Select
+
 Changelog v5.1.37 (2024-12-19):
 - Added Kitsu Episode Meta
 - Improved Animetosho Scraping

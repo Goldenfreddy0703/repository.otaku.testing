@@ -59,6 +59,10 @@ class Resolver(BaseWindow):
         self.context = actionArgs.get('context')
         self.silent = actionArgs.get('silent')
 
+        # Save the default setting and set to autoplay the next item
+        control.jsonrpc_get_setting('videoplayer.autoplaynextitem')
+        control.jsonrpc_set_setting('videoplayer.autoplaynextitem', [2])
+
         if self.source_select:
             control.setSetting('last_played_source', None)
 

@@ -48,6 +48,11 @@ class WatchlistPlayer(player):
         self._build_playlist = build_playlist
         self.episode = episode
         self.resume_time = resume_time
+        self.default_autoplaynextitem = control.getSetting('videoplayer.autoplaynextitem')
+        parsed_value = json.loads(self.default_autoplaynextitem).get('result', {}).get('value', [])
+
+        # Reset Kodi's default "Play Next" feature back to users preference
+        control.jsonrpc_set_setting('videoplayer.autoplaynextitem', parsed_value)
 
         # process skip times
         self.process_hianime()
@@ -120,7 +125,7 @@ class WatchlistPlayer(player):
             xbmc.sleep(5000)
 
     def keepAlive(self):
-        for _ in range(40):
+        for _ in range(20):
             if self.isPlayingVideo() and self.getTotalTime() != 0:
                 break
             xbmc.sleep(250)
