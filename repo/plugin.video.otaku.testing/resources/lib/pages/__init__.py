@@ -8,19 +8,19 @@ from resources.lib.windows.get_sources_window import GetSources
 from resources.lib.windows import sort_select
 
 
-def getSourcesHelper(actionargs):
+def getSourcesHelper(actionArgs):
     if control.getSetting('general.dialog') == '5':
-        sources_window = Sources('get_sources_az.xml', control.ADDON_PATH, actionargs=actionargs)
+        sources_window = Sources('get_sources_az.xml', control.ADDON_PATH, actionArgs=actionArgs)
     else:
-        sources_window = Sources('get_sources.xml', control.ADDON_PATH, actionargs=actionargs)
+        sources_window = Sources('get_sources.xml', control.ADDON_PATH, actionArgs=actionArgs)
     sources = sources_window.doModal()
     del sources_window
     return sources
 
 
 class Sources(GetSources):
-    def __init__(self, xml_file, location, actionargs=None):
-        super(Sources, self).__init__(xml_file, location, actionargs)
+    def __init__(self, xml_file, location, actionArgs=None):
+        super(Sources, self).__init__(xml_file, location, actionArgs)
         self.torrentProviders = ['nyaa', 'animetosho', 'Cloud Inspection']
         self.embedProviders = ['animepahe', 'animix', 'aniwave', 'gogo', 'hianime']
         self.localProviders = ['Local Inspection']

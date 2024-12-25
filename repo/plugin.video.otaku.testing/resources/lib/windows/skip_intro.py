@@ -55,8 +55,10 @@ class SkipIntro(BaseWindow):
     def onAction(self, action):
         actionID = action.getId()
 
-        if actionID in [92, 10, 100, 401]:
-            # BACKSPACE /ESCAPE / STOP / BACK
+        if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
             self.close()
+
         if actionID == 7:
+            # ENTER
             self.handle_action(actionID)

@@ -255,4 +255,7 @@ class SQL:
             control.log('database error')
             control.log(f"{''.join(traceback.format_exception(exc_type, exc_val, exc_tb))}", 'error')
         if exc_type is OperationalError:
+            import traceback
+            control.log('database error')
+            control.log(f"{''.join(traceback.format_exception(exc_type, exc_val, exc_tb))}", 'error')
             return True

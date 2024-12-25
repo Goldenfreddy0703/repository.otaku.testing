@@ -12,8 +12,8 @@ BROWSER = OtakuBrowser.BROWSER
 
 class Anichart(BaseWindow):
 
-    def __init__(self, xml_file, location, get_anime=None, anime_items=None, **kwargs):
-        super(Anichart, self).__init__(xml_file, location)
+    def __init__(self, xml_file, location, get_anime=None, anime_items=None):
+        super().__init__(xml_file, location)
         self.get_anime = get_anime
         self.anime_items = anime_items
         self.position = -1
@@ -47,7 +47,7 @@ class Anichart(BaseWindow):
         self.setFocusId(1000)
 
     def doModal(self):
-        super(Anichart, self).doModal()
+        super().doModal()
         return self.anime_item
 
     def onClick(self, controlId):
@@ -56,9 +56,6 @@ class Anichart(BaseWindow):
             self.handle_action(7)
 
     def handle_action(self, actionID):
-        if (time.time() - self.last_action) < .5:
-            return
-
         if actionID == 7 and self.getFocusId() == 1000:
             self.position = self.display_list.getSelectedPosition()
             self.resolve_item()
@@ -67,12 +64,15 @@ class Anichart(BaseWindow):
             self.anime_item = False
             self.close()
 
-        self.last_action = time.time()
-
     def onAction(self, action):
         actionID = action.getId()
 
-        if actionID in [7, 92, 10]:
+        if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
+            self.close()
+
+        if actionID == 7:
+            # ENTER / BACKSPACE / ESCAPE
             self.handle_action(actionID)
 
         if actionID == 117:
@@ -87,12 +87,12 @@ class Anichart(BaseWindow):
                 context_menu_options.append("Delete From Database")
             if control.getBool('context.otaku.testing.watchlist'):
                 context_menu_options.append("WatchList Manager")
-        
+
             context = control.context_menu(context_menu_options)
             self.position = self.display_list.getSelectedPosition()
             anime = self.anime_items[self.position]['id']
             page = 1
-        
+
             if context == 0 and control.getBool('context.otaku.testing.findrecommendations'):  # Find Recommendations
                 control.draw_items(BROWSER.get_recommendations(anime, page), 'tvshows')
                 self.close()

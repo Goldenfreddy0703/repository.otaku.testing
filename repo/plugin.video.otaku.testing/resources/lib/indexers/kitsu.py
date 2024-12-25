@@ -54,8 +54,7 @@ class KitsuAPI:
             'episode': episode,
             'plot': res['attributes'].get('synopsis', 'No plot available'),
             'tvshowtitle': tvshowtitle,
-            'mediatype': 'episode',
-            'rating': {'score': float(res['attributes'].get('averageRating', 0))}
+            'mediatype': 'episode'
         }
         if eps_watched and int(eps_watched) >= episode:
             info['playcount'] = 1
@@ -96,7 +95,6 @@ class KitsuAPI:
             return []
 
         title_list = [title for title in result['attributes']['titles'].values()]
-        control.log(title_list)
         season = utils.get_season(title_list, mal_id)
 
         result_ep = self.get_episode_meta(kitsu_id)

@@ -39,11 +39,15 @@ class ANIZIPAPI:
             'season': season,
             'episode': episode,
             'tvshowtitle': tvshowtitle,
-            'mediatype': 'episode',
-            'rating': {'score': float(res.get('rating', 0))}
+            'mediatype': 'episode'
         }
         if eps_watched and int(eps_watched) >= episode:
             info['playcount'] = 1
+
+        try:
+            info['rating'] = {'score': float(res['rating'])}
+        except KeyError:
+            pass
 
         try:
             info['aired'] = res['airDate'][:10]

@@ -38,15 +38,15 @@ def allocate_item(name, url, isfolder, isplayable, cm, image='', info=None, fana
 
 
 def parse_history_view(res, cm):
-    return allocate_item(res, f'search/{res}', True, False, cm, '', {})
+    return allocate_item(res, f'search/{res}', True, False, cm, 'search.png', {})
 
 
 def search_history(search_array):
     cm = [('Remove from Item', 'remove_search_item'), ("Edit Search Item...", "edit_search_item")]
     result = [allocate_item("New Search", "search/", True, False, [], 'new_search.png', {})]
     mapfun = partial(parse_history_view, cm=cm)
-    result += list(map(mapfun, search_array))
     result.append(allocate_item("Clear Search History...", "clear_search_history", False, False, [], 'clear_search_history.png', {}))
+    result += list(map(mapfun, search_array))
     return result
 
 

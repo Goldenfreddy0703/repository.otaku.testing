@@ -53,21 +53,6 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
         self.setProperty('item.info.aired.month', '01')
         self.setProperty('item.info.aired.day', '01')
 
-        try:
-            if 'aired' in self.item_information['info']:
-                aired_date = self.item_information['info']['aired']
-                aired_date = control.datetime_workaround(aired_date)
-                aired_date = aired_date.strftime(control.get_region('dateshort'))
-                self.item_information['info']['aired'] = aired_date
-
-            if 'premiered' in self.item_information['info']:
-                premiered = self.item_information['info']['premiered']
-                premiered = control.datetime_workaround(premiered)
-                premiered = premiered.strftime(control.get_region('dateshort'))
-                self.item_information['info']['premiered'] = premiered
-        except:
-            pass
-
         # value = 'TBA'
         try:
             self.setProperty('item.info.%s' % 1, str('fdf'))

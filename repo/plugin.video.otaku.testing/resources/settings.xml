@@ -844,9 +844,7 @@
 						</options>
 					</constraints>
 					<dependencies>
-						<dependency type="enable">
-							<condition operator="is" setting="general.kodi_language">false</condition>
-						</dependency>
+                        <dependency type="enable" setting="general.kodi_language">false</dependency>
 					</dependencies>
 					<control type="spinner" format="string"/>
 				</setting>
@@ -878,12 +876,48 @@
 						</options>
 					</constraints>
 					<dependencies>
-						<dependency type="enable">
-							<condition operator="is" setting="general.kodi_language">false</condition>
-						</dependency>
+                        <dependency type="enable" setting="general.kodi_language">false</dependency>
 					</dependencies>
 					<control type="spinner" format="string"/>
 				</setting>
+                <setting id="general.subtitles.keyword" type="boolean" label="30625" help="">
+                    <level>1</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+					<dependencies>
+                        <dependency type="enable" setting="general.kodi_language">false</dependency>
+					</dependencies>
+                </setting>
+                <setting id="subtitles.keywords" type="integer" label="30626" help="" parent="general.subtitles.keyword">
+                    <level>1</level>
+                    <default>1</default>
+                    <constraints>
+                        <options>
+                            <option label="30627">1</option>
+                            <option label="30628">2</option>
+                            <option label="30629">3</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                    <dependencies>
+                        <dependency type="visible" setting="general.subtitles.keyword">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="subtitles.customkeyword" type="string" label="30630" help="" parent="general.subtitles.keyword">
+                    <level>1</level>
+                    <default/>
+	                <constraints>
+	                	<allowempty>true</allowempty>
+	                </constraints>
+	                <control type="edit" format="string">
+	                	<heading>30630</heading>
+	                	<hidden>false</hidden>
+	                </control>
+                    <dependencies>
+                        <dependency type="visible" setting="general.subtitles.keyword">true</dependency>
+                        <dependency type="visible" setting="subtitles.keywords">3</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="general.dubsubtitles" type="boolean" label="30553" help="">
 					<level>0</level>
 					<default>false</default>

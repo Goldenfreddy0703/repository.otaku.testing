@@ -5,7 +5,7 @@ from resources.lib.windows.base_window import BaseWindow
 
 
 class WatchlistFlavorAuth(BaseWindow):
-    def __init__(self, xml_file, location, flavor=None, **kwargs):
+    def __init__(self, xml_file, location, flavor=None):
         super().__init__(xml_file, location)
         self.flavor = flavor
         self.authorized = False
@@ -31,10 +31,13 @@ class WatchlistFlavorAuth(BaseWindow):
 
     def onAction(self, action):
         actionID = action.getId()
+
         if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
             self.close()
 
-        if actionID in [7, 100, 401]:
+        if actionID == 7:
+            # ENTER
             self.handle_action(7)
 
     def set_settings(self):

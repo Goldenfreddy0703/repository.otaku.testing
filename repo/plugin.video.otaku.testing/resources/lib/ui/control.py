@@ -148,7 +148,7 @@ def lang(x):
 
 
 def addon_url(url):
-    return f'plugin://{ADDON_ID}/{url}'
+    return f"plugin://{ADDON_ID}/{url}"
 
 
 def get_plugin_url():
@@ -162,7 +162,7 @@ def get_plugin_params():
 
 def exit_code():
     if getSetting('reuselanguageinvoker.status') == 'Enabled':
-        exit_(1)
+        exit_(0)
 
 
 def keyboard(title, text=''):
@@ -218,7 +218,7 @@ def browse(type_, heading, shares, mask=''):
 
 
 def set_videotags(li, info):
-    vinfo = li.getVideoInfoTag()
+    vinfo: xbmc.InfoTagVideo = li.getVideoInfoTag()
     if title := info.get('title'):
         vinfo.setTitle(title)
     if media_type := info.get('mediatype'):
@@ -228,7 +228,7 @@ def set_videotags(li, info):
     if plot := info.get('plot'):
         vinfo.setPlot(plot)
     if year := info.get('year'):
-        vinfo.setYear(year)
+        vinfo.setYear(int(year))
     if premiered := info.get('premiered'):
         vinfo.setPremiered(premiered)
     if status := info.get('status'):
@@ -238,11 +238,14 @@ def set_videotags(li, info):
     if mpaa := info.get('mpaa'):
         vinfo.setMpaa(mpaa)
     if rating := info.get('rating'):
-        vinfo.setRating(rating.get('score', 0), rating.get('votes', 0))
+        if isinstance(rating, dict):
+            vinfo.setRating(rating.get('score', 0), rating.get('votes', 0))
+        else:
+            vinfo.setRating(0, 0)
     if season := info.get('season'):
-        vinfo.setSeason(season)
+        vinfo.setSeason(int(season))
     if episode := info.get('episode'):
-        vinfo.setEpisode(episode)
+        vinfo.setEpisode(int(episode))
     if aired := info.get('aired'):
         vinfo.setFirstAired(aired)
     if playcount := info.get('playcount'):
@@ -261,8 +264,12 @@ def set_videotags(li, info):
         vinfo.setTrailer(trailer)
     if uniqueids := info.get('UniqueIDs'):
         vinfo.setUniqueIDs(uniqueids)
-    # if info.get('resume'):
-    #     vinfo.setResumePoint(info['resume'], 0)
+    if resume := info.get('resume'):
+        vinfo.setResumePoint(float(resume), 1)
+
+
+def jsonrpc(json_data):
+    return json.loads(xbmc.executeJSONRPC(json.dumps(json_data)))
 
 
 def xbmc_add_dir(name, url, art, info, draw_cm, bulk_add, isfolder, isplayable):
@@ -296,7 +303,7 @@ def xbmc_add_dir(name, url, art, info, draw_cm, bulk_add, isfolder, isplayable):
 
 
 def bulk_draw_items(video_data):
-    list_items = [xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], vid['cm'], True, vid['isfolder'], vid['isplayable']) for vid in video_data if vid]
+    list_items = bulk_dir_list(video_data, True)
     return xbmcplugin.addDirectoryItems(HANDLE, list_items)
 
 
@@ -358,8 +365,8 @@ def draw_items(video_data, content_type=''):
                     xbmc.executebuiltin('Action(Right)')
 
 
-def bulk_player_list(video_data, draw_cm=None, bulk_add=True):
-    return [xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], draw_cm, bulk_add, vid['isfolder'], vid['isplayable']) for vid in video_data if vid]
+def bulk_dir_list(video_data, bulk_add=True):
+    return [xbmc_add_dir(vid['name'], vid['url'], vid['image'], vid['info'], vid['cm'], bulk_add, vid['isfolder'], vid['isplayable']) for vid in video_data if vid]
 
 
 def get_view_type(viewtype):
@@ -376,31 +383,6 @@ def get_view_type(viewtype):
         'List': 0
     }
     return viewTypes[viewtype]
-
-
-def jsonrpc_get_setting(setting):
-    value = xbmc.executeJSONRPC(json.dumps({
-        'jsonrpc': '2.0',
-        'method': 'Settings.GetSettingValue',
-        'params': {
-            'setting': setting
-        },
-        'id': 1
-    }))
-
-    setSetting(setting, value)
-
-
-def jsonrpc_set_setting(setting, value):
-    return xbmc.executeJSONRPC(json.dumps({
-        'jsonrpc': '2.0',
-        'method': 'Settings.SetSettingValue',
-        'params': {
-            'setting': setting,
-            'value': value
-        },
-        'id': 1
-    }))
 
 
 def exit_(code):

@@ -118,7 +118,7 @@ class Premiumize:
 
         if pack_select:
             identified_file = source_utils.get_best_match('path', folder_details, episode, pack_select)
-            stream_link = identified_file['link']
+            stream_link = identified_file.get('link')
             return stream_link
 
         elif len(filter_list) == 1:
@@ -127,7 +127,7 @@ class Premiumize:
 
         elif len(filter_list) >= 1:
             identified_file = source_utils.get_best_match('path', folder_details, episode)
-            stream_link = identified_file['link']
+            stream_link = identified_file.get('link')
             return stream_link
 
         filter_list = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]

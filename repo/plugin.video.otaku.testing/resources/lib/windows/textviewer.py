@@ -29,9 +29,12 @@ class TextViewerXML(WindowXMLDialog):
     def onAction(self, action):
         actionID = action.getId()
 
-        if action in [92, 10, 100, 401]:
+        if action in [92, 10]:
+            # BACKSPACE / ESCAPE
             self.close()
+
         if actionID == 7:
+            # ENTER
             self.handle_action(actionID)
 
     def set_properties(self):

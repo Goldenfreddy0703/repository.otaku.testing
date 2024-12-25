@@ -1,3 +1,14 @@
+Changelog v5.1.39 (2024-12-25):
+- Added More Subtitle Settings
+- Added building playlist
+- Added New Icons for Search
+- Added Resume Indicators
+- Recoded Subtitle and Audio Stuff
+- Fixed Context menu playing items
+- Fixed Exodus Theme Favorites Icons
+- Fixed Resume Time
+- Fixed Resolver Stuff
+
 Changelog v5.1.38 (2024-12-22):
 - Fixed Premiumize Cloud Files
 - Used JSONRPC to set Player Setting

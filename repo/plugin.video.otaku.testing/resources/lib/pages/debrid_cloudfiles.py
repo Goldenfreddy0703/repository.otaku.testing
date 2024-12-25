@@ -57,13 +57,13 @@ class Sources(BrowserBase):
 
             self.cloud_files.append(
                 {
-                    'quality': source_utils.getQuality(torrent_files[0]['path']),
-                    'lang': source_utils.getAudio_lang(torrent_files[0]['path']),
+                    'quality': source_utils.getQuality(torrent['filename']),
+                    'lang': source_utils.getAudio_lang(torrent['filename']),
                     'hash': torrent_info['links'],
                     'provider': 'Cloud',
                     'type': 'cloud',
                     'release_title': torrent['filename'],
-                    'info': source_utils.getInfo(torrent_files[0]['path']),
+                    'info': source_utils.getInfo(torrent['filename']),
                     'debrid_provider': 'Real-Debrid',
                     'size': source_utils.get_size(torrent['bytes']),
                     'byte_size': torrent['bytes'],
@@ -74,7 +74,7 @@ class Sources(BrowserBase):
                 }
             )
 
-    def premiumize_cloud_inspection(self, query: str, episode) -> None:
+    def premiumize_cloud_inspection(self, query, episode):
         query1, query2 = query.replace('(', '').replace(')', '').rsplit('|', 1)
         cloud_items = premiumize.Premiumize().search_folder(query1)
         cloud_items += premiumize.Premiumize().search_folder(query2)

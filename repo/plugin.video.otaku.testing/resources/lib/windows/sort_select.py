@@ -60,12 +60,9 @@ class SortSelect(BaseWindow):
     def onAction(self, action):
         actionID = action.getId()
 
-        if actionID in [92, 10, 100, 401]:
-            # BACKSPACE /ESCAPE / STOP / BACK
+        if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
             self.close()
-
-        # if actionID == 7:
-        #     self.handle_action(7)
 
     def onClick(self, control_id):
         self.handle_action(control_id)

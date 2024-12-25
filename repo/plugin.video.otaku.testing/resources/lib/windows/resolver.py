@@ -32,7 +32,7 @@ class HookMimetype:
 
 
 class Resolver(BaseWindow):
-    def __init__(self, xml_file, location=None, actionArgs=None, source_select=False):
+    def __init__(self, xml_file, location, actionArgs=None, source_select=False):
         super().__init__(xml_file, location, actionArgs=actionArgs)
         self.return_data = {
             'link': None,
@@ -58,10 +58,8 @@ class Resolver(BaseWindow):
         self.resume_time = actionArgs.get('resume_time')
         self.context = actionArgs.get('context')
         self.silent = actionArgs.get('silent')
-
-        # Save the default setting and set to autoplay the next item
-        control.jsonrpc_get_setting('videoplayer.autoplaynextitem')
-        control.jsonrpc_set_setting('videoplayer.autoplaynextitem', [2])
+        self.params = actionArgs.get('params', {})
+        self.abort = False
 
         if self.source_select:
             control.setSetting('last_played_source', None)
@@ -191,21 +189,29 @@ class Resolver(BaseWindow):
                 item = HookMimetype.trigger(linkInfo['headers']['Content-Type'], item)
 
             if self.context:
+                control.set_videotags(item, self.params)
+                art = {
+                    'icon': self.params.get('icon'),
+                    'thumb': self.params.get('thumb'),
+                    'fanart': self.params.get('fanart'),
+                    'landscape': self.params.get('landscape'),
+                    'banner': self.params.get('banner'),
+                    'clearart': self.params.get('clearart'),
+                    'clearlogo': self.params.get('clearlogo'),
+                    'tvshow.poster': self.params.get('tvshow.poster')
+                }
+                item.setArt(art)
                 control.playList.add(linkInfo['url'], item)
-                playlist_info = OtakuBrowser.get_episodeList(self.mal_id, self.episode)
-                episode_info = playlist_info[self.episode - 1]
-                control.set_videotags(item, episode_info['info'])
-                item.setArt(episode_info['image'])
                 xbmc.Player().play(control.playList, item)
             else:
                 xbmcplugin.setResolvedUrl(control.HANDLE, True, item)
             monitor = Monitor()
             for _ in range(30):
-                monitor.waitForAbort(.5)
+                monitor.waitForAbort(1)
                 if monitor.abortRequested() or monitor.playbackerror or monitor.playing:
                     break
             self.close()
-            player.WatchlistPlayer().handle_player(self.mal_id, watchlist_update_episode, OtakuBrowser.get_episodeList, self.episode, self.resume_time)
+            player.WatchlistPlayer().handle_player(self.mal_id, watchlist_update_episode, self.episode, self.params.get('path', ''), self.context)
         else:
             self.close()
 
@@ -314,7 +320,9 @@ class Resolver(BaseWindow):
 
     def onAction(self, action):
         actionID = action.getId()
+
         if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
             self.canceled = True
             self.close()
 
@@ -330,8 +338,8 @@ class Monitor(xbmc.Monitor):
             self.playing = True
         elif method == 'Player.OnStop':
             self.playbackerror = True
-        else:
-            control.log(f'{method} | {data}')
+        # else:
+        #     control.log(f'{method} | {data}')
 
 
 @HookMimetype('application/dash+xml')

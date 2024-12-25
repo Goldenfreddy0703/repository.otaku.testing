@@ -2,11 +2,10 @@ import xbmc
 import xbmcgui
 import pickle
 import service
-import json
 
 from resources.lib.ui import control, database
 from resources.lib.indexers import aniskip, anime_skip
-from resources.lib import WatchlistIntegration
+from resources.lib import WatchlistIntegration, indexers
 
 playList = control.playList
 player = xbmc.Player
@@ -18,15 +17,15 @@ class WatchlistPlayer(player):
     def __init__(self):
         super(WatchlistPlayer, self).__init__()
         self.vtag = None
-        self.resume_time = None
         self.episode = None
-        self._build_playlist = None
         self.mal_id = None
         self._watchlist_update = None
         self.current_time = 0
         self.updated = False
         self.media_type = None
         self.update_percent = control.getInt('watchlist.update.percent')
+        self.path = ''
+        self.context = False
 
         self.total_time = None
         self.delay_time = control.getInt('skipintro.delay')
@@ -42,17 +41,12 @@ class WatchlistPlayer(player):
         self.skipintro_offset = control.getInt('skipintro.aniskip.offset')
         self.skipoutro_offset = control.getInt('skipoutro.aniskip.offset')
 
-    def handle_player(self, mal_id, watchlist_update, build_playlist, episode, resume_time):
+    def handle_player(self, mal_id, watchlist_update, episode, path, context):
         self.mal_id = mal_id
         self._watchlist_update = watchlist_update
-        self._build_playlist = build_playlist
         self.episode = episode
-        self.resume_time = resume_time
-        self.default_autoplaynextitem = control.getSetting('videoplayer.autoplaynextitem')
-        parsed_value = json.loads(self.default_autoplaynextitem).get('result', {}).get('value', [])
-
-        # Reset Kodi's default "Play Next" feature back to users preference
-        control.jsonrpc_set_setting('videoplayer.autoplaynextitem', parsed_value)
+        self.path = path
+        self.context = context
 
         # process skip times
         self.process_hianime()
@@ -68,19 +62,25 @@ class WatchlistPlayer(player):
     # def onPlayBackStarted(self):
     #     pass
 
-    def onPlayBackStarted(self):
-        if self._build_playlist and playList.size() == 1:
-            self._build_playlist(self.mal_id, self.episode)
-
-        current_ = playList.getposition()
-        try:
-            self.media_type = playList[current_].getVideoInfoTag().getMediaType()
-        except:
-            self.media_type = ''
-
     def onPlayBackStopped(self):
         control.closeAllDialogs()
         playList.clear()
+        if self.context and self.path:
+            if 10 < self.getWatchedPercent() < 90:
+                query = {
+                    'jsonrpc': '2.0',
+                    'method': 'Files.SetFileDetails',
+                    'params': {
+                        'file': self.path,
+                        'media': 'video',
+                        'resume': {
+                            'position': self.current_time,
+                            'total': self.total_time
+                        }
+                    },
+                    'id': 1
+                }
+                control.jsonrpc(query)
 
     def onPlayBackEnded(self):
         control.closeAllDialogs()
@@ -88,19 +88,23 @@ class WatchlistPlayer(player):
     def onPlayBackError(self):
         control.closeAllDialogs()
         playList.clear()
-        control.exit_(1)
+
+    def build_playlist(self):
+        episodes = database.get_episode_list(self.mal_id)
+        video_data = indexers.process_episodes(episodes, '') if episodes else []
+        playlist = control.bulk_dir_list(video_data, True)[self.episode:]
+        for i in playlist:
+            control.playList.add(url=i[0], listitem=i[1])
 
     def getWatchedPercent(self):
-        current_position = self.getTime()
-        media_length = self.getTotalTime()
-        return float(current_position) / float(media_length) * 100 if int(media_length) != 0 else 0
+        return (self.current_time / self.total_time) * 100 if self.total_time != 0 else 0
 
     def onWatchedPercent(self):
         if not self._watchlist_update:
             return
         while self.isPlaying() and not self.updated:
-            watched_percentage = self.getWatchedPercent()
             self.current_time = self.getTime()
+            watched_percentage = self.getWatchedPercent()
             if watched_percentage > self.update_percent:
                 self._watchlist_update(self.mal_id, self.episode)
                 self.updated = True
@@ -125,34 +129,32 @@ class WatchlistPlayer(player):
             xbmc.sleep(5000)
 
     def keepAlive(self):
+        self.vtag = self.getVideoInfoTag()
+        self.media_type = self.vtag.getMediaType()
+        self.total_time = int(self.getTotalTime())
+        control.setSetting('addon.last_watched', self.mal_id)
+
         for _ in range(20):
-            if self.isPlayingVideo() and self.getTotalTime() != 0:
+            if self.isPlayingVideo() and self.total_time != 0:
                 break
             xbmc.sleep(250)
 
         if not self.isPlayingVideo():
+            control.log('Not playing Video', 'warning')
             return
 
-        self.vtag = self.getVideoInfoTag()
-        self.media_type = self.vtag.getMediaType()
-        control.setSetting('addon.last_watched', self.mal_id)
-
-        self.total_time = int(self.getTotalTime())
-        control.closeAllDialogs()
-        if self.resume_time:
-            player().seekTime(self.resume_time)
-
         if control.getSetting('general.kodi_language') == 'false':
-            # Subtitle Preferences
-            response = xbmc.executeJSONRPC(json.dumps({
-                "jsonrpc": "2.0",
+            query = {
+                'jsonrpc': '2.0',
                 "method": "Player.GetProperties",
                 "params": {
                     "playerid": 1,
-                    "properties": ["subtitles"]
+                    "properties": ["subtitles", "audiostreams"]
                 },
                 "id": 1
-            }))
+            }
+
+            audios = ['jpn', 'eng']
 
             subtitles = [
                 "none", "eng", "jpn", "spa", "fre", "ger",
@@ -161,103 +163,138 @@ class WatchlistPlayer(player):
                 "dan", "fin"
             ]
 
-            response = json.loads(response)
-            subtitle_lang = self.getAvailableSubtitleStreams()
-            preferred_subtitle_setting = int(control.getSetting('general.subtitles'))
-            preferred_subtitle = subtitles[preferred_subtitle_setting]
+            keywords = {
+                1: 'dialogue',
+                2: ['signs', 'songs'],
+                3: control.getSetting('subtitles.customkeyword')
+            }
 
-            if preferred_subtitle == "none":
-                self.showSubtitles(False)
+            response = control.jsonrpc(query)
+
+            if 'result' in response:
+                player_properties = response['result']
+                audio_streams = player_properties.get('audiostreams', [])
+                subtitle_streams = player_properties.get('subtitles', [])
             else:
-                # Check if preferred subtitle is available, else default to English
-                if preferred_subtitle not in subtitle_lang:
-                    preferred_subtitle = "eng"
+                audio_streams = []
+                subtitle_streams = []
 
-                subtitle_int = -1
-                for index, sub in enumerate(response['result']['subtitles']):
-                    if sub['language'] == preferred_subtitle and 'dialogue' in sub['name'].lower():
+            preferred_audio = int(control.getSetting('general.audio'))
+            preferred_subtitle_setting = int(control.getSetting('general.subtitles'))
+            preferred_subtitle_keyword = int(control.getSetting('subtitles.keywords'))
+
+            preferred_audio_streams = audios[preferred_audio]
+            preferred_subtitle_lang = subtitles[preferred_subtitle_setting]
+            preferred_keyword = keywords[preferred_subtitle_keyword]
+
+            # Set preferred audio stream
+            for stream in audio_streams:
+                if stream['language'] == preferred_audio_streams:
+                    self.setAudioStream(stream['index'])
+                    break
+            else:
+                # If no preferred audio stream is found, set to the default audio stream
+                for stream in audio_streams:
+                    if stream.get('isdefault', False):
+                        self.setAudioStream(stream['index'])
+                        break
+                else:
+                    # If no default audio stream is found, set to the first available audio stream
+                    self.setAudioStream(audio_streams[0]['index'])
+
+            # Set preferred subtitle stream
+            subtitle_int = None
+            if control.getSetting('general.subtitles.keyword') == 'true':
+                for index, sub in enumerate(subtitle_streams):
+                    if sub['language'] == preferred_subtitle_lang:
+                        sub_name_lower = sub['name'].lower()
+                        if isinstance(preferred_keyword, list):
+                            if any(kw in sub_name_lower for kw in preferred_keyword):
+                                subtitle_int = index
+                                break
+                        elif preferred_keyword and preferred_keyword in sub_name_lower:
+                            subtitle_int = index
+                            break
+            else:
+                for index, sub in enumerate(subtitle_streams):
+                    if sub['language'] == preferred_subtitle_lang:
                         subtitle_int = index
                         break
-                    
-                if subtitle_int == -1:
-                    try:
-                        subtitle_int = subtitle_lang.index(preferred_subtitle)
-                    except ValueError:
-                        subtitle_int = 0
 
+            if subtitle_int is None:
+                # If no preferred subtitle stream is found, set to the default subtitle stream
+                for index, sub in enumerate(subtitle_streams):
+                    if sub.get('isdefault', False):
+                        subtitle_int = index
+                        break
+                else:
+                    # If no default subtitle stream is found, set to the first available subtitle stream
+                    subtitle_int = 0
+
+            if subtitle_int is not None:
                 self.setSubtitleStream(subtitle_int)
 
-            # Audio Preferences
-            audio_lang = self.getAvailableAudioStreams()
-            audios = ['jpn', 'eng']
-            preferred_audio_setting = int(control.getSetting('general.audio'))
-
-            if 0 <= preferred_audio_setting < len(audios):
-                preferred_audio = audios[preferred_audio_setting]
-
-            try:
-                audio_int = audio_lang.index(preferred_audio)
-                self.setAudioStream(audio_int)
-            except ValueError:
-                audio_int = 0
-                self.setAudioStream(audio_int)
-
-            if len(audio_lang) == 1:
-                if "jpn" not in audio_lang:
-                    if control.getSetting('general.dubsubtitles') == 'true':
-                        if preferred_subtitle == "none":
+            # Enable and Disable Subtitles based on audio streams
+            if len(audio_streams) == 1:
+                if "jpn" not in audio_streams:
+                    if control.getBool('general.dubsubtitles'):
+                        if preferred_subtitle_lang == "none":
                             self.showSubtitles(False)
                         else:
                             self.showSubtitles(True)
                     else:
                         self.showSubtitles(False)
 
-                if "eng" not in audio_lang:
-                    if preferred_subtitle == "none":
+                if "eng" not in audio_streams:
+                    if preferred_subtitle_lang == "none":
                         self.showSubtitles(False)
                     else:
                         self.showSubtitles(True)
 
-            if len(audio_lang) > 1:
-                if preferred_audio == "eng":
-                    if control.getSetting('general.dubsubtitles') == 'true':
-                        if preferred_subtitle == "none":
+            if len(audio_streams) > 1:
+                if preferred_audio_streams == "eng":
+                    if control.getBool('general.dubsubtitles'):
+                        if preferred_subtitle_lang == "none":
                             self.showSubtitles(False)
                         else:
                             self.showSubtitles(True)
                     else:
                         self.showSubtitles(False)
 
-                if preferred_audio == "jpn":
-                    if preferred_subtitle == "none":
+                if preferred_audio_streams == "jpn":
+                    if preferred_subtitle_lang == "none":
                         self.showSubtitles(False)
                     else:
                         self.showSubtitles(True)
 
         if self.media_type == 'movie':
-            return self.onWatchedPercent()
+            self.onWatchedPercent()
+        else:
+            if self.media_type == 'episode' and playList.size() == 1:
+                self.build_playlist()
 
-        if control.getBool('smartplay.skipintrodialog'):
-            if self.skipintro_start < 1:
-                self.skipintro_start = 1
-            while self.isPlaying():
-                self.current_time = int(self.getTime())
-                if self.current_time > self.skipintro_end:
-                    break
-                elif self.current_time > self.skipintro_start:
-                    PlayerDialogs().show_skip_intro(self.skipintro_aniskip, self.skipintro_end)
-                    break
-                xbmc.sleep(1000)
-        self.onWatchedPercent()
-        # OtakuBrowser.get_sources(self.mal_id, str(self.episode), self.media_type, silent=True)
-        endpoint = control.getInt('playingnext.time') if control.getBool('smartplay.playingnextdialog') else 0
-        if endpoint != 0:
-            while self.isPlaying():
-                self.current_time = int(self.getTime())
-                if (not self.skipoutro_aniskip and self.total_time - self.current_time <= endpoint) or self.current_time > self.skipoutro_start != 0:
-                    PlayerDialogs().display_dialog(self.skipoutro_aniskip, self.skipoutro_end)
-                    break
-                xbmc.sleep(5000)
+            if control.getBool('smartplay.skipintrodialog'):
+                if self.skipintro_start < 1:
+                    self.skipintro_start = 1
+                while self.isPlaying():
+                    self.current_time = int(self.getTime())
+                    if self.current_time > self.skipintro_end:
+                        break
+                    elif self.current_time > self.skipintro_start:
+                        PlayerDialogs().show_skip_intro(self.skipintro_aniskip, self.skipintro_end)
+                        break
+                    xbmc.sleep(1000)
+            self.onWatchedPercent()
+
+            endpoint = control.getInt('playingnext.time') if control.getBool('smartplay.playingnextdialog') else 0
+            if endpoint != 0:
+                while self.isPlaying():
+                    self.current_time = int(self.getTime())
+                    if (not self.skipoutro_aniskip and self.total_time - self.current_time <= endpoint) or self.current_time > self.skipoutro_start != 0:
+                        PlayerDialogs().display_dialog(self.skipoutro_aniskip, self.skipoutro_end)
+                        break
+                    xbmc.sleep(5000)
+        control.closeAllDialogs()
 
     def process_aniskip(self):
         if self.skipintro_aniskip_enable:
@@ -368,7 +405,7 @@ class PlayerDialogs(xbmc.Player):
 
             # Call PlayingNext with the retrieved XML file
             if xml_file:
-                PlayingNext(*(xml_file, control.ADDON_PATH), actionArgs=args).doModal()
+                PlayingNext(xml_file, control.ADDON_PATH, actionArgs=args).doModal()
         else:
             dialog_mapping = {
                 '0': 'playing_next_default.xml',
@@ -384,7 +421,7 @@ class PlayerDialogs(xbmc.Player):
 
             # Call PlayingNext with the retrieved XML file
             if xml_file:
-                PlayingNext(*(xml_file, control.ADDON_PATH), actionArgs=args).doModal()
+                PlayingNext(xml_file, control.ADDON_PATH, actionArgs=args).doModal()
 
 
     @staticmethod
@@ -410,7 +447,7 @@ class PlayerDialogs(xbmc.Player):
 
         # Call SkipIntro with the retrieved XML file
         if xml_file:
-            SkipIntro(*(xml_file, control.ADDON_PATH), actionArgs=args).doModal()
+            SkipIntro(xml_file, control.ADDON_PATH, actionArgs=args).doModal()
 
 
     @staticmethod

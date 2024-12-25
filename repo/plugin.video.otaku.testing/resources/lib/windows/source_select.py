@@ -88,7 +88,13 @@ class SourceSelect(BaseWindow):
     def onAction(self, action):
         actionID = action.getId()
 
-        if actionID in [7, 100, 401] and self.getFocusId() == 1000:
+        if actionID in [92, 10]:
+            # BACKSPACE / ESCAPE
+            control.playList.clear()
+            self.stream_link = False
+            self.close()
+
+        if actionID in [7, 100] and self.getFocusId() == 1000:
             self.position = self.display_list.getSelectedPosition()
             self.resolve_item()
 
@@ -111,9 +117,9 @@ class SourceSelect(BaseWindow):
                     source = [self.sources[self.display_list.getSelectedPosition()]]
                     self.actionArgs['play'] = False
                     if control.getSetting('general.dialog') == '5':
-                        return_data = Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=self.actionArgs, source_select=True).doModal(source, {}, False)
+                        return_data = Resolver('resolver_az.xml', control.ADDON_PATH, actionArgs=self.actionArgs, source_select=True).doModal(source, {}, False)
                     else:
-                        return_data = Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=self.actionArgs, source_select=True).doModal(source, {}, False)
+                        return_data = Resolver('resolver.xml', control.ADDON_PATH, actionArgs=self.actionArgs, source_select=True).doModal(source, {}, False)
                     if isinstance(return_data, dict):
                         Manager().download_file(return_data['link'])
 
@@ -122,12 +128,6 @@ class SourceSelect(BaseWindow):
                     control.notify(control.ADDON_NAME, "Please Select A Debrid File")
                 else:
                     self.resolve_item(True)
-
-        if actionID in [92, 10, 100, 401]:
-            control.playList.clear()
-            self.stream_link = False
-            self.close()
-
 
     def resolve_item(self, pack_select=False):
         if control.getBool('general.autotrynext') and not pack_select:
@@ -139,8 +139,8 @@ class SourceSelect(BaseWindow):
             selected_source['name'] = selected_source['release_title']
         self.actionArgs['close'] = self.close
         if control.getSetting('general.dialog') == '5':
-            self.stream_link = Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=self.actionArgs, source_select=True).doModal(sources, {}, pack_select)
+            self.stream_link = Resolver('resolver_az.xml', control.ADDON_PATH, actionArgs=self.actionArgs, source_select=True).doModal(sources, {}, pack_select)
         else:
-            self.stream_link = Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=self.actionArgs, source_select=True).doModal(sources, {}, pack_select)
+            self.stream_link = Resolver('resolver.xml', control.ADDON_PATH, actionArgs=self.actionArgs, source_select=True).doModal(sources, {}, pack_select)
         if isinstance(self.stream_link, dict):
             self.close()

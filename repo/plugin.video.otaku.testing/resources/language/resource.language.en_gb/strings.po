@@ -1432,3 +1432,27 @@ msgstr ""
 msgctxt "#30624"
 msgid "Scrape TorBox Cloud"
 msgstr ""
+
+msgctxt "#30625"
+msgid "Enable Subtitle Keywords for Streams"
+msgstr ""
+
+msgctxt "#30626"
+msgid "Subtitle Keywords"
+msgstr ""
+
+msgctxt "#30627"
+msgid "Dialog"
+msgstr ""
+
+msgctxt "#30628"
+msgid "Signs & Songs"
+msgstr ""
+
+msgctxt "#30629"
+msgid "Custom"
+msgstr ""
+
+msgctxt "#30630"
+msgid "Custom Keyword"
+msgstr ""

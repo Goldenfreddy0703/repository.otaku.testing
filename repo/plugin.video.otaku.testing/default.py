@@ -22,6 +22,7 @@
 import pickle
 import service
 import json
+import ast
 
 from resources.lib import OtakuBrowser
 from resources.lib.ui import control, database, utils
@@ -92,7 +93,7 @@ def AIRING_CALENDAR(payload, params):
     airing = BROWSER.get_airing_calendar()
     from resources.lib.windows.anichart import Anichart
 
-    anime = Anichart(*('anichart.xml', control.ADDON_PATH), get_anime=OtakuBrowser.get_anime_init, anime_items=airing).doModal()
+    anime = Anichart('anichart.xml', control.ADDON_PATH, get_anime=OtakuBrowser.get_anime_init, anime_items=airing).doModal()
     if not anime:
         return
 
@@ -391,7 +392,7 @@ def GENRE_THRILLER(payload, params):
 def SEARCH_HISTORY(payload, params):
     history = database.getSearchHistory('show')
     if control.getInt('searchhistory') == 0:
-        control.draw_items(utils.search_history(history), 'addons')
+        control.draw_items(utils.search_history(history))
     else:
         SEARCH(payload, params)
 
@@ -435,6 +436,9 @@ def PLAY(payload, params):
     source_select = bool(params.get('source_select'))
     rescrape = bool(params.get('rescrape'))
     resume_time = params.get('resume')
+    if rating := params.get('rating'):
+        params['rating'] = ast.literal_eval(rating)
+    params['path'] = f"{control.addon_url(f'play/{payload}')}"
     if resume_time:
         resume_time = float(resume_time)
         context = control.context_menu([f'Resume from {utils.format_time(resume_time)}', 'Play from beginning'])
@@ -444,19 +448,19 @@ def PLAY(payload, params):
             resume_time = None
 
     sources = OtakuBrowser.get_sources(mal_id, episode, 'show', rescrape, source_select)
-    _mock_args = {"mal_id": mal_id, "episode": episode, 'play': True, 'resume_time': resume_time, 'context': rescrape or source_select}
+    _mock_args = {"mal_id": mal_id, "episode": episode, 'play': True, 'resume_time': resume_time, 'context': rescrape or source_select, 'params': params}
     if control.getSetting('general.playstyle.episode') == '1' or source_select or rescrape:
         from resources.lib.windows.source_select import SourceSelect
         if control.getSetting('general.dialog') == '5':
-            SourceSelect(*('source_select_az.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
+            SourceSelect('source_select_az.xml', control.ADDON_PATH, actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
         else:
-            SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
+            SourceSelect('source_select.xml', control.ADDON_PATH, actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
     else:
         from resources.lib.windows.resolver import Resolver
         if control.getSetting('general.dialog') == '5':
-            Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
+            Resolver('resolver_az.xml', control.ADDON_PATH, actionArgs=_mock_args).doModal(sources, {}, False)
         else:
-            Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
+            Resolver('resolver.xml', control.ADDON_PATH, actionArgs=_mock_args).doModal(sources, {}, False)
     control.exit_code()
 
 
@@ -465,7 +469,8 @@ def PLAY_MOVIE(payload, params):
     mal_id, eps_watched = payload.rsplit("/")
     source_select = bool(params.get('source_select'))
     rescrape = bool(params.get('rescrape'))
-    resume_time = params.get('resume')
+    resume_time = params.get('resume') 
+    params['path'] = f"{control.addon_url(f'play_movie/{payload}')}"
     if resume_time:
         resume_time = float(resume_time)
         context = control.context_menu([f'Resume from {utils.format_time(resume_time)}', 'Play from beginning'])
@@ -475,20 +480,19 @@ def PLAY_MOVIE(payload, params):
             resume_time = None
 
     sources = OtakuBrowser.get_sources(mal_id, 1, 'movie', rescrape, source_select)
-    _mock_args = {'mal_id': mal_id, 'play': True, 'resume_time': resume_time, 'context': rescrape or source_select}
-    control.playList.clear()
+    _mock_args = {'mal_id': mal_id, 'play': True, 'resume_time': resume_time, 'context': rescrape or source_select, 'params': params}
     if control.getSetting('general.playstyle.movie') == '1' or source_select or rescrape:
         from resources.lib.windows.source_select import SourceSelect
         if control.getSetting('general.dialog') == '5':
-            SourceSelect(*('source_select_az.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
+            SourceSelect('source_select_az.xml', control.ADDON_PATH, actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
         else:
-            SourceSelect(*('source_select.xml', control.ADDON_PATH), actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
+            SourceSelect('source_select.xml', control.ADDON_PATH, actionArgs=_mock_args, sources=sources, rescrape=rescrape).doModal()
     else:
         from resources.lib.windows.resolver import Resolver
         if control.getSetting('general.dialog') == '5':
-            Resolver(*('resolver_az.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
+            Resolver('resolver_az.xml', control.ADDON_PATH, actionArgs=_mock_args).doModal(sources, {}, False)
         else:
-            Resolver(*('resolver.xml', control.ADDON_PATH), actionArgs=_mock_args).doModal(sources, {}, False)
+            Resolver('resolver.xml', control.ADDON_PATH, actionArgs=_mock_args).doModal(sources, {}, False)
     control.exit_code()
 
 
@@ -855,7 +859,7 @@ def COMPLETED_SYNC(payload, params):
 @Route('sort_select')
 def SORT_SELECT(payload, params):
     from resources.lib.windows.sort_select import SortSelect
-    SortSelect(*('sort_select.xml', control.ADDON_PATH)).doModal()
+    SortSelect('sort_select.xml', control.ADDON_PATH).doModal()
 
 
 # @Route('filter_select')
@@ -867,7 +871,7 @@ def SORT_SELECT(payload, params):
 @Route('download_manager')
 def DOWNLOAD_MANAGER(payload, params):
     from resources.lib.windows.download_manager import DownloadManager
-    DownloadManager(*('download_manager.xml', control.ADDON_PATH)).doModal()
+    DownloadManager('download_manager.xml', control.ADDON_PATH).doModal()
 
 
 @Route('import_settings')
@@ -940,12 +944,9 @@ def INPUTSTREAMHELPER(payload, params):
 
 
 if __name__ == "__main__":
-    try:
-        router_process(control.get_plugin_url(), control.get_plugin_params())
-    except:
-        import traceback
-        traceback.print_exc()
-    # router_process(control.get_plugin_url(), control.get_plugin_params())
+    plugin_url = control.get_plugin_url()
+    plugin_params = control.get_plugin_params()
+    router_process(plugin_url, plugin_params)
     if len(control.playList) > 0:
         import xbmc
         if not xbmc.Player().isPlaying():
