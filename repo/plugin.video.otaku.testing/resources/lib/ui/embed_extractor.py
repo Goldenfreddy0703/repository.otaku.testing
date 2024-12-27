@@ -279,16 +279,6 @@ def __extract_streamwish(url, page_content, referer=None):
     return
 
 
-def __extract_aniwave(url, page_content, referer=None):
-    r = re.search(r'''sources\s*[:=]\s*\[{["']?file["']?:\s*["']([^"']+)''', page_content)
-    if r:
-        surl = r.group(1)
-        if 'vipanicdn.net' in surl:
-            surl = surl.replace('vipanicdn.net', 'anzeat.pro')
-        return surl
-    return
-
-
 def __extract_voe(url, page_content, referer=None):
     r = re.search(r"let\s*(?:wc0|[0-9a-f]+)\s*=\s*'([^']+)", page_content)
     if r:
@@ -425,9 +415,6 @@ __register_extractor(["https://kwik.cx/",
 
 __register_extractor(["https://www.yourupload.com/"],
                      __extract_yourupload)
-
-__register_extractor(["https://aniwave.se/"],
-                     __extract_aniwave)
 
 __register_extractor(["https://mixdrop.co/",
                       "https://mixdrop.to/",

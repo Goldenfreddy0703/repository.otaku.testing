@@ -1,3 +1,6 @@
+Changelog v5.1.40 (2024-12-27):
+- Readded Skip times from Aniwave
+
 Changelog v5.1.39 (2024-12-25):
 - Added More Subtitle Settings
 - Added building playlist

@@ -16,7 +16,6 @@ class Sources(BrowserBase):
     EKEY = "ysJhV6U27FVIjjuk"
     DKEY = "hlPeNwkncH0fq9so"
     CHAR_SUBST_OFFSETS = (-3, 3, -4, 2, -2, 5, 4, 5)
-    # KEYS = json.loads(control.getSetting('keys.aniwave'))
 
     def get_sources(self, mal_id, episode):
         show = database.get_show(mal_id)
@@ -26,36 +25,59 @@ class Sources(BrowserBase):
 
         all_results = []
         items = []
-        srcs = ['sub', 'dub']
+        srcs = ['sub', 'dub', 's-sub']
         if control.getSetting('general.source') == 'Sub':
             srcs.remove('dub')
         elif control.getSetting('general.source') == 'Dub':
             srcs.remove('sub')
+            srcs.remove('s-sub')
 
         headers = {'Referer': self._BASE_URL}
         params = {'keyword': title}
         r = database.get(
             self._get_request,
             8,
-            self._BASE_URL + 'filter',
+            self._BASE_URL + 'ajax/anime/search',
             data=params,
             headers=headers,
             XHR=True
         )
-        if not r:
-            return all_results
 
-        mlink = SoupStrainer('div', {'class': 'ani items'})
-        soup = BeautifulSoup(r, "html.parser", parse_only=mlink)
-        sitems = soup.find_all('div', {'class': 'item'})
-        if sitems:
-            items = [urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
-                     for x in sitems
-                     if self.clean_title(title) == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))]
-            if not items:
-                items = [urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
-                         for x in sitems
-                         if self.clean_title(title + 'dub') == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))]
+        if 'NOT FOUND' in r:
+            r1 = database.get(
+                self._get_request,
+                8,
+                self._BASE_URL + 'filter',
+                data=params,
+                headers=headers,
+                XHR=True
+            )
+
+            mlink = SoupStrainer('div', {'class': 'ani items'})
+            soup = BeautifulSoup(r1, "html.parser", parse_only=mlink)
+            sitems = soup.find_all('div', {'class': 'item'})
+            if sitems:
+                items = [
+                    urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
+                    for x in sitems
+                    if self.clean_title(title) == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))
+                ]
+                if not items:
+                    items = [
+                        urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
+                        for x in sitems
+                        if self.clean_title(title + 'dub') == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))
+                    ]
+        elif r:
+            r = json.loads(r)
+            r = BeautifulSoup(r.get('html') or r.get('result', {}).get('html'), "html.parser")
+            sitems = r.find_all('a', {'class': 'item'})
+            if sitems:
+                items = [
+                    urllib_parse.urljoin(self._BASE_URL, x.get('href'))
+                    for x in sitems
+                    if self.clean_title(title) in self.clean_title(x.find('div', {'class': 'name'}).text)
+                ]
 
         if items:
             slug = items[0]
@@ -129,51 +151,67 @@ class Sources(BrowserBase):
                                 if outro:
                                     skip.update({'outro': {'start': outro[0], 'end': outro[1]}})
                             slink = self.decrypt_vrf(resp.get('url'))
-                            source = {
-                                'release_title': '{0} - Ep {1}'.format(title, episode),
-                                'hash': slink,
-                                'type': 'embed',
-                                'quality': 0,
-                                'debrid_provider': '',
-                                'provider': 'aniwave',
-                                'size': 'NA',
-                                'byte_size': 0,
-                                'info': [lang, edata_name],
-                                'lang': 2 if lang == 'dub' else 0,
-                                'skip': skip
-                            }
-                            sources.append(source)
+                            if self._BASE_URL in slink:
+                                sresp = self.__extract_aniwave(slink)
+                                if sresp:
+                                    if isinstance(sresp, dict):
+                                        subs = sresp.get('subs')
+                                        skip = sresp.get('skip') or skip
+                                        srclink = sresp.get('url')
+                                    else:
+                                        srclink = sresp
+                                        subs = {}
+                                    res = self._get_request(srclink)
+                                    quals = re.findall(r'#EXT.+?RESOLUTION=\d+x(\d+).+\n(?!#)(.+)', res)
+                                    for qual, qlink in quals:
+                                        qual = int(qual)
+                                        if qual < 577:
+                                            quality = 1
+                                        elif qual < 721:
+                                            quality = 2
+                                        elif qual < 1081:
+                                            quality = 3
+                                        else:
+                                            quality = 4
+
+                                        source = {
+                                            'release_title': '{0} - Ep {1}'.format(title, episode),
+                                            'hash': urllib_parse.urljoin(srclink, qlink) + '|User-Agent=iPad',
+                                            'type': 'direct',
+                                            'quality': quality,
+                                            'debrid_provider': '',
+                                            'provider': 'aniwave',
+                                            'size': 'NA',
+                                            'byte_size': 0,
+                                            'info': ['DUB' if lang == 'dub' else 'SUB', edata_name],
+                                            'lang': 2 if lang == 'dub' else 0
+                                        }
+                                        if subs:
+                                            source.update({'subs': subs})
+                                        if skip:
+                                            source.update({'skip': skip})
+                                        sources.append(source)
+                            else:
+                                source = {
+                                    'release_title': '{0} - Ep {1}'.format(title, episode),
+                                    'hash': slink,
+                                    'type': 'embed',
+                                    'quality': 0,
+                                    'debrid_provider': '',
+                                    'provider': 'aniwave',
+                                    'size': 'NA',
+                                    'byte_size': 0,
+                                    'info': [lang, edata_name],
+                                    'lang': 2 if lang == 'dub' else 0
+                                }
+                                if skip:
+                                    source.update({'skip': skip})
+                                sources.append(source)
         except:
+            import traceback
+            traceback.print_exc()
             pass
         return sources
-
-    # def generate_vrf(self, content_id, keys=KEYS):
-    #     vrf = control.vrf_shift(content_id, keys[0], keys[1])
-    #     vrf = control.arc4(six.b(keys[2]), six.b(vrf))
-    #     vrf = control.serialize_text(vrf)
-    #     vrf = control.arc4(six.b(keys[3]), six.b(vrf))
-    #     vrf = control.serialize_text(vrf)
-    #     vrf = control.vrf_shift(vrf, keys[4], keys[5])
-    #     vrf = control.vrf_shift(vrf, keys[6], keys[7])
-    #     vrf = vrf[::-1]
-    #     vrf = control.arc4(six.b(keys[8]), six.b(vrf))
-    #     vrf = control.serialize_text(vrf)
-    #     vrf = control.serialize_text(vrf)
-    #     return vrf
-
-    # def decrypt_vrf(self, text, keys=KEYS):
-    #     text = control.deserialize_text(text)
-    #     text = control.deserialize_text(six.ensure_str(text))
-    #     text = control.arc4(six.b(keys[8]), text)
-    #     text = text[::-1]
-    #     text = control.vrf_shift(text, keys[7], keys[6])
-    #     text = control.vrf_shift(text, keys[5], keys[4])
-    #     text = control.deserialize_text(text)
-    #     text = control.arc4(six.b(keys[3]), text)
-    #     text = control.deserialize_text(text)
-    #     text = control.arc4(six.b(keys[2]), text)
-    #     text = control.vrf_shift(text, keys[1], keys[0])
-    #     return text
 
     @staticmethod
     def vrf_shift(t, offsets=CHAR_SUBST_OFFSETS):
@@ -200,3 +238,34 @@ class Sources(BrowserBase):
     @staticmethod
     def clean_title(text):
         return re.sub(r'\W', '', text).lower()
+
+    def __extract_aniwave(self, url):
+        page_content = self._get_request(url, headers={'Referer': self._BASE_URL})
+        r = re.search(r'''sources["\s]?[:=]\s*\[\{"?file"?:\s*"([^"]+)''', page_content)
+        if r:
+            subs = []
+            skip = {}
+            surl = r.group(1)
+            if 'vipanicdn.net' in surl:
+                surl = surl.replace('vipanicdn.net', 'anzeat.pro')
+
+            s = re.search(r'''tracks:\s*(\[[^\]]+])''', page_content)
+            if s:
+                s = json.loads(s.group(1))
+                subs = [
+                    {'url': x.get('file'), 'lang': x.get('label')}
+                    for x in s if x.get('kind') == 'captions'
+                    and x.get('file') is not None
+                ]
+
+            s = re.search(r'''var\s*intro_begin\s*=\s*(\d+);\s*var\s*introEnd\s*=\s*(\d+);\s*var\s*outroStart\s*=\s*(\d+);\s*var\s*outroEnd\s*=\s*(\d+);''', page_content)
+            if s:
+                if int(s.group(2)) > 0:
+                    skip = {
+                        "intro": {"start": int(s.group(1)), "end": int(s.group(2))},
+                        "outro": {"start": int(s.group(3)), "end": int(s.group(4))}
+                    }
+            if subs or skip:
+                surl = {'url': surl, 'subs': subs, 'skip': skip}
+
+            return surl
