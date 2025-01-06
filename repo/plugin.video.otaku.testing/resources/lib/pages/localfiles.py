@@ -42,8 +42,11 @@ class Sources(BrowserBase):
             'debrid_provider': 'Local-Debrid',
             'episode_re': episode,
             'size': source_utils.get_size(os.path.getsize(full_path)),
+            'seeders': 0,
             'byte_size': os.path.getsize(full_path),
             'info': source_utils.getInfo(f),
-            'lang': source_utils.getAudio_lang(f)
+            'lang': source_utils.getAudio_lang(f),
+            'channel': source_utils.getAudio_channel(f),
+            'sub': source_utils.getSubtitle_lang(f)
         }
         return source

@@ -228,8 +228,14 @@ class WatchlistPlayer(player):
                         subtitle_int = index
                         break
                 else:
-                    # If no default subtitle stream is found, set to the first available subtitle stream
-                    subtitle_int = 0
+                    # If no default subtitle stream is found, set to the first available subtitle stream with the preferred language
+                    for index, sub in enumerate(subtitle_streams):
+                        if sub['language'] == preferred_subtitle_lang:
+                            subtitle_int = index
+                            break
+                    else:
+                        # If no subtitle stream with the preferred language is found, set to the first available subtitle stream
+                        subtitle_int = 0
 
             if subtitle_int is not None:
                 self.setSubtitleStream(subtitle_int)

@@ -115,9 +115,12 @@ class Sources(BrowserBase):
                         'debrid_provider': '',
                         'provider': 'animepahe',
                         'size': 'NA',
+                        'seeders': 0,
                         'byte_size': 0,
                         'info': [source_utils.get_embedhost(item.get('data-src')), 'DUB' if item.get('data-audio') == 'eng' else 'SUB'],
-                        'lang': 2 if item.get('data-audio') == 'eng' else 0
+                        'lang': 3 if item.get('data-audio') == 'eng' else 2,
+                        'channel': 3,
+                        'sub': 1
                     }
                     sources.append(source)
 

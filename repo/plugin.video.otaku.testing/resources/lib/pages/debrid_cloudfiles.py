@@ -59,6 +59,8 @@ class Sources(BrowserBase):
                 {
                     'quality': source_utils.getQuality(torrent['filename']),
                     'lang': source_utils.getAudio_lang(torrent['filename']),
+                    'channel': source_utils.getAudio_channel(torrent['filename']),
+                    'sub': source_utils.getSubtitle_lang(torrent['filename']),
                     'hash': torrent_info['links'],
                     'provider': 'Cloud',
                     'type': 'cloud',
@@ -66,6 +68,7 @@ class Sources(BrowserBase):
                     'info': source_utils.getInfo(torrent['filename']),
                     'debrid_provider': 'Real-Debrid',
                     'size': source_utils.get_size(torrent['bytes']),
+                    'seeders': 0,
                     'byte_size': torrent['bytes'],
                     'torrent': torrent,
                     'torrent_files': torrent_files,
@@ -93,6 +96,8 @@ class Sources(BrowserBase):
                     'torrent_type': torrent['type'],
                     'quality': source_utils.getQuality(torrent['name']),
                     'lang': source_utils.getAudio_lang(torrent['name']),
+                    'channel': source_utils.getAudio_channel(torrent['name']),
+                    'sub': source_utils.getSubtitle_lang(torrent['name']),
                     'hash': torrent.get('link', ''),
                     'provider': 'Cloud',
                     'type': 'cloud',
@@ -100,6 +105,7 @@ class Sources(BrowserBase):
                     'info': source_utils.getInfo(torrent['name']),
                     'debrid_provider': 'Premiumize',
                     'size': source_utils.get_size(int(torrent.get('size', 0))),
+                    'seeders': 0,
                     'byte_size': int(torrent.get('size', 0)),
                     'episode': episode
                 }
@@ -124,6 +130,8 @@ class Sources(BrowserBase):
                     'id': torrent['id'],
                     'quality': source_utils.getQuality(torrent['name']),
                     'lang': source_utils.getAudio_lang(torrent['name']),
+                    'channel': source_utils.getAudio_channel(torrent['name']),
+                    'sub': source_utils.getSubtitle_lang(torrent['name']),
                     'hash': torrent['files'],
                     'provider': 'Cloud',
                     'type': 'cloud',
@@ -131,6 +139,7 @@ class Sources(BrowserBase):
                     'info': source_utils.getInfo(torrent['name']),
                     'debrid_provider': 'TorBox',
                     'size': source_utils.get_size(torrent['size']),
+                    'seeders': 0,
                     'byte_size': torrent['size'],
                     'torrent': torrent,
                     'episode': episode
@@ -164,6 +173,8 @@ class Sources(BrowserBase):
                 {
                     'quality': source_utils.getQuality(torrent['filename']),
                     'lang': source_utils.getAudio_lang(torrent['filename']),
+                    'channel': source_utils.getAudio_channel(torrent['filename']),
+                    'sub': source_utils.getSubtitle_lang(torrent['filename']),
                     'hash': url,
                     'provider': 'Cloud',
                     'type': 'cloud',
@@ -171,6 +182,7 @@ class Sources(BrowserBase):
                     'info': source_utils.getInfo(torrent['filename']),
                     'debrid_provider': 'Alldebrid',
                     'size': source_utils.get_size(torrent['size']),
+                    'seeders': 0,
                     'byte_size': int(torrent['size']),
                     'episode': episode
                 }

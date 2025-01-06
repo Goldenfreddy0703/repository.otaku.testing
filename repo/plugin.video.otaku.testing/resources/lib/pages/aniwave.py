@@ -25,12 +25,11 @@ class Sources(BrowserBase):
 
         all_results = []
         items = []
-        srcs = ['sub', 'dub', 's-sub']
+        srcs = ['sub', 'dub']
         if control.getSetting('general.source') == 'Sub':
             srcs.remove('dub')
         elif control.getSetting('general.source') == 'Dub':
             srcs.remove('sub')
-            srcs.remove('s-sub')
 
         headers = {'Referer': self._BASE_URL}
         params = {'keyword': title}
@@ -161,7 +160,8 @@ class Sources(BrowserBase):
                                     else:
                                         srclink = sresp
                                         subs = {}
-                                    res = self._get_request(srclink)
+                                    headers.update({'Origin': self._BASE_URL[:-1]})
+                                    res = self._get_request(srclink, headers=headers)
                                     quals = re.findall(r'#EXT.+?RESOLUTION=\d+x(\d+).+\n(?!#)(.+)', res)
                                     for qual, qlink in quals:
                                         qual = int(qual)
@@ -182,9 +182,12 @@ class Sources(BrowserBase):
                                             'debrid_provider': '',
                                             'provider': 'aniwave',
                                             'size': 'NA',
+                                            'seeders': 0,
                                             'byte_size': 0,
                                             'info': ['DUB' if lang == 'dub' else 'SUB', edata_name],
-                                            'lang': 2 if lang == 'dub' else 0
+                                            'lang': 3 if lang == 'dub' else 2,
+                                            'channel': 3,
+                                            'sub': 1
                                         }
                                         if subs:
                                             source.update({'subs': subs})
@@ -200,9 +203,12 @@ class Sources(BrowserBase):
                                     'debrid_provider': '',
                                     'provider': 'aniwave',
                                     'size': 'NA',
+                                    'seeders': 0,
                                     'byte_size': 0,
                                     'info': [lang, edata_name],
-                                    'lang': 2 if lang == 'dub' else 0
+                                    'lang': 3 if lang == 'dub' else 2,
+                                    'channel': 3,
+                                    'sub': 1
                                 }
                                 if skip:
                                     source.update({'skip': skip})

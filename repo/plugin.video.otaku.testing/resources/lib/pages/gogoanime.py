@@ -140,9 +140,12 @@ class Sources(BrowserBase):
                     'debrid_provider': '',
                     'provider': 'gogo',
                     'size': 'NA',
+                    'seeders': 0,
                     'byte_size': 0,
                     'info': source_utils.getInfo(slug) + [server],
-                    'lang': source_utils.getAudio_lang(title)
+                    'lang': source_utils.getAudio_lang(title),
+                    'channel': source_utils.getAudio_channel(title),
+                    'sub': source_utils.getSubtitle_lang(title),
                 }
                 sources.append(source)
 

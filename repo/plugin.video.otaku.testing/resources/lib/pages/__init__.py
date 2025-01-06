@@ -2,7 +2,7 @@ import threading
 import time
 import xbmc
 
-from resources.lib.pages import nyaa, animetosho, debrid_cloudfiles, animixplay, aniwave, animepahe, hianime, gogoanime, localfiles
+from resources.lib.pages import nyaa, animetosho, debrid_cloudfiles, aniwave, animepahe, hianime, gogoanime, localfiles
 from resources.lib.ui import control, database
 from resources.lib.windows.get_sources_window import GetSources
 from resources.lib.windows import sort_select
@@ -22,7 +22,7 @@ class Sources(GetSources):
     def __init__(self, xml_file, location, actionArgs=None):
         super(Sources, self).__init__(xml_file, location, actionArgs)
         self.torrentProviders = ['nyaa', 'animetosho', 'Cloud Inspection']
-        self.embedProviders = ['animepahe', 'animix', 'aniwave', 'gogo', 'hianime']
+        self.embedProviders = ['animepahe', 'aniwave', 'gogo', 'hianime']
         self.localProviders = ['Local Inspection']
         self.remainingProviders = self.embedProviders + self.torrentProviders + self.localProviders
 
@@ -107,12 +107,12 @@ class Sources(GetSources):
         else:
             self.remainingProviders.remove('animepahe')
 
-        if control.getBool('provider.animix'):
-            t = threading.Thread(target=self.animix_worker, args=(mal_id, episode, rescrape))
-            t.start()
-            self.threads.append(t)
-        else:
-            self.remainingProviders.remove('animix')
+        # if control.getBool('provider.animix'):
+        #     t = threading.Thread(target=self.animix_worker, args=(mal_id, episode, rescrape))
+        #     t.start()
+        #     self.threads.append(t)
+        # else:
+        #     self.remainingProviders.remove('animix')
 
         if control.getBool('provider.aniwave'):
             t = threading.Thread(target=self.aniwave_worker, args=(mal_id, episode, rescrape))
@@ -128,7 +128,7 @@ class Sources(GetSources):
         else:
             self.remainingProviders.remove('gogo')
 
-        if control.getBool('provider.hianime'):
+        if control.getBool('provider.hianime') and control.settingids.ms_enabled:
             t = threading.Thread(target=self.hianime_worker, args=(mal_id, episode, rescrape))
             t.start()
             self.threads.append(t)
@@ -189,20 +189,21 @@ class Sources(GetSources):
         self.embedSources += database.get(animepahe.Sources().get_sources, 8, mal_id, episode, key='animepahe')
         self.remainingProviders.remove('animepahe')
 
-    def animix_worker(self, mal_id, episode, rescrape):
-        self.embedSources += database.get(animixplay.Sources().get_sources, 8, mal_id, episode, key='animixplay')
-        self.remainingProviders.remove('animix')
+    # def animix_worker(self, mal_id, episode, rescrape):
+    #     self.embedSources += database.get(animixplay.Sources().get_sources, 8, mal_id, episode, key='animixplay')
+    #     self.remainingProviders.remove('animix')
 
     def aniwave_worker(self, mal_id, episode, rescrape):
         aniwave_sources = database.get(aniwave.Sources().get_sources, 8, mal_id, episode, key='aniwave')
         self.embedSources += aniwave_sources
         for x in aniwave_sources:
-            if x and x['skip'].get('intro') and x['skip']['intro']['start'] != 0:
-                control.setInt('aniwave.skipintro.start', int(x['skip']['intro']['start']))
-                control.setInt('aniwave.skipintro.end', int(x['skip']['intro']['end']))
-            if x and x['skip'].get('outro') and x['skip']['outro']['start'] != 0:
-                control.setInt('aniwave.skipoutro.start', int(x['skip']['outro']['start']))
-                control.setInt('aniwave.skipoutro.end', int(x['skip']['outro']['end']))
+            if x.get('skip'):
+                if x['skip'].get('intro') and x['skip']['intro']['start'] != 0:
+                    control.setInt('aniwave.skipintro.start', int(x['skip']['intro']['start']))
+                    control.setInt('aniwave.skipintro.end', int(x['skip']['intro']['end']))
+                if x['skip'].get('outro') and x['skip']['outro']['start'] != 0:
+                    control.setInt('aniwave.skipoutro.start', int(x['skip']['outro']['start']))
+                    control.setInt('aniwave.skipoutro.end', int(x['skip']['outro']['end']))
         self.remainingProviders.remove('aniwave')
 
     def gogo_worker(self, mal_id, episode, rescrape):
@@ -213,12 +214,13 @@ class Sources(GetSources):
         hianime_sources = database.get(hianime.Sources().get_sources, 8, mal_id, episode, key='hianime')
         self.embedSources += hianime_sources
         for x in hianime_sources:
-            if x and x['skip'].get('intro') and x['skip']['intro']['start'] != 0:
-                control.setInt('hianime.skipintro.start', int(x['skip']['intro']['start']))
-                control.setInt('hianime.skipintro.end', int(x['skip']['intro']['end']))
-            if x and x['skip'].get('outro') and x['skip']['outro']['start'] != 0:
-                control.setInt('hianime.skipoutro.start', int(x['skip']['outro']['start']))
-                control.setInt('hianime.skipoutro.end', int(x['skip']['outro']['end']))
+            if x.get('skip'):
+                if x['skip'].get('intro') and x['skip']['intro']['start'] != 0:
+                    control.setInt('hianime.skipintro.start', int(x['skip']['intro']['start']))
+                    control.setInt('hianime.skipintro.end', int(x['skip']['intro']['end']))
+                if x['skip'].get('outro') and x['skip']['outro']['start'] != 0:
+                    control.setInt('hianime.skipoutro.start', int(x['skip']['outro']['start']))
+                    control.setInt('hianime.skipoutro.end', int(x['skip']['outro']['end']))
         self.remainingProviders.remove('hianime')
 
     ### Local & Cloud ###
@@ -323,17 +325,21 @@ class Sources(GetSources):
         if control.getBool('general.disablebatch'):
             sortedList = [i for i in sortedList if 'BATCH' not in i['info']]
         lang = control.getInt("general.source")
-        if lang != 1:
-            langs = [0, 1, 2]
+        if lang != 0:
+            langs = [0, 2, 3]
             sortedList = [i for i in sortedList if i['lang'] != langs[lang]]
 
         # Sort Sources
         SORT_METHODS = sort_select.SORT_METHODS
         sort_options = sort_select.sort_options
+        
         for x in range(len(SORT_METHODS), 0, -1):
             reverse = sort_options[f'sortmethod.{x}.reverse']
             method = SORT_METHODS[int(sort_options[f'sortmethod.{x}'])]
+            # Replace spaces with underscores in the method name
+            method = method.replace(' ', '_')
             sortedList = getattr(sort_select, f'sort_by_{method}')(sortedList, not reverse)
+        
         return sortedList
 
     def updateProgress(self):

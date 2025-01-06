@@ -101,7 +101,7 @@ class Sources(BrowserBase):
                         qual = 2
                     else:
                         qual = 0
-                    lang = 2 if mitem.a.get('id').endswith('dub') else 0
+                    lang = 3 if mitem.a.get('id').endswith('dub') else 2
 
                     data = {
                         'name_server': server,
@@ -151,9 +151,12 @@ class Sources(BrowserBase):
                                     'debrid_provider': '',
                                     'provider': 'animix',
                                     'size': 'NA',
+                                    'seeders': 0,
                                     'byte_size': 0,
                                     'info': [server, 'DUB' if lang == 2 else 'SUB'],
-                                    'lang': lang
+                                    'lang': lang,
+                                    'channel': 3,
+                                    'sub': 1
                                 }
 
                                 if subs:

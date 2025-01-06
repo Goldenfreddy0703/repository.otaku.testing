@@ -810,8 +810,8 @@ def CHANGE_LOG(payload, params):
     service.getChangeLog()
 
 
-@Route('fs_inst')
-def FS_INST(payload, params):
+@Route('solver_inst')
+def SOLVER_INST(payload, params):
     import service
     service.getInstructions()
 
