@@ -16,9 +16,6 @@ New in this version:
 
 However, you may notice some missing features, such as:
 
-    - Anichart replacement
-    - Get Watch Order context menu
-    - Certain prioritization settings
     - TV and Movie menus
 
 Some of these will be added in future updates as we continue to improve the addon.

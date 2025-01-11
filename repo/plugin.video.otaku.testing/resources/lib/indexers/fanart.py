@@ -1,8 +1,11 @@
 import requests
 
+from resources.lib.ui import control
+
 baseUrl = "https://webservice.fanart.tv/v3"
 lang = ['en', 'ja', '']
 headers = {'Api-Key': "dfe6380e34f49f9b2b9518184922b49c"}
+language = ["ja", 'en'][control.getInt("titlelanguage")]
 
 
 def getArt(meta_ids, mtype):
@@ -40,27 +43,39 @@ def getArt(meta_ids, mtype):
                 items = sorted([item for item in res['clearlogo'] if item.get('lang') in lang], key=lambda x: int(x['id']))
                 logos = []
                 try:
-                    logos.append(next(x['url'] for x in items if x['lang'] == 'en'))
+                    logos.append(next(x['url'] for x in items if x['lang'] == language))
                 except StopIteration:
                     pass
-                try:
-                    logos.append(next(x['url'] for x in items if x['lang'] == 'ja'))
-                except StopIteration:
-                    pass
+                if not logos:
+                    try:
+                        logos.append(next(x['url'] for x in items))
+                    except StopIteration:
+                        pass
                 art['clearlogo'] = logos
             elif res.get('hdtvlogo'):
                 items = sorted([item for item in res['hdtvlogo'] if item.get('lang') in lang], key=lambda x: int(x['id']))
                 logos = []
                 try:
-                    logos.append(next(x['url'] for x in items if x['lang'] == 'en'))
+                    logos.append(next(x['url'] for x in items if x['lang'] == language))
                 except StopIteration:
                     pass
-                try:
-                    logos.append(next(x['url'] for x in items if x['lang'] == 'ja'))
-                except StopIteration:
-                    pass
+                if not logos:
+                    try:
+                        logos.append(next(x['url'] for x in items))
+                    except StopIteration:
+                        pass
                 art['clearlogo'] = logos
             elif res.get('hdmovielogo'):
-                items = [item.get('url') for item in res['hdmovielogo'] if item.get('lang') in lang]
-                art['clearlogo'] = items
+                items = sorted([item for item in res['hdmovielogo'] if item.get('lang') in lang], key=lambda x: int(x['id']))
+                logos = []
+                try:
+                    logos.append(next(x['url'] for x in items if x['lang'] == language))
+                except StopIteration:
+                    pass
+                if not logos:
+                    try:
+                        logos.append(next(x['url'] for x in items))
+                    except StopIteration:
+                        pass
+                art['clearlogo'] = logos
     return art

@@ -1413,8 +1413,9 @@
                     <constraints>
                         <options>
                             <option label="Both">0</option>
-                            <option label="Sub">2</option>
-                            <option label="Dub">3</option>
+                            <option label="Sub">1</option>
+                            <option label="Dub">2</option>
+
                         </options>
                     </constraints>
                     <control type="spinner" format="string"/>

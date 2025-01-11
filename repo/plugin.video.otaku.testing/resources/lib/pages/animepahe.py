@@ -107,6 +107,7 @@ class Sources(BrowserBase):
                         quality = 3
                     else:
                         quality = 4
+
                     source = {
                         'release_title': '{0} - Ep {1}'.format(title, episode),
                         'hash': item.get('data-src'),
@@ -117,7 +118,7 @@ class Sources(BrowserBase):
                         'size': 'NA',
                         'seeders': 0,
                         'byte_size': 0,
-                        'info': [source_utils.get_embedhost(item.get('data-src')), 'DUB' if item.get('data-audio') == 'eng' else 'SUB'],
+                        'info': source_utils.get_embedhost(item.get('data-src')) + (' DUB' if item.get('data-audio') == 'eng' else ' SUB'),
                         'lang': 3 if item.get('data-audio') == 'eng' else 2,
                         'channel': 3,
                         'sub': 1
