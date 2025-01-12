@@ -109,6 +109,8 @@ class SortSelect(BaseWindow):
         elif control_id == 9003:  # set default
             self.sort_options = default_sort_options
             self.save_settings()
+            self.close()
+            control.execute('RunPlugin(plugin://plugin.video.otaku.testing/sort_select)')
         elif control_id in [1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888]:
             self.handle_reverse(int(control_id / 1111))
         else:

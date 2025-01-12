@@ -1,3 +1,6 @@
+Changelog v5.1.44 (2024-01-12):
+- Added "Reset To Default" in Sort Select
+
 Changelog v5.1.43 (2024-01-10):
 - Fanart now utilizes Title Language
 - Info is now more consistent for Embeds
