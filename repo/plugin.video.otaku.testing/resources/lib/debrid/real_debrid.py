@@ -162,40 +162,71 @@ class RealDebrid:
         if not runinbackground:
             control.progressDialog.create(heading, "Caching Progress")
         stream_link = None
-        self.addMagnet(source['magnet'])
-        torrent = self.list_torrents()[0]
-        torrent = self.torrentInfo(torrent['id'])
-        if not self.torrentSelect(torrent['id']):
-            self.deleteTorrent(torrent['id'])
-            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
-            if runinbackground:
-                return
-        else:
-            if runinbackground:
-                control.notify(heading, "The souce is downloading to your cloud")
-                return
-            while torrent['status'] != 'downloaded':
-                if control.progressDialog.iscanceled() or control.wait_for_abort(5):
-                    break
-                torrent = self.torrentInfo(torrent['id'])
-                f_body = (f"Progress: {torrent['progress']} %[CR]"
-                          f"Seeders: {torrent.get('seeders', 0)}[CR]"
-                          f"Speed: {source_utils.get_size(torrent.get('speed', 0))}")
-                control.progressDialog.update(int(torrent.get('progress', 0)), f_body)
-        control.progressDialog.close()
-        if torrent['status'] == 'downloaded':
-            torrent_files = [selected for selected in torrent['files'] if selected['selected'] == 1]
-            if len(torrent['files']) == 1:
-                best_match = torrent_files[0]
+
+        # List the torrents in the cloud
+        torrents = self.list_torrents()
+        torrent_in_cloud = None
+
+        # Check if the torrent is already in the cloud
+        for torrent in torrents:
+            if torrent['hash'] == source['hash']:
+                torrent_in_cloud = torrent
+                break
+
+        if torrent_in_cloud:
+            # If the torrent is already in the cloud, resolve the hoster link and play the video
+            torrent = self.torrentInfo(torrent_in_cloud['id'])
+            if torrent['status'] == 'downloaded':
+                torrent_files = [selected for selected in torrent['files'] if selected['selected'] == 1]
+                if len(torrent['files']) == 1:
+                    best_match = torrent_files[0]
+                else:
+                    best_match = source_utils.get_best_match('path', torrent_files, source['episode_re'])
+                if not best_match or not best_match['path']:
+                    return
+                for f_index, torrent_file in enumerate(torrent_files):
+                    if torrent_file['path'] == best_match['path']:
+                        hash_ = torrent['links'][f_index]
+                        stream_link = self.resolve_hoster(hash_)
+                        break
             else:
-                best_match = source_utils.get_best_match('path', torrent_files, source['episode_re'])
-            if not best_match or not best_match['path']:
-                return
-            for f_index, torrent_file in enumerate(torrent_files):
-                if torrent_file['path'] == best_match['path']:
-                    hash_ = torrent['links'][f_index]
-                    stream_link = self.resolve_hoster(hash_)
-                    break
+                control.ok_dialog(control.ADDON_NAME, "The torrent is not fully downloaded yet.")
         else:
-            self.deleteTorrent(torrent['id'])
+            # If the torrent is not in the cloud, add the magnet link and download the torrent
+            self.addMagnet(source['magnet'])
+            torrent = self.list_torrents()[0]
+            torrent = self.torrentInfo(torrent['id'])
+            if not self.torrentSelect(torrent['id']):
+                self.deleteTorrent(torrent['id'])
+                control.ok_dialog(control.ADDON_NAME, "BAD LINK")
+                if runinbackground:
+                    return
+            else:
+                if runinbackground:
+                    control.notify(heading, "The source is downloading to your cloud")
+                    return
+                while torrent['status'] != 'downloaded':
+                    if control.progressDialog.iscanceled() or control.wait_for_abort(5):
+                        break
+                    torrent = self.torrentInfo(torrent['id'])
+                    f_body = (f"Progress: {torrent['progress']} %[CR]"
+                              f"Seeders: {torrent.get('seeders', 0)}[CR]"
+                              f"Speed: {source_utils.get_size(torrent.get('speed', 0))}")
+                    control.progressDialog.update(int(torrent.get('progress', 0)), f_body)
+            control.progressDialog.close()
+            if torrent['status'] == 'downloaded':
+                torrent_files = [selected for selected in torrent['files'] if selected['selected'] == 1]
+                if len(torrent['files']) == 1:
+                    best_match = torrent_files[0]
+                else:
+                    best_match = source_utils.get_best_match('path', torrent_files, source['episode_re'])
+                if not best_match or not best_match['path']:
+                    return
+                for f_index, torrent_file in enumerate(torrent_files):
+                    if torrent_file['path'] == best_match['path']:
+                        hash_ = torrent['links'][f_index]
+                        stream_link = self.resolve_hoster(hash_)
+                        break
+            else:
+                self.deleteTorrent(torrent['id'])
         return stream_link

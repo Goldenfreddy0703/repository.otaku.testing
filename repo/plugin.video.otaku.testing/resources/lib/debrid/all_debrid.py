@@ -146,8 +146,3 @@ class AllDebrid:
         }
         r = requests.get(f'{self.base_url}/magnet/delete', params=params)
         return r.ok
-
-    @staticmethod
-    def resolve_uncached_source(source, runinbackground):
-        heading = f'{control.ADDON_NAME}: Cache Resolver'
-        control.ok_dialog(heading, 'Cache Reolver Has not been added for Alldebrid')

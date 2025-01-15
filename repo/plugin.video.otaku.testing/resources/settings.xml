@@ -726,7 +726,7 @@
             <group id="3" label="30574" help="">
                 <setting id="show.uncached" type="boolean" label="30364" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="uncached.autoruninforground" type="boolean" label="30617" help="" parent="show.uncached">

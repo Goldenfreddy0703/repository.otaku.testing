@@ -97,6 +97,21 @@
             <texture background="true">$INFO[Window().Property(item.art.clearlogo)]</texture>
         </control>
 
+        <!-- View Cached/Uncached -->
+        <control type="button" id="15">
+            <left>80</left>
+            <top>85</top>
+            <width>250</width>
+            <height>50</height>
+            <font>font12</font>
+            <border>5</border>
+            <texturefocus colordiffuse="77d3d3d3">white.png</texturefocus>
+            <texturenofocus colordiffuse="AA2e2d32">white.png</texturenofocus>
+            <label>View Uncached</label>
+            <align>center</align>
+            <ondown>1000</ondown>
+        </control>
+
         <!-- Scrollbar  -->
         <control type="scrollbar" id="17">
       	    <left>1250</left>
@@ -108,6 +123,7 @@
       	    <orientation>vertical</orientation>
       	    <showonepage>false</showonepage>
             <onleft>1000</onleft>
+            <onup>15</onup>
         </control>
 
         <!-- Sources List -->
@@ -121,6 +137,7 @@
             <focusposition>1</focusposition>
 	        <pagecontrol>17</pagecontrol>
 	        <onright>17</onright>
+            <onup>15</onup>
 
             <itemlayout height="120">
                 <control type="image">

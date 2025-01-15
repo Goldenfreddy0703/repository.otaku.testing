@@ -1,3 +1,8 @@
+Changelog v5.1.45 (2024-01-14):
+- Added Cached & Uncached Button to Source Select
+- Added Resolve Uncached to TorBox
+- Uncached Sources will be on by Default
+
 Changelog v5.1.44 (2024-01-12):
 - Added "Reset To Default" in Sort Select
 

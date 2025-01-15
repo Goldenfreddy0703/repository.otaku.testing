@@ -22,7 +22,6 @@ class TorBox:
     def status(self):
         r = requests.get(f'{self.BaseUrl}/user/me', headers=self.headers())
         if r.ok:
-
             user_info = r.json()['data']
             control.setSetting('torbox.username', user_info['email'])
             if user_info['plan'] == 0:
@@ -115,3 +114,17 @@ class TorBox:
             for f_index, torrent_file in enumerate(source['hash']):
                 if torrent_file['short_name'] == best_match['short_name']:
                     return {'folder_id': source['id'], 'file': source['hash'][f_index]}
+
+    def resolve_uncached_source(self, source, runinbackground):
+        heading = f'{control.ADDON_NAME}: Cache Resolver'
+        torrent = self.addMagnet(source['magnet'])
+        torrent_id = torrent['torrent_id']
+        torrent_info = self.get_torrent_info(torrent_id)
+        control.log(torrent_info)
+        if not torrent_info:
+            self.delete_torrent(torrent_id)
+            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
+            return
+        else:
+            control.notify(heading, "The source is downloading to your cloud")
+            return
