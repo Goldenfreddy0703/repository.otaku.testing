@@ -57,8 +57,16 @@ class SourceSelect(BaseWindow):
     def onInit(self):
         self.display_list = self.getControl(1000)
         # Initially populate with only cached sources
-        cached_sources = [source for source in self.sources if source.get('cached') != False]
-        self.populate_sources(cached_sources)
+        cached_sources = [source for source in self.sources if source.get('cached') is not False]
+        if cached_sources:
+            self.populate_sources(cached_sources)
+            self.getControl(15).setLabel("View Uncached")
+            self.showing_uncached = False
+        else:
+            uncached_sources = [source for source in self.sources if source.get('cached') is False]
+            self.populate_sources(uncached_sources)
+            self.getControl(15).setLabel("View Cached")
+            self.showing_uncached = True
         self.setFocusId(1000)
 
     def populate_sources(self, sources):
@@ -90,16 +98,15 @@ class SourceSelect(BaseWindow):
         # For now, you can just log the action_id
         control.log(f"Action handled: {action_id}")
 
-
     def onClick(self, controlId):
         if controlId == 15:  # View Uncached button
             if self.showing_uncached:
-                cached_sources = [source for source in self.sources if source.get('cached') != False]
+                cached_sources = [source for source in self.sources if source.get('cached') is not False]
                 self.populate_sources(cached_sources)
                 self.getControl(15).setLabel("View Uncached")
                 self.showing_uncached = False
             else:
-                uncached_sources = [source for source in self.sources if source.get('cached') == False]
+                uncached_sources = [source for source in self.sources if source.get('cached') is False]
                 self.populate_sources(uncached_sources)
                 self.getControl(15).setLabel("View Cached")
                 self.showing_uncached = True

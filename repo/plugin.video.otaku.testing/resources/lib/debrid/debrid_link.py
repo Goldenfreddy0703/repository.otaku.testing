@@ -12,6 +12,7 @@ class DebridLink:
         self.USER_AGENT = 'Otaku'
         self.token = control.getSetting('debridlink.token')
         self.refresh = control.getSetting('debridlink.refresh')
+        self.autodelete = control.getBool('debridlink.autodelete')
         self.api_url = "https://debrid-link.com/api/v2"
         self.cache_check_results = {}
         self.DeviceCode = ''
@@ -144,5 +145,5 @@ class DebridLink:
         return selected_file
 
     @staticmethod
-    def resolve_cloud(source, pack_selct):
+    def resolve_cloud(source, pack_select):
         pass

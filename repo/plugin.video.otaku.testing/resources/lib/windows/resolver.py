@@ -4,7 +4,6 @@ import xbmcplugin
 import xbmc
 
 from urllib import parse
-from resources.lib import OtakuBrowser
 from resources.lib.WatchlistIntegration import watchlist_update_episode
 from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid, torbox
 from resources.lib.ui import control, source_utils, player
@@ -131,7 +130,10 @@ class Resolver(BaseWindow):
                 break
 
             if i['type'] in ['torrent', 'cloud', 'hoster']:
-                stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i)
+                if i['type'] == 'cloud' and i['debrid_provider'] == 'Alldebrid':
+                    stream_link = i['hash']
+                else:
+                    stream_link = self.resolve_source(self.resolvers[i['debrid_provider']], i)
                 if stream_link:
                     self.return_data['link'] = stream_link
                     break
@@ -261,64 +263,44 @@ class Resolver(BaseWindow):
 
     def resolve_uncache(self, source):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
+        f_string = (f"[I]{source['release_title']}[/I][CR]"
+                    f"[CR]"
+                    f"This source is not cached. Would you like to cache it now?")
 
-        if source['debrid_provider'] == 'Alldebrid' or source['debrid_provider'] == 'Debrid-Link':
-            if source['debrid_provider'] == 'Alldebrid':
-                control.ok_dialog(heading, 'Cache Reolver Has not been added for Alldebrid')
-                return
-            else:
-                control.ok_dialog(heading, 'Cache Reolver Has not been added for Debrid-Link')
-                return
-
-        elif source['debrid_provider'] == 'TorBox':
-            f_string = (f"[I]{source['release_title']}[/I][CR]"
-                        f"[CR]"
-                        f"This source is not cached. Would you like to cache it in the Background?")
-
-            yesno = control.yesno_dialog(
-                heading, f_string, nolabel="Cancel", yeslabel="Run in Background"
-            )
-            if not yesno:
-                self.canceled = True
-                return
-            runbackground = True
+        if source['debrid_provider'] == 'Debrid-Link':
+            control.ok_dialog(heading, 'Cache Reolver Has not been added for Debrid-Link')
+            return
 
         else:
-            f_string = (f"[I]{source['release_title']}[/I][CR]"
-                        f"[CR]"
-                        f"This source is not cached. Would you like to cache it now?")
-
-            # Ensure the dialog is created and displayed properly
-            if not control.getBool('uncached.autoruninforground'):
+            if control.getBool('uncached.autoruninbackground'):
+                runbackground = True
+                runinforground = False
+            elif control.getBool('uncached.autoruninforground'):
+                runbackground = False
+                runinforground = True
+            else:
                 yesnocustom = control.yesnocustom_dialog(
                     heading, f_string, "Cancel", "Run in Background", "Run in Foreground", defaultbutton=xbmcgui.DLG_YESNO_YES_BTN
                 )
                 if yesnocustom == -1 or yesnocustom == 2:
                     self.canceled = True
                     return
-                if yesnocustom == 0:
-                    runbackground = True
-                elif yesnocustom == 1:
-                    runbackground = False
-                else:
-                    return
-            else:
-                runbackground = False
+                runbackground = yesnocustom == 0
+                runinforground = yesnocustom == 1
 
         api = self.resolvers[source['debrid_provider']]()
         try:
-            resolved_cache = api.resolve_uncached_source(source, runbackground)
+            resolved_cache = api.resolve_uncached_source(source, runbackground, runinforground, self.pack_select)
         except Exception as e:
             control.progressDialog.close()
             import traceback
             control.ok_dialog(control.ADDON_NAME, f'Error: {e}')
             control.log(traceback.format_exc(), 'error')
             return
-    
+
         if not resolved_cache:
             self.canceled = True
         return resolved_cache
-
 
     def doModal(self, sources, args, pack_select):
         self.sources = sources

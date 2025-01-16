@@ -7,6 +7,7 @@ from resources.lib.ui import control, source_utils
 class AllDebrid:
     def __init__(self):
         self.token = control.getSetting('alldebrid.token')
+        self.autodelete = control.getBool('alldebrid.autodelete')
         self.agent_identifier = 'Otaku'
         self.base_url = 'https://api.alldebrid.com/v4'
         self.cache_check_results = []
@@ -123,17 +124,21 @@ class AllDebrid:
 
         if episode:
             selected_file = source_utils.get_best_match('path', folder_details, str(episode), pack_select)
-            self.delete_magnet(magnet_id)
             if selected_file is not None:
-                return self.resolve_hoster(selected_file['link'])
+                resolved_link = self.resolve_hoster(selected_file['link'])
+                if self.autodelete:
+                    self.delete_magnet(magnet_id)
+                return resolved_link
 
         selected_file = folder_details[0]['link']
 
         if selected_file is None:
             return
 
-        self.delete_magnet(magnet_id)
-        return self.resolve_hoster(selected_file)
+        resolved_link = self.resolve_hoster(selected_file)
+        if self.autodelete:
+            self.delete_magnet(magnet_id)
+        return resolved_link
 
     def resolve_cloud(self, source, pack_select):
         pass
@@ -146,3 +151,61 @@ class AllDebrid:
         }
         r = requests.get(f'{self.base_url}/magnet/delete', params=params)
         return r.ok
+
+    def resolve_uncached_source(self, source, runinbackground, runinforground, pack_select):
+        heading = f'{control.ADDON_NAME}: Cache Resolver'
+        if runinforground:
+            control.progressDialog.create(heading, "Caching Progress")
+        stream_link = None
+        magnet = source['magnet']
+        magnet_data = self.addMagnet(magnet)
+        magnet_id = magnet_data['magnets'][0]['id']
+        magnet_status = self.magnet_status(magnet_id)
+        status = magnet_status['magnets']['status']
+        folder_details = magnet_status['magnets']['links']
+        folder_details = [{'link': x['link'], 'path': x['filename']} for x in folder_details]
+
+        if runinbackground:
+            control.notify(heading, "The source is downloading to your cloud")
+            return
+
+        total_size = 0
+        progress = 0
+        while status not in ['Ready', 'Error']:
+            if runinforground and (control.progressDialog.iscanceled() or control.wait_for_abort(5)):
+                break
+            magnet_status = self.magnet_status(magnet_id)
+            status = magnet_status['magnets']['status']
+            total_size = magnet_status['magnets'].get('size', 0)  # Update total_size in the loop
+            try:
+                downloaded = magnet_status['magnets']['downloaded']
+                seeders = magnet_status['magnets'].get('seeders', 0)
+                speed = magnet_status['magnets'].get('downloadSpeed', 0)
+                if total_size > 0:
+                    progress = (downloaded / total_size) * 100
+                else:
+                    progress = 0
+            except TypeError:
+                control.log(magnet_status)
+            if runinforground:
+                f_body = (f"Status: {status}[CR]"
+                          f"Progress: {round(progress, 2)} %[CR]"
+                          f"Seeders: {seeders}[CR]"
+                          f"Speed: {source_utils.get_size(speed)}")
+                control.progressDialog.update(int(progress), f_body)
+
+        if status == 'Ready':
+            if total_size > 0:
+                control.ok_dialog(heading, "This file has been added to your Cloud")
+            selected_file = source_utils.get_best_match('path', folder_details, source['episode_re'], pack_select)
+            if selected_file:
+                stream_link = self.resolve_hoster(selected_file['link'])
+            else:
+                stream_link = self.resolve_hoster(folder_details[0]['link'])
+            if self.autodelete:
+                self.delete_magnet(magnet_id)
+        else:
+            self.delete_magnet(magnet_id)
+        if runinforground:
+            control.progressDialog.close()
+        return stream_link

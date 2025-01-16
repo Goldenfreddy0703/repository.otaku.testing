@@ -9,6 +9,9 @@ class Premiumize:
         # self.client_id = "855400527"      # Swag
         self.client_id = '807831898'        # Otaku
         self.token = control.getSetting('premiumize.token')
+        self.addtocloud = control.getBool('premiumize.addToCloud')
+        self.autodelete = control.getBool('premiumize.autodelete')
+        self.threshold = control.getInt('premiumize.threshold')
         self.base_url = 'https://www.premiumize.me/api'
         self.OauthTimeStep = 0
         self.OauthTimeout = 0
@@ -71,7 +74,7 @@ class Premiumize:
             if token.get('error') == 'slow_down':
                 xbmc.sleep(1000)
         return False
-    
+
     def search_folder(self, query):
         params = {'q': query}
         r = requests.get(f'{self.base_url}/folder/search', headers=self.headers(), params=params)
@@ -106,11 +109,47 @@ class Premiumize:
         r = requests.post(f'{self.base_url}/transfer/delete', headers=self.headers(), params=params)
         return r.json()
 
+    def manage_storage_space(self):
+        storage_info = self.get_storage_info()
+        used_space_gb = storage_info['space_used'] / (1024 ** 3)
+        if used_space_gb > self.threshold:
+            oldest_items = self.get_oldest_items()
+            for item in oldest_items:
+                self.delete_torrent(item['id'])
+                used_space_gb -= item['size'] / (1024 ** 3)
+                if used_space_gb <= self.threshold:
+                    break
+
+    def get_storage_info(self):
+        r = requests.get(f'{self.base_url}/account/info', headers=self.headers())
+        return r.json()
+
+    def get_oldest_items(self):
+        r = requests.get(f'{self.base_url}/transfer/list', headers=self.headers())
+        transfers = r.json()['transfers']
+        return sorted(transfers, key=lambda x: x['created_at'])
+
+    def add_to_cloud(self, link):
+        postData = {'src': link}
+        r = requests.post(f'{self.base_url}/transfer/create', headers=self.headers(), data=postData)
+        response = r.json()
+        if response.get('status') == 'success':
+            control.log(f"Successfully added to cloud: {link}")
+        else:
+            control.log(f"Failed to add to cloud: {link}", level=control.LOGERROR)
+        return response
+
     def resolve_hoster(self, source):
+        self.manage_storage_space()
         directLink = self.direct_download(source)
-        return directLink['location'] if directLink['status'] == 'success' else None
+        if directLink['status'] == 'success':
+            if self.addtocloud:
+                self.add_to_cloud(directLink['location'])
+            return directLink['location']
+        return None
 
     def resolve_single_magnet(self, hash_, magnet, episode, pack_select):
+        self.manage_storage_space()
         folder_details = self.direct_download(magnet)['content']
         folder_details = sorted(folder_details, key=lambda i: int(i['size']), reverse=True)
         folder_details = [i for i in folder_details if source_utils.is_file_ext_valid(i['link'])]
@@ -119,22 +158,19 @@ class Premiumize:
         if pack_select:
             identified_file = source_utils.get_best_match('path', folder_details, episode, pack_select)
             stream_link = identified_file.get('link')
-            return stream_link
-
         elif len(filter_list) == 1:
             stream_link = filter_list[0]['link']
-            return stream_link
-
         elif len(filter_list) >= 1:
             identified_file = source_utils.get_best_match('path', folder_details, episode)
             stream_link = identified_file.get('link')
-            return stream_link
+        else:
+            filter_list = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
+            if len(filter_list) == 1:
+                stream_link = filter_list[0]['link']
 
-        filter_list = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
-
-        if len(filter_list) == 1:
-            stream_link = filter_list[0]['link']
-            return stream_link
+        if stream_link and self.addtocloud:
+            self.add_to_cloud(stream_link)
+        return stream_link
 
     def resolve_cloud(self, source, pack_select):
         link = None
@@ -147,42 +183,64 @@ class Premiumize:
                 link = best_match['link']
         return link
 
-    def resolve_uncached_source(self, source, runinbackground):
+    def resolve_uncached_source(self, source, runinbackground, runinforground, pack_select):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
-        if not runinbackground:
+        if runinforground:
             control.progressDialog.create(heading, "Caching Progress")
         stream_link = None
-        torrent = self.addMagnet(source['magnet'])
+        magnet = source['magnet']
+        magnet_data = self.addMagnet(magnet)
+        transfer_id = magnet_data['id']
+        transfer_status = self.transfer_list()
+        status = next((item for item in transfer_status if item['id'] == transfer_id), None)['status']
+
         if runinbackground:
-            control.notify(heading, "The souce is downloading to your cloud")
+            control.notify(heading, "The source is downloading to your cloud")
             return
 
         progress = 0
-        status = 'running'
-        while status != 'finished':
-            if control.progressDialog.iscanceled() or control.wait_for_abort(5):
+        while status not in ['finished', 'error']:
+            if runinforground and (control.progressDialog.iscanceled() or control.wait_for_abort(5)):
                 break
-            transfer_list = self.transfer_list()
-            for i in transfer_list:
-                if i['id'] == torrent['id']:
-                    status = i['status']
-                    try:
-                        progress = float(i['progress'] * 100)
-                    except TypeError:
-                        control.log(i)
-                    f_body = (f"Progress: {round(progress, 2)} %[CR]"
-                              f"Status: {status}")
-                    control.progressDialog.update(int(progress), f_body)
-                    break
+            transfer_status = self.transfer_list()
+            status = next((item for item in transfer_status if item['id'] == transfer_id), None).get('status', 'error')
+            progress = next((item for item in transfer_status if item['id'] == transfer_id), None).get('progress', 0)
+            if progress is not None:
+                progress *= 100
             else:
-                control.log('Unable to find torrent', 'warning')
-                break
+                progress = 100 if status == 'finished' else 0
+            if runinforground:
+                f_body = (f"Status: {status}[CR]"
+                          f"Progress: {round(progress, 2)} %")
+                control.progressDialog.update(int(progress), f_body)
+
         if status == 'finished':
+            self.manage_storage_space()
             control.ok_dialog(heading, "This file has been added to your Cloud")
-        else:
-            self.delete_torrent(torrent['id'])
-            # torrent_list = self.list_folder(torrent['id'])
-            # if torrent_list['transcode_status'] == 'finished':
-            #     stream_link = self.resolve_cloud(source, False)
-        control.progressDialog.close()
+            folder_details = self.direct_download(magnet)['content']
+            folder_details = sorted(folder_details, key=lambda i: int(i['size']), reverse=True)
+            folder_details = [i for i in folder_details if source_utils.is_file_ext_valid(i['link'])]
+            filter_list = [i for i in folder_details]
+
+            if pack_select:
+                identified_file = source_utils.get_best_match('path', folder_details, source['episode_re'], pack_select)
+                stream_link = identified_file.get('link')
+
+            elif len(filter_list) == 1:
+                stream_link = filter_list[0]['link']
+
+            elif len(filter_list) >= 1:
+                identified_file = source_utils.get_best_match('path', folder_details, source['episode_re'])
+                stream_link = identified_file.get('link')
+
+            filter_list = [tfile for tfile in folder_details if 'sample' not in tfile['path'].lower()]
+
+            if len(filter_list) == 1:
+                stream_link = filter_list[0]['link']
+
+            if stream_link and self.addtocloud:
+                self.add_to_cloud(stream_link)
+
+        if runinforground:
+            control.progressDialog.close()
         return stream_link

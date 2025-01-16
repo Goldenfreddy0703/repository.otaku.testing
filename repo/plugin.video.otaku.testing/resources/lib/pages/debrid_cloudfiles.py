@@ -13,7 +13,7 @@ class Sources(BrowserBase):
         self.threads = []
 
     def get_sources(self, debrid, query, episode):
-        if debrid.get('rd'):
+        if debrid.get('realdebrid'):
             t = threading.Thread(target=self.rd_cloud_inspection, args=(query, episode,))
             t.start()
             self.threads.append(t)

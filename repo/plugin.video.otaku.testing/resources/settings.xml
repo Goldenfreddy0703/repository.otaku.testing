@@ -735,6 +735,16 @@
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="show.uncached">true</dependency>
+                        <dependency type="enable" setting="uncached.autoruninbackground">false</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="uncached.autoruninbackground" type="boolean" label="30635" help="" parent="show.uncached">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="show.uncached">true</dependency>
+                        <dependency type="enable" setting="uncached.autoruninforground">false</dependency>
                     </dependencies>
                 </setting>
             </group>
@@ -743,7 +753,7 @@
             <group id="4" label="30541" help="">
                 <setting id="realdebrid.cloudInspection" type="boolean" label="30190" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="realdebrid.enabled">true</dependency>
@@ -751,7 +761,7 @@
                 </setting>
                 <setting id="premiumize.cloudInspection" type="boolean" label="30191" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="premiumize.enabled">true</dependency>
@@ -759,7 +769,7 @@
                 </setting>
                 <setting id="alldebrid.cloudInspection" type="boolean" label="30192" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="alldebrid.enabled">true</dependency>
@@ -767,7 +777,7 @@
                 </setting>
                 <setting id="torbox.cloudInspection" type="boolean" label="30624" help="">
 					<level>0</level>
-					<default>false</default>
+					<default>true</default>
 					<control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="torbox.enabled">true</dependency>
@@ -1485,6 +1495,14 @@
                         <dependency type="visible" setting="realdebrid.enabled">true</dependency>
                     </dependencies>
                 </setting>
+                <setting id="realdebrid.autodelete" type="boolean" label="30636" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="realdebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
             </group>
 
             <!-- Premiumize -->
@@ -1538,6 +1556,42 @@
 <!--                        <dependency type="visible" setting="premiumize.enabled">true</dependency>-->
 <!--                    </dependencies>-->
 <!--                </setting>-->
+				<setting id="premiumize.addToCloud" type="boolean" label="30637" help="" parent="">
+					<level>0</level>
+					<default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="premiumize.enabled">true</dependency>
+                    </dependencies>
+				</setting>
+                <setting id="premiumize.autodelete" type="boolean" label="30638" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="premiumize.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="premiumize.threshold" type="integer" label="30639" help="" parent="">
+					<level>0</level>
+					<default>750</default>
+					<constraints>
+						<minimum>50</minimum>
+						<step>50</step>
+						<maximum>1000</maximum>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<and>
+								<condition operator="is" setting="premiumize.autodelete">true</condition>
+								<condition operator="is" setting="premiumize.enabled">true</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="slider" format="integer">
+						<popup>false</popup>
+					</control>
+				</setting>
             </group>
 
             <!-- ALLDebrid -->
@@ -1591,6 +1645,14 @@
 <!--                        <dependency type="visible" setting="alldebrid.enabled">true</dependency>-->
 <!--                    </dependencies>-->
 <!--                </setting>-->
+                <setting id="alldebrid.autodelete" type="boolean" label="30636" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="alldebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
             </group>
 
             <!-- Debrid-Link -->
@@ -1640,6 +1702,14 @@
                     <control type="button" format="action">
                         <close>true</close>
                     </control>
+                    <dependencies>
+                        <dependency type="visible" setting="debridlink.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="debridlink.autodelete" type="boolean" label="30636" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="debridlink.enabled">true</dependency>
                     </dependencies>
@@ -1697,6 +1767,14 @@
                         <dependency type="visible" setting="torbox.enabled">true</dependency>
                     </dependencies>
                 </setting> -->
+                <setting id="torbox.autodelete" type="boolean" label="30636" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="torbox.enabled">true</dependency>
+                    </dependencies>
+                </setting>
             </group>
         </category>
 

@@ -1472,3 +1472,23 @@ msgstr ""
 msgctxt "#30634"
 msgid "Requires Megacloud Solver"
 msgstr ""
+
+msgctxt "#30635"
+msgid "Run All UnCached Sources in Background"
+msgstr ""
+
+msgctxt "#30636"
+msgid "Auto-Delete Torrents"
+msgstr ""
+
+msgctxt "#30637"
+msgid "Store resolved items in cloud"
+msgstr ""
+
+msgctxt "#30638"
+msgid "Automatic Cloud Removal"
+msgstr ""
+
+msgctxt "#30639"
+msgid "Max Storage Space Used Before Deletion (GB)"
+msgstr ""

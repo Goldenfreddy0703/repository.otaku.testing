@@ -7,6 +7,7 @@ from resources.lib.ui import source_utils, control
 class TorBox:
     def __init__(self):
         self.token = control.getSetting('torbox.token')
+        self.autodelete = control.getBool('torbox.autodelete')
         self.BaseUrl = "https://api.torbox.app/v1/api"
 
     def headers(self):
@@ -90,17 +91,18 @@ class TorBox:
 
     def resolve_single_magnet(self, hash_, magnet, episode, pack_select):
         torrent = self.addMagnet(magnet)
-        torrentId = torrent['torrent_id']
-        torrent_info = self.get_torrent_info(torrentId)
+        torrent_id = torrent['torrent_id']
+        torrent_info = self.get_torrent_info(torrent_id)
         folder_details = [{'fileId': x['id'], 'path': x['name']} for x in torrent_info['files']]
 
         if episode:
             selected_file = source_utils.get_best_match('path', folder_details, str(episode), pack_select)
             if selected_file and selected_file['fileId'] is not None:
-                stream_link = self.request_dl_link(torrentId, selected_file['fileId'])
-                self.delete_torrent(torrentId)
+                stream_link = self.request_dl_link(torrent_id, selected_file['fileId'])
+                if self.autodelete:
+                    self.delete_torrent(torrent_id)
                 return stream_link
-        self.delete_torrent(torrentId)
+        self.delete_torrent(torrent_id)
 
     def resolve_hoster(self, source):
         return self.request_dl_link(source['folder_id'], source['file']['id'])
@@ -115,16 +117,53 @@ class TorBox:
                 if torrent_file['short_name'] == best_match['short_name']:
                     return {'folder_id': source['id'], 'file': source['hash'][f_index]}
 
-    def resolve_uncached_source(self, source, runinbackground):
+    def resolve_uncached_source(self, source, runinbackground, runinforground, pack_select):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
-        torrent = self.addMagnet(source['magnet'])
+        if runinforground:
+            control.progressDialog.create(heading, "Caching Progress")
+        stream_link = None
+        magnet = source['magnet']
+        torrent = self.addMagnet(magnet)
         torrent_id = torrent['torrent_id']
         torrent_info = self.get_torrent_info(torrent_id)
-        control.log(torrent_info)
-        if not torrent_info:
-            self.delete_torrent(torrent_id)
-            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
-            return
-        else:
+        status = torrent_info['download_state']
+
+        if runinbackground:
             control.notify(heading, "The source is downloading to your cloud")
             return
+
+        progress = 0
+        while status not in ['cached', 'error']:
+            if runinforground and (control.progressDialog.iscanceled() or control.wait_for_abort(5)):
+                break
+            torrent_info = self.get_torrent_info(torrent_id)
+            status = torrent_info.get('download_state', 'error')
+            progress = torrent_info.get('progress', 0) * 100
+            peers = torrent_info.get('peers', 0)
+            download_speed = torrent_info.get('download_speed', 0)
+            if runinforground:
+                f_body = (f"Status: {status}[CR]"
+                          f"Progress: {round(progress, 2)} %[CR]"
+                          f"Peers: {peers}[CR]"
+                          f"Download Speed: {source_utils.get_size(download_speed)}")
+                control.progressDialog.update(int(progress), f_body)
+
+        if status == 'cached':
+            control.ok_dialog(heading, "This file has been added to your Cloud")
+            folder_details = [{'fileId': x['id'], 'path': x['name']} for x in torrent_info['files']]
+            selected_file = source_utils.get_best_match('path', folder_details, source['episode_re'], pack_select)
+            if selected_file and selected_file['fileId'] is not None:
+                stream_link = self.request_dl_link(torrent_id, selected_file['fileId'])
+                if self.autodelete:
+                    self.delete_torrent(torrent_id)
+            else:
+                stream_link = self.request_dl_link(torrent_id)
+                if self.autodelete:
+                    self.delete_torrent(torrent_id)
+            if self.autodelete:
+                self.delete_torrent(torrent_id)
+        else:
+            self.delete_torrent(torrent_id)
+        if runinforground:
+            control.progressDialog.close()
+        return stream_link

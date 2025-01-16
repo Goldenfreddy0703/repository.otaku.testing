@@ -1,3 +1,12 @@
+Changelog v5.1.46 (2024-01-16):
+- Recoded Uncached Sources for every debrid
+- Fixed Most Issues with every debrid
+- Added Cached & Uncached Fallbacks to Source Select
+- Added Auto-Delete Torrents Option for each debrid
+- Added 3 New Settings to Premiumize
+- Added New Uncached Setting in Scrapping
+- Modified a couple of setting defaults
+
 Changelog v5.1.45 (2024-01-14):
 - Added Cached & Uncached Button to Source Select
 - Added Resolve Uncached to TorBox
