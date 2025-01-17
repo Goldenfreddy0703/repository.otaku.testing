@@ -74,7 +74,7 @@ class TorBox:
 
     def get_torrent_info(self, torrent_id):
         url = f'{self.BaseUrl}/torrents/mylist'
-        params = {'id': torrent_id}
+        params = {'id': torrent_id, 'bypass_cache': 'true'}
         r = requests.get(url, headers=self.headers(), params=params)
         return r.json()['data']
 
@@ -133,7 +133,7 @@ class TorBox:
             return
 
         progress = 0
-        while status not in ['cached', 'error']:
+        while status not in ['completed', 'error']:
             if runinforground and (control.progressDialog.iscanceled() or control.wait_for_abort(5)):
                 break
             torrent_info = self.get_torrent_info(torrent_id)
@@ -148,7 +148,7 @@ class TorBox:
                           f"Download Speed: {source_utils.get_size(download_speed)}")
                 control.progressDialog.update(int(progress), f_body)
 
-        if status == 'cached':
+        if status == 'completed':
             control.ok_dialog(heading, "This file has been added to your Cloud")
             folder_details = [{'fileId': x['id'], 'path': x['name']} for x in torrent_info['files']]
             selected_file = source_utils.get_best_match('path', folder_details, source['episode_re'], pack_select)

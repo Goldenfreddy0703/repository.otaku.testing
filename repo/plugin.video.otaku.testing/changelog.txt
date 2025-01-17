@@ -1,3 +1,6 @@
+Changelog v5.1.47 (2024-01-17):
+- Fixed Uncached Sources for TorBox
+
 Changelog v5.1.46 (2024-01-16):
 - Recoded Uncached Sources for every debrid
 - Fixed Most Issues with every debrid
