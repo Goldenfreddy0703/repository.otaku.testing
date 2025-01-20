@@ -124,10 +124,13 @@ class SimklWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_watchlist_status_view(self, res, mal_dub=None):
         show_ids = res['show']['ids']
-
+        anilist_id = show_ids.get('anilist')
         mal_id = show_ids.get('mal')
+        kitsu_id = show_ids.get('kitsu')
+
         if not mal_id:
             control.log(f"Mal ID not found for {show_ids}", 'warning')
+
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         show = database.get_show(mal_id)
@@ -139,6 +142,7 @@ class SimklWLF(WatchlistFlavorBase):
             title = res['show']['title']
 
         info = {
+            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id), 'kitsu_id': str(kitsu_id)},
             'title': title,
             'mediatype': 'tvshow',
             'year': res['show']['year'],
@@ -177,8 +181,9 @@ class SimklWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_next_up_view(self, res, mal_dub=None):
         show_ids = res['show']['ids']
-
+        anilist_id = show_ids.get('anilist')
         mal_id = show_ids.get('mal')
+        kitsu_id = show_ids.get('kitsu')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         progress = res['watched_episodes_count']
@@ -208,6 +213,7 @@ class SimklWLF(WatchlistFlavorBase):
             plot = aired = None
 
         info = {
+            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id), 'kitsu_id': str(kitsu_id)},
             'episode': next_up,
             'title': title,
             'tvshowtitle': base_title,

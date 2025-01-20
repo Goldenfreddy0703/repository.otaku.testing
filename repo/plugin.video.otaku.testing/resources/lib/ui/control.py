@@ -9,6 +9,7 @@ import sys
 import json
 
 from urllib import parse
+from resources.lib.ui import database
 
 try:
     HANDLE = int(sys.argv[1])
@@ -49,6 +50,7 @@ OTAKU_ICONS_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'icons', ADDO
 OTAKU_GENRE_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'genres')
 
 dialogWindow = xbmcgui.WindowDialog
+homeWindow = xbmcgui.Window(10000)
 menuItem = xbmcgui.ListItem
 execute = xbmc.executebuiltin
 get_region = xbmc.getRegion
@@ -142,6 +144,14 @@ def setInt(settingid, value):
 
 def setStr(settingid, value):
     ADDON.setSettingString(settingid, value)
+
+
+def setGlobalProp(property, value):
+    homeWindow.setProperty(property, str(value))
+
+
+def clearGlobalProp(property):
+    homeWindow.clearProperty(property)
 
 
 def lang(x):
@@ -263,8 +273,24 @@ def set_videotags(li, info):
         vinfo.setOriginalTitle(originaltitle)
     if trailer := info.get('trailer'):
         vinfo.setTrailer(trailer)
+
     if uniqueids := info.get('UniqueIDs'):
-        vinfo.setUniqueIDs(uniqueids)
+        if isinstance(uniqueids, dict):
+            # Retrieve additional IDs
+            for id_type in ['anilist_id', 'mal_id', 'kitsu_id']:
+                if id_value := uniqueids.get(id_type):
+                    additional_ids = database.get_mapping_ids(id_value, id_type)
+                    uniqueids.update(additional_ids)
+
+            # Convert all values in uniqueids to strings
+            uniqueids = {key: str(value) for key, value in uniqueids.items()}
+
+            vinfo.setUniqueIDs(uniqueids)
+            if 'imdb' in uniqueids:
+                vinfo.setIMDBNumber(uniqueids['imdb'])
+            for key, value in uniqueids.items():
+                li.setProperty(key, value)
+
     if resume := info.get('resume'):
         vinfo.setResumePoint(float(resume), 1)
 

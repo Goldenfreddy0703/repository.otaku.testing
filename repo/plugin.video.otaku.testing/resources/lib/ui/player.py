@@ -2,6 +2,7 @@ import xbmc
 import xbmcgui
 import pickle
 import service
+import json
 
 from resources.lib.ui import control, database
 from resources.lib.indexers import aniskip, anime_skip
@@ -132,6 +133,13 @@ class WatchlistPlayer(player):
         self.vtag = self.getVideoInfoTag()
         self.media_type = self.vtag.getMediaType()
         self.total_time = int(self.getTotalTime())
+        unique_ids = database.get_mapping_ids(self.mal_id, 'mal_id')
+
+        # Trakt scrobbling support
+        control.clearGlobalProp('script.trakt.ids')
+        control.setGlobalProp('script.trakt.ids', json.dumps(unique_ids))
+
+        # Set the last watched episode
         control.setSetting('addon.last_watched', self.mal_id)
 
         for _ in range(20):

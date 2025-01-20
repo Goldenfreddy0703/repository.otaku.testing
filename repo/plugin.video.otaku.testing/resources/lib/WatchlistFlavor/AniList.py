@@ -193,15 +193,17 @@ class AniListWLF(WatchlistFlavorBase):
         progress = res['progress']
         res = res['media']
         anilist_id = res['id']
-
         mal_id = res.get('idMal')
+
         if not mal_id:
             control.log(f"Mal ID not found for {anilist_id}", 'warning')
+
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         title = res['title'].get(self.title_lang) or res['title'].get('userPreferred')
 
         info = {
+            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id)},
             'title': title,
             'genre': res.get('genres'),
             'status': res.get('status'),
@@ -279,6 +281,7 @@ class AniListWLF(WatchlistFlavorBase):
         progress = res['progress']
         res = res['media']
 
+        anilist_id = res['id']
         mal_id = res.get('idMal')
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
@@ -306,6 +309,7 @@ class AniListWLF(WatchlistFlavorBase):
             plot = aired = None
 
         info = {
+            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id)},
             'episode': next_up,
             'title': title,
             'tvshowtitle': res['title']['userPreferred'],

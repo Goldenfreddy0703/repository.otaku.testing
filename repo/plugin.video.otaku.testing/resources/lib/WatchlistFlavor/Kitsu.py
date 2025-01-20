@@ -152,13 +152,15 @@ class KitsuWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_watchlist_view(self, res, eres, mal_dub=None):
         kitsu_id = eres['id']
-
         mal_id = self.mapping_mal(kitsu_id)
+
         if not mal_id:
             control.log(f"Mal ID not found for {kitsu_id}", 'warning')
+
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         info = {
+            'UniqueIDs': {'kitsu_id': str(kitsu_id), 'mal_id': str(mal_id)},
             'plot': eres['attributes'].get('synopsis'),
             'title': eres["attributes"]["titles"].get(self.__get_title_lang(), eres["attributes"]['canonicalTitle']),
             'mpaa': eres['attributes']['ageRating'],
@@ -229,6 +231,7 @@ class KitsuWLF(WatchlistFlavorBase):
             aired = next_up_meta.get('aired')
 
         info = {
+            'UniqueIDs': {'kitsu_id': str(kitsu_id), 'mal_id': str(mal_id)},
             'episode': next_up,
             'title': title,
             'tvshowtitle': anime_title,

@@ -146,8 +146,10 @@ class MyAnimeListWLF(WatchlistFlavorBase):
     @div_flavor
     def _base_watchlist_status_view(self, res, mal_dub=None):
         mal_id = res['node']['id']
+
         if not mal_id:
             control.log(f"Mal ID not found for {mal_id}", 'warning')
+
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         title = res['node'].get('title')
@@ -159,6 +161,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         image = res['node']['main_picture'].get('large', res['node']['main_picture']['medium'])
 
         info = {
+            'UniqueIDs': {'mal_id': str(mal_id)},
             'title': title,
             'plot': res['node']['synopsis'],
             'rating': {'score': res['node'].get('mean', 0)},
@@ -232,6 +235,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             plot = aired = None
 
         info = {
+            'UniqueIDs': {'mal_id': str(mal_id)},
             'episode': next_up,
             'title': title,
             'tvshowtitle': base_title,
