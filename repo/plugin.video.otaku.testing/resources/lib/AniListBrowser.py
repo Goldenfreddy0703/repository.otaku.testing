@@ -2131,7 +2131,7 @@ class AniListBrowser(BrowserBase):
         # if 'Hentai' in genres_list:
         #     genres_list.remove('Hentai')
         try:
-            tags_list = [x['name'] for x in results['tags'] if not x['isAdult']]
+            tags_list = [x['name'] for x in results['data']['tags'] if not x['isAdult']]
         except KeyError:
             tags_list = []
         multiselect = control.multiselect_dialog(control.lang(30934), genres_list + tags_list)
@@ -2146,7 +2146,7 @@ class AniListBrowser(BrowserBase):
                 tag_display_list.append(tag_display_list[selection])
         return self.genres_payload(genre_display_list, tag_display_list, 1)
 
-    def genres_payload(self, genre_list, tag_list, page):
+    def genres_payload(self, genre_list, tag_list, page=1):
         query = '''
         query (
             $page: Int,
@@ -2154,6 +2154,7 @@ class AniListBrowser(BrowserBase):
             $type: MediaType,
             $isAdult: Boolean = false,
             $genre_in: [String],
+            $tag_in: [String],
             $sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC]
         ) {
             Page (page: $page, perPage: $perPage) {
@@ -2163,6 +2164,7 @@ class AniListBrowser(BrowserBase):
                 ANIME: media (
                     type: $type,
                     genre_in: $genre_in,
+                    tag_in: $tag_in,
                     sort: $sort,
                     isAdult: $isAdult
                 ) {
@@ -2231,17 +2233,16 @@ class AniListBrowser(BrowserBase):
             genre_list = ast.literal_eval(genre_list)
         if not isinstance(tag_list, list):
             tag_list = ast.literal_eval(tag_list)
+
         variables = {
             'page': page,
             'perPage': self.perpage,
-            'type': "ANIME"
+            'type': "ANIME",
+            'genre_in': genre_list if genre_list else None,
+            'tag_in': tag_list if tag_list else None,
+            'isAdult': 'Hentai' in genre_list
         }
-        if genre_list:
-            variables['genre_in'] = genre_list
-        if tag_list:
-            variables['tag_in'] = tag_list
-        if 'Hentai' in genre_list:
-            variables['isAdult'] = True
+
         return self.process_genre_view(query, variables, f"genres/{genre_list}/{tag_list}?page=%d", page)
 
     def process_genre_view(self, query, variables, base_plugin_url, page):

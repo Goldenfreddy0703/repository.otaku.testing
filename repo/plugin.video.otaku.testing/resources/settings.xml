@@ -688,9 +688,9 @@
             </group>
         </category>
 
-        <!-- Scrapping -->
-        <category id="Scrapping" label="30538" help="">
-            <!-- General Scrapping -->
+        <!-- Scraping -->
+        <category id="Scraping" label="30538" help="">
+            <!-- General Scraping -->
             <group id="1" label="30539" help="">
                 <setting id="general.autotrynext" type="boolean" label="30350" help="">
                     <level>0</level>
@@ -722,7 +722,7 @@
                 </setting>
             </group>
 
-            <!-- Torrent Scrapping -->
+            <!-- Torrent Scraping -->
             <group id="3" label="30574" help="">
                 <setting id="show.uncached" type="boolean" label="30364" help="">
                     <level>0</level>
@@ -749,7 +749,7 @@
                 </setting>
             </group>
 
-            <!-- Cloud Scrapping -->
+            <!-- Cloud Scraping -->
             <group id="4" label="30541" help="">
                 <setting id="realdebrid.cloudInspection" type="boolean" label="30190" help="">
                     <level>0</level>
@@ -785,7 +785,7 @@
 				</setting>
             </group>
 
-            <!-- Local Scrapping -->
+            <!-- Local Scraping -->
             <group id="5" label="30542" help="">
                 <setting id="provider.localfiles" type="boolean" label="30410" help="">
                     <level>0</level>

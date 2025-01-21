@@ -1086,11 +1086,11 @@ msgid "Force view types on menus"
 msgstr ""
 
 msgctxt "#30538"
-msgid "Scrapping"
+msgid "Scraping"
 msgstr ""
 
 msgctxt "#30539"
-msgid "General Scrapping"
+msgid "General Scraping"
 msgstr ""
 
 msgctxt "#30540"
@@ -1098,11 +1098,11 @@ msgid "Terminate on Local Sources"
 msgstr ""
 
 msgctxt "#30541"
-msgid "Cloud Scrapping"
+msgid "Cloud Scraping"
 msgstr ""
 
 msgctxt "#30542"
-msgid "Local Scrapping"
+msgid "Local Scraping"
 msgstr ""
 
 msgctxt "#30543"
@@ -1230,7 +1230,7 @@ msgid "Exclude Keywords"
 msgstr ""
 
 msgctxt "#30574"
-msgid "Torrent Scrapping"
+msgid "Torrent Scraping"
 msgstr ""
 
 msgctxt "#30575"

@@ -10,7 +10,7 @@ New in this version:
 
     - MyAnimeList (MAL) menus (AniList menus are still available)
     - New sorting system for more precise control over your content
-    - Improved scrapping for more accurate data
+    - Improved scraping for more accurate data
     - Reuse Language Invoker support for faster, more efficient performance
     - New menu settings for more customization
 

@@ -1,5 +1,14 @@
+Changelog v5.1.49 (2024-01-21):
+- Fixed Anilist Genres & Tags
+- Fixed Smart Resolver 
+- Fixed Resolving Last Source
+- Fixed Info field on resolver page
+- Relabeled Scrapping to Scraping
+
 Changelog v5.1.48 (2024-01-20):
 - Added Individual properties for each ID
+- Added Trakt Script Support
+- Added a4kSubtitles Support
 
 Changelog v5.1.47 (2024-01-17):
 - Fixed Uncached Sources for TorBox
@@ -10,7 +19,7 @@ Changelog v5.1.46 (2024-01-16):
 - Added Cached & Uncached Fallbacks to Source Select
 - Added Auto-Delete Torrents Option for each debrid
 - Added 3 New Settings to Premiumize
-- Added New Uncached Setting in Scrapping
+- Added New Uncached Setting in Scraping
 - Modified a couple of setting defaults
 
 Changelog v5.1.45 (2024-01-14):
@@ -138,7 +147,7 @@ Changelog v5.1.23 (2024-11-25):
 - Fixed Bugs in Database
 - Fixed Type in Sort Order
 - Fixed Dub Api for Upcoming Dates
-- Moved Uncached Settings in Scrapping
+- Moved Uncached Settings in Scraping
 
 Changelog v5.1.22 (2024-11-25):
 - Fixed real-debrid
@@ -160,7 +169,7 @@ Changelog v5.1.18 (2024-11-14):
 
 Changelog v5.1.17 (2024-11-14):
 - Fixed Sort Select with Audio
-- Fixed some scrapping bugs
+- Fixed some scraping bugs
 
 Changelog v5.1.16 (2024-11-13):
 - Fixed the Paging
@@ -252,7 +261,7 @@ Changelog v5.1.0 (2024-10-21):
 - Added MAl_Browser
 - New Icons
 - A ton of database changes
-- Improved Scrapping
+- Improved Scraping
 - re-formatted ids to use mal_ids instead of anilist
 - Fixed database updating episode meta
 - A ton of bug fixes
@@ -346,14 +355,14 @@ Changelog v5.0.34 (2024-06-23):
 - improved episode database
 
 Changelog v5.0.33 (2024-06-18):
-- Improved scrapping sorting
+- Improved scraping sorting
 - Improved simkl season
 - Improved scraping
 - Cleaned up database.py
 
 Changelog v5.0.32 (2024-06-18):
 - Removed Seasons from database
-- improved scrapping
+- improved scraping
 
 Changelog v5.0.31 (2024-06-17):
 - reformated utils
@@ -486,7 +495,7 @@ Changelog v5.0.6 (2023-08-06):
 
 Changelog v5.0.5 (2023-08-05):
 - fixed clearlogo
-- improved scrapping
+- improved scraping
 
 Changelog v5.0.4 (2023-08-01):
 - fixed None in thumb error

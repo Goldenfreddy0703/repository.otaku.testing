@@ -132,7 +132,7 @@ class Sources(BrowserBase):
                 if not slug.endswith('-dub') and not slug.endswith('-sub'):
                     slug += '-sub'
 
-                info = ' DUB' if slug.endswith('-dub') else ' SUB'
+                info = (' DUB' if slug.endswith('-dub') else ' SUB')
 
                 source = {
                     'release_title': title,
@@ -144,7 +144,7 @@ class Sources(BrowserBase):
                     'size': 'NA',
                     'seeders': 0,
                     'byte_size': 0,
-                    'info': server + info,
+                    'info': [server + info],
                     'lang': source_utils.getAudio_lang(title),
                     'channel': source_utils.getAudio_channel(title),
                     'sub': source_utils.getSubtitle_lang(title),

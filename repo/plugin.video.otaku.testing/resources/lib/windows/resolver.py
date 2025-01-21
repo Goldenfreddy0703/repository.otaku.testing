@@ -111,6 +111,7 @@ class Resolver(BaseWindow):
                             if str(source['release_title']) == last_played:
                                 sources.insert(0, sources.pop(index))
                                 break
+        xbmc.sleep(1000)
 
         # Begin resolving links
         for i in sources:

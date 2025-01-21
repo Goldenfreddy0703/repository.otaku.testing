@@ -184,7 +184,7 @@ class Sources(BrowserBase):
                                             'size': 'NA',
                                             'seeders': 0,
                                             'byte_size': 0,
-                                            'info': edata_name + (' DUB ' if lang == 'dub' else ' SUB'),                                            
+                                            'info': [edata_name + (' DUB' if lang == 'dub' else ' SUB')],
                                             'lang': 3 if lang == 'dub' else 2,
                                             'channel': 3,
                                             'sub': 1
@@ -205,7 +205,7 @@ class Sources(BrowserBase):
                                     'size': 'NA',
                                     'seeders': 0,
                                     'byte_size': 0,
-                                    'info': edata_name + ' ' + lang,
+                                    'info': [edata_name + (' DUB' if lang == 'dub' else ' SUB')],
                                     'lang': 3 if lang == 'dub' else 2,
                                     'channel': 3,
                                     'sub': 1
