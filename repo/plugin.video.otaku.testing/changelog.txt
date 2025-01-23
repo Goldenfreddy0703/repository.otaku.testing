@@ -1,3 +1,6 @@
+Changelog v5.1.50 (2024-01-22):
+- Added Paging to Animetosho
+
 Changelog v5.1.49 (2024-01-21):
 - Fixed Anilist Genres & Tags
 - Fixed Smart Resolver 

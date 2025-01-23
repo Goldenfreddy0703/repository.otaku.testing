@@ -159,7 +159,7 @@ def getInfo(release_title):
         info.append('60-FPS')
 
     # info.batch
-    if any(i in release_title for i in ['batch']):
+    if any(i in release_title for i in ['batch', 'complete series']):
         info.append('BATCH')
 
     return info

@@ -19,6 +19,7 @@ class Sources(BrowserBase):
         self.cached = []
         self.uncached = []
         self.anidb_id = None
+        self.paging = control.getInt('animetosho.paging')
 
     def get_sources(self, show, mal_id, episode, status, media_type, rescrape):
         show = self._clean_title(show)
@@ -49,7 +50,11 @@ class Sources(BrowserBase):
                 database.update_show_meta(mal_id, meta_ids, pickle.loads(show_meta['art']))
         if self.anidb_id:
             params['aids'] = self.anidb_id
-        self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
+
+        # Add paging using self.paging
+        for page in range(1, self.paging + 1):
+            params['page'] = page
+            self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
 
         if status == 'FINISHED':
             query = f'{show} "Batch"|"Complete Series"'
@@ -63,7 +68,11 @@ class Sources(BrowserBase):
 
             query = self._sphinx_clean(show)
             params['q'] = query
-            self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
+
+            # Add paging using self.paging
+            for page in range(1, self.paging + 1):
+                params['page'] = page
+                self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
 
         show = show.lower()
         if 'season' in show:
@@ -76,7 +85,10 @@ class Sources(BrowserBase):
                 match_2 = match_2.group(0).strip() + ')'
             params['q'] = self._sphinx_clean(f'{match_1}|{match_2}')
 
-            self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
+            # Add paging using self.paging
+            for page in range(1, self.paging + 1):
+                params['page'] = page
+                self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
 
         # remove any duplicate sources
         self.append_cache_uncached_noduplicates()

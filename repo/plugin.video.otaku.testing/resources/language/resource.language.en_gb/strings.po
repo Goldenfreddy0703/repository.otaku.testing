@@ -1492,3 +1492,11 @@ msgstr ""
 msgctxt "#30639"
 msgid "Max Storage Space Used Before Deletion (GB)"
 msgstr ""
+
+msgctxt "#30640"
+msgid "Number of Pages to Scrape"
+msgstr ""
+
+msgctxt "#30641"
+msgid "Provides more sources but will increase scraping time"
+msgstr ""
