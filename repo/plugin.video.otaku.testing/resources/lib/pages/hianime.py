@@ -1,9 +1,9 @@
 import json
 import pickle
 import re
+import urllib.parse
 
 from bs4 import BeautifulSoup, SoupStrainer
-from six.moves import urllib_parse
 from resources.lib.ui import control, database
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.indexers import malsync
@@ -132,7 +132,7 @@ class Sources(BrowserBase):
                         else:
                             srclink = False
                             params = {'url': slink, 'referer': self._BASE_URL}
-                            mcs_url = urllib_parse.urljoin(control.getSetting('ms_url'), '/get')
+                            mcs_url = urllib.parse.urljoin(control.getSetting('ms_url'), '/get')
                             res = self._get_request(mcs_url, data=params)
                             res = json.loads(res)
                             subs = res.get('tracks')
@@ -165,7 +165,7 @@ class Sources(BrowserBase):
 
                                 source = {
                                     'release_title': '{0} - Ep {1}'.format(title, episode),
-                                    'hash': urllib_parse.urljoin(srclink, qlink) + '|User-Agent=iPad',
+                                    'hash': urllib.parse.urljoin(srclink, qlink) + '|User-Agent=iPad',
                                     'type': 'direct',
                                     'quality': quality,
                                     'debrid_provider': '',

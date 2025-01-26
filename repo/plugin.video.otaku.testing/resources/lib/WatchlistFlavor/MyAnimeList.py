@@ -1,10 +1,10 @@
 import re
 import time
-import requests
 import random
 import pickle
+import json
 
-from resources.lib.ui import utils, control, get_meta, database
+from resources.lib.ui import utils, client, control, get_meta, database
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.ui.divide_flavors import div_flavor
 
@@ -36,14 +36,14 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             'code_verifier': code_verifier,
             'grant_type': 'authorization_code'
         }
-        r = requests.post(oauth_url, data=data)
-        if not r.ok:
+        r = client.request(oauth_url, post=data)
+        if not r:
             return
-        res = r.json()
+        res = json.loads(r)
 
         self.token = res['access_token']
-        user = requests.get(f'{self._URL}/users/@me', headers=self.__headers(), params={'fields': 'name'})
-        user = user.json()
+        user = client.request(f'{self._URL}/users/@me', headers=self.__headers(), params={'fields': 'name'})
+        user = json.loads(user)
 
         login_data = {
             'token': res['access_token'],
@@ -61,8 +61,10 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             'grant_type': 'refresh_token',
             'refresh_token': control.getSetting('mal.refresh')
         }
-        r = requests.post(oauth_url, data=data)
-        res = r.json()
+        r = client.request(oauth_url, post=data, jpost=True)
+        if not r:
+            return
+        res = json.loads(r)
         control.setSetting('mal.token', res['access_token'])
         control.setSetting('mal.refresh', res['refresh_token'])
         control.setInt('mal.expiry', int(time.time()) + int(res['expires_in']))
@@ -132,15 +134,15 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         return self._process_status_view(url, params, next_up, f'watchlist_status_type_pages/mal/{status}', page)
 
     def _process_status_view(self, url, params, next_up, base_plugin_url, page):
-        r = requests.get(url, headers=self.__headers(), params=params)
-        results = r.json()
+        r = client.request(url, headers=self.__headers(), params=params)
+        results = json.loads(r) if r else {}
 
         # Extract mal_ids and create a list of dictionaries with 'mal_id' keys
-        mal_ids = [{'mal_id': item['node']['id']} for item in results['data']]
+        mal_ids = [{'mal_id': item['node']['id']} for item in results.get('data', [])]
         get_meta.collect_meta(mal_ids)
 
         all_results = list(map(self._base_next_up_view, results['data'])) if next_up else list(map(self._base_watchlist_status_view, results['data']))
-        all_results += self.handle_paging(results['paging'].get('next'), base_plugin_url, page)
+        all_results += self.handle_paging(results.get('paging', {}).get('next'), base_plugin_url, page)
         return all_results
 
     @div_flavor
@@ -283,8 +285,8 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         }
 
         url = f'{self._URL}/anime/{mal_id}'
-        r = requests.get(url, headers=self.__headers(), params=params)
-        results = r.json().get('my_list_status')
+        r = client.request(url, headers=self.__headers(), params=params)
+        results = json.loads(r).get('my_list_status') if r else {}
         if not results:
             return {}
         anime_entry = {
@@ -321,38 +323,38 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             'limit': 1000,
             "fields": ','.join(fields)
         }
-        r = requests.get(f'{self._URL}/users/@me/animelist', headers=self.__headers(), params=params)
-        res = r.json()
-        paging = res['paging']
-        data = res['data']
+        r = client.request(f'{self._URL}/users/@me/animelist', headers=self.__headers(), params=params)
+        res = json.loads(r) if r else {}
+        paging = res.get('paging', {})
+        data = res.get('data', [])
         while paging.get('next'):
-            r = requests.get(paging['next'], headers=self.__headers())
-            res = r.json()
-            paging = res['paging']
-            data += res['data']
+            r = client.request(paging['next'], headers=self.__headers())
+            res = json.loads(r) if r else {}
+            paging = res.get('paging', {})
+            data += res.get('data', [])
         return data
 
     def update_list_status(self, mal_id, status):
         data = {
             "status": status,
         }
-        r = requests.put(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), data=data)
-        return r.ok
+        r = client.request(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), post=data, method='PUT')
+        return r is not None
 
     def update_num_episodes(self, mal_id, episode):
         data = {
             'num_watched_episodes': int(episode)
         }
-        r = requests.put(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), data=data)
-        return r.ok
+        r = client.request(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), post=data, method='PUT')
+        return r is not None
 
     def update_score(self, mal_id, score):
         data = {
             "score": score,
         }
-        r = requests.put(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), data=data)
-        return r.ok
+        r = client.request(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), post=data, method='PUT')
+        return r is not None
 
     def delete_anime(self, mal_id):
-        r = requests.delete(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers())
-        return r.ok
+        r = client.request(f'{self._URL}/anime/{mal_id}/my_list_status', headers=self.__headers(), method='DELETE')
+        return r is not None

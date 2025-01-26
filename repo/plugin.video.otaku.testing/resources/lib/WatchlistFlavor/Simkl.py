@@ -1,9 +1,8 @@
-import xbmc
-import requests
 import pickle
 import random
+import json
 
-from resources.lib.ui import utils, database, control, get_meta
+from resources.lib.ui import utils, database, client, control, get_meta
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.ui.divide_flavors import div_flavor
 
@@ -32,8 +31,8 @@ class SimklWLF(WatchlistFlavorBase):
             'client_id': self.client_id,
         }
 
-        r = requests.get(f'{self._URL}/oauth/pin', params=params)
-        device_code = r.json()
+        r = client.request(f'{self._URL}/oauth/pin', params=params)
+        device_code = json.loads(r) if r else {}
 
         copied = control.copy2clip(device_code["user_code"])
         display_dialog = (f"{control.lang(30020).format(control.colorstr('https://simkl.com/pin'))}[CR]"
@@ -47,16 +46,16 @@ class SimklWLF(WatchlistFlavorBase):
             if control.progressDialog.iscanceled():
                 control.progressDialog.close()
                 return
-            xbmc.sleep(device_code['interval'] * 1000)
+            control.sleep(device_code['interval'] * 1000)
 
-            r = requests.get(f'{self._URL}/oauth/pin/{device_code["user_code"]}', params=params)
-            r = r.json()
-            if r['result'] == 'OK':
+            r = client.request(f'{self._URL}/oauth/pin/{device_code["user_code"]}', params=params)
+            r = json.loads(r) if r else {}
+            if r.get('result') == 'OK':
                 self.token = r['access_token']
                 login_data = {'token': self.token}
-                r = requests.post(f'{self._URL}/users/settings', headers=self.__headers())
-                if r.ok:
-                    user = r.json()['user']
+                r = client.request(f'{self._URL}/users/settings', headers=self.__headers(), post={}, jpost=True)
+                if r:
+                    user = json.loads(r)['user']
                     login_data['username'] = user['name']
                 return login_data
             new_display_dialog = f"{display_dialog}[CR]Code Valid for {control.colorstr(device_code['expires_in'] - i * device_code['interval'])} Seconds"
@@ -100,12 +99,12 @@ class SimklWLF(WatchlistFlavorBase):
     def get_watchlist_status(self, status, next_up, offset, page):
         results = self.get_all_items(status)
 
+        if not results:
+            return []
+
         # Extract mal_ids from the new API response structure
         mal_ids = [{'mal_id': anime['show']['ids']['mal']} for anime in results['anime']]
         get_meta.collect_meta(mal_ids)
-
-        if not results:
-            return []
 
         all_results = list(map(self._base_next_up_view, results['anime'])) if next_up else list(map(self._base_watchlist_status_view, results['anime']))
 
@@ -201,7 +200,7 @@ class SimklWLF(WatchlistFlavorBase):
         if next_up_meta:
             kodi_meta = pickle.loads(show['kodi_meta'])
             if self.title_lang == 'english':
-                base_title = kodi_meta['english']
+                base_title = kodi_meta.get('ename') or res['show']['title']
                 title = '%s - %s/%s' % (base_title, next_up, episode_count)
             if next_up_meta.get('title'):
                 title = '%s - %s' % (title, next_up_meta['title'])
@@ -251,7 +250,7 @@ class SimklWLF(WatchlistFlavorBase):
             return utils.parse_view(base, False, True, dub)
 
         if next_up_meta:
-            base['url'] = 'play/%d/%d' % (mal_id, next_up)
+            base['url'] = 'play/%d/%d' % (int(mal_id), int(next_up))
             return utils.parse_view(base, False, True, dub)
 
         return utils.parse_view(base, True, False, dub)
@@ -265,7 +264,7 @@ class SimklWLF(WatchlistFlavorBase):
         # params = {
         #     'mal': mal_id
         # }
-        # r = requests.post(f'{self._URL}/sync/watched', headers=self.__headers(), params=params)
+        # r = client.request(f'{self._URL}/sync/watched', headers=self.__headers(), params=params)
         # result = r.json()
         # anime_entry = {
         #     'eps_watched': results['num_episodes_watched'],
@@ -289,8 +288,8 @@ class SimklWLF(WatchlistFlavorBase):
             'extended': 'full',
             # 'next_watch_info': 'yes'
         }
-        r = requests.get(f'{self._URL}/sync/all-items/anime/{status}', headers=self.__headers(), params=params)
-        return r.json()
+        r = client.request(f'{self._URL}/sync/all-items/anime/{status}', headers=self.__headers(), params=params)
+        return json.loads(r) if r else {}
 
     def update_list_status(self, mal_id, status):
         data = {
@@ -301,9 +300,9 @@ class SimklWLF(WatchlistFlavorBase):
                 }
             }]
         }
-        r = requests.post(f'{self._URL}/sync/add-to-list', headers=self.__headers(), json=data)
-        if r.ok:
-            r = r.json()
+        r = client.request(f'{self._URL}/sync/add-to-list', headers=self.__headers(), post=data, jpost=True)
+        if r:
+            r = json.loads(r)
             if not r['not_found']['shows'] or not r['not_found']['shows']:
                 if status == 'completed' and r.get('added', {}).get('shows', [{}])[0].get('to') == 'watching':
                     return 'watching'
@@ -319,9 +318,9 @@ class SimklWLF(WatchlistFlavorBase):
                 "episodes": [{'number': i} for i in range(1, int(episode) + 1)]
             }]
         }
-        r = requests.post(f'{self._URL}/sync/history', headers=self.__headers(), json=data)
-        if r.ok:
-            r = r.json()
+        r = client.request(f'{self._URL}/sync/history', headers=self.__headers(), post=data, jpost=True)
+        if r:
+            r = json.loads(r)
             if not r['not_found']['shows'] or not r['not_found']['movies']:
                 return True
         return False
@@ -339,9 +338,9 @@ class SimklWLF(WatchlistFlavorBase):
         if score == 0:
             url = f"{url}/remove"
 
-        r = requests.post(url, headers=self.__headers(), json=data)
-        if r.ok:
-            r = r.json()
+        r = client.request(url, headers=self.__headers(), post=data, jpost=True)
+        if r:
+            r = json.loads(r)
             if not r['not_found']['shows'] or not r['not_found']['movies']:
                 return True
         return False
@@ -354,9 +353,9 @@ class SimklWLF(WatchlistFlavorBase):
                 }
             }]
         }
-        r = requests.post(f"{self._URL}/sync/history/remove", headers=self.__headers(), json=data)
-        if r.ok:
-            r = r.json()
+        r = client.request(f"{self._URL}/sync/history/remove", headers=self.__headers(), post=data, jpost=True)
+        if r:
+            r = json.loads(r)
             if not r['not_found']['shows'] or not r['not_found']['movies']:
                 return True
         return False

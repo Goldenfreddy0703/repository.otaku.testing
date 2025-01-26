@@ -1,8 +1,8 @@
-import requests
 import random
 import pickle
+import json
 
-from resources.lib.ui import utils, control, get_meta, database
+from resources.lib.ui import utils, client, control, get_meta, database
 from resources.lib.WatchlistFlavor.WatchlistFlavorBase import WatchlistFlavorBase
 from resources.lib.ui.divide_flavors import div_flavor
 
@@ -34,9 +34,9 @@ class AniListWLF(WatchlistFlavorBase):
             "name": self.username
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        results = r.json()
-        if "errors" in results.keys():
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        results = json.loads(r) if r else None
+        if results is None:
             control.setSetting('anilist.token', '')
             control.setSetting('anilist.username', '')
             return
@@ -174,8 +174,8 @@ class AniListWLF(WatchlistFlavorBase):
         return self.process_status_view(query, variables, next_up)
 
     def process_status_view(self, query, variables, next_up):
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        results = r.json()
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        results = json.loads(r) if r else {}
         lists = results['data']['MediaListCollection']['lists']
         entries = []
         for mlist in lists:
@@ -373,8 +373,8 @@ class AniListWLF(WatchlistFlavorBase):
             'mediaId': mal_id
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        results = r.json()['data']['Media']['mediaListEntry']
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        results = json.loads(r)['data']['Media']['mediaListEntry'] if r else {}
         if not results:
             return {}
         anime_entry = {
@@ -422,9 +422,9 @@ class AniListWLF(WatchlistFlavorBase):
             'type': 'ANIME',
             'sort': self.__get_sort()
         }
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        results = r.json()
-        return results['data']['MediaListCollection']['lists']
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        results = json.loads(r) if r else {}
+        return results['data']['MediaListCollection']['lists'] if 'data' in results else []
 
     def get_watchlist_anime_info(self, anilist_id):
         query = '''
@@ -446,8 +446,8 @@ class AniListWLF(WatchlistFlavorBase):
             'mediaId': anilist_id
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        results = r.json()
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        results = json.loads(r) if r else {}
         return results
 
     def update_list_status(self, mal_id, status):
@@ -459,8 +459,8 @@ class AniListWLF(WatchlistFlavorBase):
             SaveMediaListEntry (mediaId: $mediaId, status: $status) {
                 id
                 status
-                }
             }
+        }
         '''
 
         variables = {
@@ -468,8 +468,8 @@ class AniListWLF(WatchlistFlavorBase):
             'status': status
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        return r.ok
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        return r is not None
 
     def update_num_episodes(self, mal_id, episode):
         anilist_id = self._get_mapping_id(mal_id, 'anilist_id')
@@ -481,8 +481,8 @@ class AniListWLF(WatchlistFlavorBase):
                 id
                 progress
                 status
-                }
             }
+        }
         '''
 
         variables = {
@@ -490,8 +490,8 @@ class AniListWLF(WatchlistFlavorBase):
             'progress': int(episode)
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        return r.ok
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        return r is not None
 
     def update_score(self, mal_id, score):
         anilist_id = self._get_mapping_id(mal_id, 'anilist_id')
@@ -502,8 +502,8 @@ class AniListWLF(WatchlistFlavorBase):
             SaveMediaListEntry (mediaId: $mediaId, score: $score) {
                 id
                 score
-                }
             }
+        }
         '''
 
         variables = {
@@ -511,8 +511,8 @@ class AniListWLF(WatchlistFlavorBase):
             'score': float(score)
         }
 
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        return r.ok
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        return r is not None
 
     def delete_anime(self, mal_id):
         anilist_id = self._get_mapping_id(mal_id, 'anilist_id')
@@ -534,5 +534,5 @@ class AniListWLF(WatchlistFlavorBase):
         variables = {
             'id': int(list_id)
         }
-        r = requests.post(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
-        return r.ok
+        r = client.request(self._URL, headers=self.__headers(), post={'query': query, 'variables': variables}, jpost=True)
+        return r is not None

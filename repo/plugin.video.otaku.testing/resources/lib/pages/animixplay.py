@@ -2,10 +2,10 @@ import itertools
 import json
 import pickle
 import re
-from functools import partial
+import urllib.parse
 
+from functools import partial
 from bs4 import BeautifulSoup, SoupStrainer
-from six.moves import urllib_parse
 from resources.lib.ui import control, database, client
 from resources.lib.ui.BrowserBase import BrowserBase
 
@@ -60,10 +60,10 @@ class Sources(BrowserBase):
             resp = database.get(client.request, 8, eurl, referer=self._BASE_URL, output='extended')
             s = resp[0]
             cookie = resp[4]
-            referer = urllib_parse.urljoin(eurl, '/')
+            referer = urllib.parse.urljoin(eurl, '/')
             if episode:
                 esurl = re.findall(r'src="(/ajax/stats.js[^"]+)', s)[0]
-                esurl = urllib_parse.urljoin(eurl, esurl)
+                esurl = urllib.parse.urljoin(eurl, esurl)
                 epage = database.get(client.request, 8, esurl, referer=eurl)
                 soup = BeautifulSoup(epage, "html.parser")
                 epurls = soup.find_all('a', {'class': 'playbutton'})
@@ -115,7 +115,7 @@ class Sources(BrowserBase):
                         'X-CSRF-TOKEN': csrf_token
                     }
                     r = client.request(
-                        urllib_parse.urljoin(eurl, '/ajax/embed'),
+                        urllib.parse.urljoin(eurl, '/ajax/embed'),
                         post=data,
                         headers=headers,
                         XHR=True,
@@ -125,7 +125,7 @@ class Sources(BrowserBase):
 
                     matches = re.findall(r'<iframe.+?src="([^"]+)', r)
                     if matches:
-                        embed_url = urllib_parse.urljoin(eurl, matches[0])
+                        embed_url = urllib.parse.urljoin(eurl, matches[0])
                         subs = ''
                         slink = ''
                         s = client.request(embed_url, referer=eurl)

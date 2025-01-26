@@ -1,9 +1,6 @@
+import json
 import time
-import requests
-import threading
-import xbmc
-
-from resources.lib.ui import control, source_utils
+from resources.lib.ui import client, control, source_utils
 
 
 class DebridLink:
@@ -13,7 +10,7 @@ class DebridLink:
         self.token = control.getSetting('debridlink.token')
         self.refresh = control.getSetting('debridlink.refresh')
         self.autodelete = control.getBool('debridlink.autodelete')
-        self.api_url = "https://debrid-link.com/api/v2"
+        self.api_url = "https://debrid-link.fr/api/v2"
         self.cache_check_results = {}
         self.DeviceCode = ''
         self.OauthTimeStep = 0
@@ -35,44 +32,48 @@ class DebridLink:
             'code': self.DeviceCode,
             'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
         }
-        r = requests.post(url, data=data, headers={'User-Agent': self.USER_AGENT})
-        if r.ok:
-            response = r.json()
+        r = client.request(url, post=data, headers={'User-Agent': self.USER_AGENT})
+        if r:
+            response = json.loads(r)
             control.progressDialog.close()
             self.token = response.get('access_token')
             self.refresh = response.get('refresh_token')
             control.setSetting('debridlink.token', self.token)
             control.setSetting('debridlink.refresh', self.refresh)
             control.setInt('debridlink.expiry', int(time.time()) + int(response['expires_in']))
-        return r.ok
+            return True
 
     def auth(self):
         url = '{0}/oauth/device/code'.format(self.api_url[:-3])
         data = {'client_id': self.ClientID, 'scope': 'get.post.delete.seedbox get.account'}
-        resp = requests.post(url, data=data, headers={'User-Agent': self.USER_AGENT}).json()
+        r = client.request(url, post=data, headers={'User-Agent': self.USER_AGENT})
+        if r:
+            resp = json.loads(r)
+            self.OauthTotalTimeout = self.OauthTimeout = resp['expires_in']
+            self.OauthTimeStep = resp['interval']
+            self.DeviceCode = resp['device_code']
 
-        self.OauthTotalTimeout = self.OauthTimeout = resp['expires_in']
-        self.OauthTimeStep = resp['interval']
-        self.DeviceCode = resp['device_code']
-
-        copied = control.copy2clip(resp.get('user_code'))
-        display_dialog = (f"{control.lang(30020).format(control.colorstr(resp['verification_url']))}[CR]"
-                          f"{control.lang(30021).format(control.colorstr(resp['user_code']))}")
-        if copied:
-            display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
-        control.progressDialog.create(f'{control.ADDON_NAME}: Debrid-Link Auth', display_dialog)
-        control.progressDialog.update(100)
-        auth_done = False
-        while not auth_done and self.OauthTimeout > 0:
-            self.OauthTimeout -= self.OauthTimeStep
-            xbmc.sleep(self.OauthTimeStep * 1000)
-            auth_done = self.auth_loop()
-        if auth_done:
-            self.status()
+            copied = control.copy2clip(resp.get('user_code'))
+            display_dialog = (
+                f"{control.lang(30020).format(control.colorstr(resp['verification_url']))}[CR]"
+                f"{control.lang(30021).format(control.colorstr(resp['user_code']))}"
+            )
+            if copied:
+                display_dialog = f"{display_dialog}[CR]{control.lang(30022)}"
+            control.progressDialog.create(f'{control.ADDON_NAME}: Debrid-Link Auth', display_dialog)
+            control.progressDialog.update(100)
+            auth_done = False
+            while not auth_done and self.OauthTimeout > 0:
+                self.OauthTimeout -= self.OauthTimeStep
+                control.sleep(self.OauthTimeStep * 1000)
+                auth_done = self.auth_loop()
+            if auth_done:
+                self.status()
 
     def status(self):
         url = f"{self.api_url[:-3]}/account/infos"
-        response = requests.get(url, headers=self.headers()).json()
+        response = client.request(url, headers=self.headers())
+        response = json.loads(response)
         username = response['value']['pseudo']
         premium = response['value']['premiumLeft'] > 0
         control.setSetting('debridlink.username', username)
@@ -90,35 +91,12 @@ class DebridLink:
             'client_id': self.ClientID
         }
         url = f"{self.api_url[:-3]}/oauth/token"
-        response = requests.post(url, data=postData, headers={'User-Agent': self.USER_AGENT}).json()
+        response = client.request(url, post=postData, headers={'User-Agent': self.USER_AGENT})
+        response = json.loads(response)
         if response.get('access_token'):
             self.token = response['access_token']
             control.setSetting('debridlink.token', self.token)
             control.setInt('debridlink.expiry', int(time.time()) + response['expires_in'])
-
-    def check_hash(self, hashlist):
-        if isinstance(hashlist, list):
-            self.cache_check_results = {}
-            hashlist = [hashlist[x: x + 100] for x in range(0, len(hashlist), 100)]
-            threads = []
-            for arg in hashlist:
-                t = threading.Thread(target=self._check_hash_thread, args=[arg])
-                threads.append(t)
-                t.start()
-            for i in threads:
-                i.join()
-            return self.cache_check_results
-        else:
-            url = f"{self.api_url}/seedbox/cached?url={hashlist}"
-            response = requests.get(url, headers=self.headers()).json()
-            return response.get('value')
-
-    def _check_hash_thread(self, hashes):
-        hashString = ','.join(hashes)
-        url = "{0}/seedbox/cached?url={1}".format(self.api_url, hashString)
-        response = requests.get(url, headers=self.headers())
-        if response.ok:
-            self.cache_check_results.update(response.json().get('value'))
 
     def addMagnet(self, magnet):
         postData = {
@@ -126,8 +104,8 @@ class DebridLink:
             'async': 'true'
         }
         url = f"{self.api_url}/seedbox/add"
-        response = requests.post(url, data=postData, headers=self.headers()).json()
-        return response.get('value')
+        r = client.request(url, post=postData, headers=self.headers())
+        return json.loads(r).get('value') if r else None
 
     def resolve_single_magnet(self, hash_, magnet, episode, pack_select):
         files = self.addMagnet(magnet)['files']

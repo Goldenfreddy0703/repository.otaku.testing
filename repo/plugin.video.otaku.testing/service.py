@@ -1,9 +1,10 @@
 import time
-import requests
 import os
 import json
+import urllib.request
+import urllib.error
 
-from resources.lib.ui import control, database_sync, database
+from resources.lib.ui import control, client, database_sync
 
 
 def refresh_apis():
@@ -42,9 +43,13 @@ def refresh_apis():
 def update_mappings_db():
     control.log("### Updating Mappings")
     url = 'https://github.com/Goldenfreddy0703/Otaku-Mappings/raw/refs/heads/main/anime_mappings.db'
-    r = requests.get(url)
-    with open(os.path.join(control.dataPath, 'mappings.db'), 'wb') as file:
-        file.write(r.content)
+    try:
+        response = urllib.request.urlopen(url)
+        with open(os.path.join(control.dataPath, 'mappings.db'), 'wb') as file:
+            file.write(response.read())
+        control.log("### Mappings updated successfully")
+    except urllib.error.URLError as e:
+        control.log(f"### Failed to update mappings: {e}")
 
 
 def sync_watchlist(silent=False):
@@ -73,10 +78,14 @@ def sync_watchlist(silent=False):
 def update_dub_json():
     control.log("### Updating Dub json")
     with open(control.maldubFile, 'w') as file:
-        r = requests.get('https://raw.githubusercontent.com/MAL-Dubs/MAL-Dubs/main/data/dubInfo.json')
-        mal_dub_list = r.json()["dubbed"]
-        mal_dub = {str(item): {'dub': True} for item in mal_dub_list}
-        json.dump(mal_dub, file)
+        response = client.request('https://raw.githubusercontent.com/MAL-Dubs/MAL-Dubs/main/data/dubInfo.json')
+        if response:
+            mal_dub_list = json.loads(response)["dubbed"]
+            mal_dub = {str(item): {'dub': True} for item in mal_dub_list}
+            json.dump(mal_dub, file)
+            control.log("### Dubs updated successfully")
+        else:
+            control.log("### Failed to update Dubs")
 
 
 def getChangeLog():

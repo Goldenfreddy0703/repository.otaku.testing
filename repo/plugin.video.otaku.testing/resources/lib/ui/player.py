@@ -437,7 +437,6 @@ class PlayerDialogs(xbmc.Player):
             if xml_file:
                 PlayingNext(xml_file, control.ADDON_PATH, actionArgs=args).doModal()
 
-
     @staticmethod
     def show_skip_intro(skipintro_aniskip, skipintro_end):
         from resources.lib.windows.skip_intro import SkipIntro
@@ -462,7 +461,6 @@ class PlayerDialogs(xbmc.Player):
         # Call SkipIntro with the retrieved XML file
         if xml_file:
             SkipIntro(xml_file, control.ADDON_PATH, actionArgs=args).doModal()
-
 
     @staticmethod
     def _get_next_item_args():

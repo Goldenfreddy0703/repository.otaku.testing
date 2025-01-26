@@ -3,12 +3,12 @@ import xbmcvfs
 import json
 import os
 import math
-import requests
 import time
+import urllib.request
+import urllib.parse
 
 from resources.lib.windows.base_window import BaseWindow
 from resources.lib.ui import database, control
-from urllib import parse
 
 CLOCK = time.time
 
@@ -200,7 +200,7 @@ class Manager:
         self.output_filename = filename
         if self.output_filename is None:
             self.output_filename = url.split("/")[-1]
-            self.output_filename = parse.unquote(self.output_filename)
+            self.output_filename = urllib.parse.unquote(self.output_filename)
         self.output_path = os.path.join(self.storage_location, self.output_filename)
 
         yesno = control.yesno_dialog(control.ADDON_NAME, f'''
@@ -219,12 +219,15 @@ class Manager:
         self.speed = 0
         self.status = "downloading"
 
-        head = requests.head(url, allow_redirects=True)
-        self.file_size = int(head.headers.get("content-length", None))
+        # Use urllib.request to get the headers
+        request = urllib.request.Request(url, method='HEAD')
+        head = urllib.request.urlopen(request)
+        self.file_size = int(head.getheader("content-length", None))
         self.file_size_display = self.get_display_size(self.file_size)
 
-        r = requests.get(url, stream=True)
-        chunks = r.iter_content(chunk_size=1024 * 1024 * 8)
+        # Use urllib.request to get the content
+        response = urllib.request.urlopen(url)
+        chunks = iter(lambda: response.read(1024 * 1024 * 8), b'')
 
         control.notify(control.ADDON_NAME, 'Download Started')
         with open(self.output_path, 'wb') as f:

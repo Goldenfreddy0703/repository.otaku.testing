@@ -1,6 +1,5 @@
 import threading
 import time
-import xbmc
 
 from resources.lib.pages import nyaa, animetosho, debrid_cloudfiles, aniwave, animepahe, hianime, gogoanime, localfiles
 from resources.lib.ui import control, database
@@ -91,7 +90,7 @@ class Sources(GetSources):
             for provider in self.torrentProviders:
                 self.remainingProviders.remove(provider)
 
-        ### local ###
+        # local #
         if control.getBool('provider.localfiles'):
             t = threading.Thread(target=self.user_local_inspection, args=(query, mal_id, episode, rescrape))
             t.start()
@@ -99,7 +98,7 @@ class Sources(GetSources):
         else:
             self.remainingProviders.remove('Local Inspection')
 
-        ### embeds ###
+        # embeds #
         if control.getBool('provider.animepahe'):
             t = threading.Thread(target=self.animepahe_worker, args=(mal_id, episode, rescrape))
             t.start()
@@ -149,13 +148,13 @@ class Sources(GetSources):
                     control.colorstr(self.torrents_qual_len[3] + self.embeds_qual_len[3]),
                     control.colorstr(self.torrents_qual_len[4] + self.embeds_qual_len[4])
                 ))
-            xbmc.sleep(500)
+            control.sleep(500)
 
             if (
-                self.canceled or
-                (len(self.remainingProviders) < 1 and runtime > 5) or
-                (control.settingids.terminateoncloud and len(self.cloud_files) > 0) or
-                (control.settingids.terminateonlocal and len(self.local_files) > 0)
+                self.canceled
+                or (len(self.remainingProviders) < 1 and runtime > 5)
+                or (control.settingids.terminateoncloud and len(self.cloud_files) > 0)
+                or (control.settingids.terminateonlocal and len(self.local_files) > 0)
             ):
                 break
 
@@ -169,7 +168,7 @@ class Sources(GetSources):
         self.close()
         return self.return_data
 
-    ### Torrents ###
+    # Torrents #
     def nyaa_worker(self, query, mal_id, episode, status, media_type, rescrape):
         all_sources = database.get(nyaa.Sources().get_sources, 8, query, mal_id, episode, status, media_type, rescrape, key='nyaa')
         self.torrentUnCacheSources += all_sources['uncached']
@@ -184,7 +183,7 @@ class Sources(GetSources):
         self.torrentSources += all_sources['cached'] + all_sources['uncached']
         self.remainingProviders.remove('animetosho')
 
-    ### embeds ###
+    # embeds #
     def animepahe_worker(self, mal_id, episode, rescrape):
         self.embedSources += database.get(animepahe.Sources().get_sources, 8, mal_id, episode, key='animepahe')
         self.remainingProviders.remove('animepahe')
@@ -223,7 +222,7 @@ class Sources(GetSources):
                     control.setInt('hianime.skipoutro.end', int(x['skip']['outro']['end']))
         self.remainingProviders.remove('hianime')
 
-    ### Local & Cloud ###
+    # Local & Cloud #
     def user_local_inspection(self, query, mal_id, episode, rescrape):
         self.local_files += localfiles.Sources().get_sources(query, mal_id, episode)
         self.remainingProviders.remove('Local Inspection')

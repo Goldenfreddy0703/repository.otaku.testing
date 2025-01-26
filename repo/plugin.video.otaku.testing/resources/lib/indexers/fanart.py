@@ -1,6 +1,6 @@
-import requests
+import json
 
-from resources.lib.ui import control
+from resources.lib.ui import client, control
 
 baseUrl = "https://webservice.fanart.tv/v3"
 lang = ['en', 'ja', '']
@@ -11,8 +11,8 @@ language = ["ja", 'en'][control.getInt("titlelanguage")]
 def getArt(meta_ids, mtype):
     art = {}
     if mid := meta_ids.get('themoviedb_id') if mtype == 'movies' else meta_ids.get('thetvdb_id'):
-        r = requests.get(f'{baseUrl}/{mtype}/{mid}', headers=headers)
-        res = r.json() if r.ok else {}
+        response = client.request(f'{baseUrl}/{mtype}/{mid}', headers=headers)
+        res = json.loads(response) if response else {}
         if res:
             if mtype == 'movies':
                 if res.get('moviebackground'):

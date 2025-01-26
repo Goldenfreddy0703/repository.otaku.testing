@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import base64
 import re
-import six
+import urllib.parse
 
 from resources.lib.ui import client, control, utils
-from six.moves import urllib_parse
 
 
 class BrowserBase(object):
@@ -52,7 +51,7 @@ class BrowserBase(object):
 
     @staticmethod
     def _clean_title(text):
-        return text.replace(u'×'.encode('utf-8') if six.PY2 else u'×', ' x ')
+        return text.replace(u'×', ' x ')
 
     def _to_url(self, url=''):
         assert self._BASE_URL is not None, "Must be set on inherentance"
@@ -70,7 +69,7 @@ class BrowserBase(object):
 
     def _get_request(self, url, data=None, headers=None, XHR=False):
         if data:
-            url = "%s?%s" % (url, urllib_parse.urlencode(data))
+            url = "%s?%s" % (url, urllib.parse.urlencode(data))
         return self._send_request(url, data=None, headers=headers, XHR=XHR)
 
     @staticmethod
@@ -84,16 +83,16 @@ class BrowserBase(object):
 
     @staticmethod
     def _bencode(text):
-        return six.ensure_str(base64.b64encode(six.ensure_binary(text)))
+        return (base64.b64encode(control.bin(text))).decode('latin-1')
 
     @staticmethod
     def _bdecode(text, binary=False):
         dec = base64.b64decode(text)
-        return dec if binary else six.ensure_str(dec)
+        return dec if binary else dec.decode('latin-1')
 
     @staticmethod
     def _get_origin(url):
-        purl = urllib_parse.urlparse(url)
+        purl = urllib.parse.urlparse(url)
         return '{0}://{1}'.format(purl.scheme, purl.netloc)
 
     @staticmethod

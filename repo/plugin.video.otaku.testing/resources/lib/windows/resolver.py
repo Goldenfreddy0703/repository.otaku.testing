@@ -1,12 +1,11 @@
-import requests
 import xbmcgui
 import xbmcplugin
 import xbmc
+import urllib.parse
 
-from urllib import parse
 from resources.lib.WatchlistIntegration import watchlist_update_episode
 from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid, torbox
-from resources.lib.ui import control, source_utils, player
+from resources.lib.ui import client, control, source_utils, player
 from resources.lib.windows.base_window import BaseWindow
 
 control.sys.path.append(control.dataPath)
@@ -218,7 +217,6 @@ class Resolver(BaseWindow):
         else:
             self.close()
 
-
     def resolve_source(self, api, source):
         api = api()
         hash_ = source['hash']
@@ -237,29 +235,21 @@ class Resolver(BaseWindow):
         if not link:
             return
         url = link
+        headers = {}
         if '|' in url:
             url, hdrs = link.split('|')
             headers = dict([item.split('=') for item in hdrs.split('&')])
             for header in headers:
-                headers[header] = parse.unquote_plus(headers[header])
-        else:
-            headers = None
-        try:
-            r = requests.get(url, headers=headers, stream=True)
-        except requests.exceptions.SSLError:
-            yesno = control.yesno_dialog(f'{control.ADDON_NAME}: Request Error',
-                                         f'{url}\nWould you like to try without verifying TLS certificate?')
-            if yesno == 1:
-                r = requests.get(url, headers=headers, stream=True, verify=False)
-            else:
-                return
-        except Exception as e:
-            control.log(str(e), level='warning')
-            return
+                headers[header] = urllib.parse.unquote_plus(headers[header])
 
+        limit = None if '.m3u8' in url else '0'
+        linkInfo = client.request(url, headers=headers, limit=limit, output='extended', error=True)
+        if linkInfo[1] not in ['200', '201']:
+            raise Exception('could not resolve %s. status_code=%s' %
+                            (link, linkInfo[1]))
         return {
-            "url": link if '|' in link else r.url,
-            "headers": r.headers
+            "url": link if '|' in link else linkInfo[5],
+            "headers": linkInfo[2],
         }
 
     def resolve_uncache(self, source):

@@ -3,10 +3,9 @@ import codecs
 import json
 import pickle
 import re
-import six
+import urllib.parse
 
 from bs4 import BeautifulSoup, SoupStrainer
-from six.moves import urllib_parse
 from resources.lib.ui import control, database
 from resources.lib.ui.BrowserBase import BrowserBase
 
@@ -57,13 +56,13 @@ class Sources(BrowserBase):
             sitems = soup.find_all('div', {'class': 'item'})
             if sitems:
                 items = [
-                    urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
+                    urllib.parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
                     for x in sitems
                     if self.clean_title(title) == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))
                 ]
                 if not items:
                     items = [
-                        urllib_parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
+                        urllib.parse.urljoin(self._BASE_URL, x.find('a', {'class': 'name'}).get('href'))
                         for x in sitems
                         if self.clean_title(title + 'dub') == self.clean_title(x.find('a', {'class': 'name'}).get('data-jp'))
                     ]
@@ -73,7 +72,7 @@ class Sources(BrowserBase):
             sitems = r.find_all('a', {'class': 'item'})
             if sitems:
                 items = [
-                    urllib_parse.urljoin(self._BASE_URL, x.get('href'))
+                    urllib.parse.urljoin(self._BASE_URL, x.get('href'))
                     for x in sitems
                     if self.clean_title(title) in self.clean_title(x.find('div', {'class': 'name'}).text)
                 ]
@@ -176,7 +175,7 @@ class Sources(BrowserBase):
 
                                         source = {
                                             'release_title': '{0} - Ep {1}'.format(title, episode),
-                                            'hash': urllib_parse.urljoin(srclink, qlink) + '|User-Agent=iPad',
+                                            'hash': urllib.parse.urljoin(srclink, qlink) + '|User-Agent=iPad',
                                             'type': 'direct',
                                             'quality': quality,
                                             'debrid_provider': '',
@@ -227,18 +226,18 @@ class Sources(BrowserBase):
         return o
 
     def generate_vrf(self, content_id, key=EKEY):
-        vrf = control.arc4(six.b(key), six.b(urllib_parse.quote(content_id)))
-        vrf = six.ensure_str(base64.urlsafe_b64encode(six.b(vrf)))
-        vrf = six.ensure_str(base64.b64encode(six.b(vrf)))
+        vrf = control.arc4(control.bin(key), control.bin(urllib.parse.quote(content_id)))
+        vrf = (base64.urlsafe_b64encode(control.bin(vrf))).decode('latin-1')
+        vrf = (base64.b64encode(control.bin(vrf))).decode('latin-1')
         vrf = self.vrf_shift(vrf)
-        vrf = six.ensure_str(base64.b64encode(six.b(vrf)))
+        vrf = (base64.b64encode(control.bin(vrf))).decode('latin-1')
         vrf = codecs.encode(vrf, 'rot_13')
         return vrf.replace('/', '_').replace('+', '-')
 
     @staticmethod
     def decrypt_vrf(text, key=DKEY):
-        data = control.arc4(six.b(key), base64.urlsafe_b64decode(six.b(text)))
-        data = urllib_parse.unquote(data)
+        data = control.arc4(control.bin(key), base64.urlsafe_b64decode(control.bin(text)))
+        data = urllib.parse.unquote(data)
         return data
 
     @staticmethod

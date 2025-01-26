@@ -1,8 +1,7 @@
 import time
-import requests
-import xbmc
+import json
 
-from resources.lib.ui import control, source_utils
+from resources.lib.ui import client, control, source_utils
 
 
 class RealDebrid:
@@ -28,19 +27,19 @@ class RealDebrid:
         if control.progressDialog.iscanceled():
             self.OauthTimeout = 0
             return False
-        control.progressDialog.update(int(self.OauthTimeout/self.OauthTotalTimeout * 100))
+        control.progressDialog.update(int(self.OauthTimeout / self.OauthTotalTimeout * 100))
         params = {
             'client_id': self.ClientID,
             'code': self.DeviceCode
         }
-        r = requests.get(f'{self.OauthUrl}/device/credentials', params=params)
-        if r.ok:
-            response = r.json()
+        r = client.request(f'{self.OauthUrl}/device/credentials', params=params, output='json')
+        if r:
+            response = json.loads(r)
             control.setSetting('realdebrid.client_id', response['client_id'])
             control.setSetting('realdebrid.secret', response['client_secret'])
             self.ClientSecret = response['client_secret']
             self.ClientID = response['client_id']
-        return r.ok
+        return r is not None
 
     def auth(self):
         self.ClientID = 'X245A4XAIBGVM'
@@ -49,7 +48,8 @@ class RealDebrid:
             'client_id': self.ClientID,
             'new_credentials': 'yes'
         }
-        resp = requests.get(f'{self.OauthUrl}/device/code', params=params).json()
+        response = client.request(f'{self.OauthUrl}/device/code', params=params)
+        resp = json.loads(response)
         copied = control.copy2clip(resp['user_code'])
         display_dialog = (f"{control.lang(30020).format(control.colorstr('https://real-debrid.com/device'))}[CR]"
                           f"{control.lang(30021).format(control.colorstr(resp['user_code']))}")
@@ -63,7 +63,7 @@ class RealDebrid:
         auth_done = False
         while not auth_done and self.OauthTimeout > 0:
             self.OauthTimeout -= self.OauthTimeStep
-            xbmc.sleep(self.OauthTimeStep * 1000)
+            control.sleep(self.OauthTimeStep * 1000)
             auth_done = self.auth_loop()
         control.progressDialog.close()
         if auth_done:
@@ -81,8 +81,8 @@ class RealDebrid:
             'grant_type': 'http://oauth.net/grant_type/device/1.0'
         }
 
-        response = requests.post(f'{self.OauthUrl}/token', data=postData)
-        response = response.json()
+        response = client.request(f'{self.OauthUrl}/token', post=postData)
+        response = json.loads(response)
 
         control.setSetting('realdebrid.token', response['access_token'])
         control.setSetting('realdebrid.refresh', response['refresh_token'])
@@ -91,7 +91,8 @@ class RealDebrid:
         self.refresh = response['refresh_token']
 
     def status(self):
-        user_info = requests.get(f'{self.BaseUrl}/user', headers=self.headers()).json()
+        response = client.request(f'{self.BaseUrl}/user', headers=self.headers())
+        user_info = json.loads(response)
         control.setSetting('realdebrid.username', user_info['username'])
         control.setSetting('realdebrid.auth.status', user_info['type'].capitalize())
         control.ok_dialog(control.ADDON_NAME, f'Real-Debrid {control.lang(30023)}')
@@ -105,48 +106,53 @@ class RealDebrid:
             'client_secret': self.ClientSecret,
             'client_id': self.ClientID
         }
-        r = requests.post(f"{self.OauthUrl}/token", data=postData)
-        if r.ok:
-            response = r.json()
+        response = client.request(f"{self.OauthUrl}/token", post=postData, output='json')
+        if response:
+            response = json.loads(response)
             self.token = response['access_token']
             self.refresh = response['refresh_token']
             control.setSetting('realdebrid.token', self.token)
             control.setSetting('realdebrid.refresh', self.refresh)
             control.setInt('realdebrid.expiry', int(time.time()) + int(response['expires_in']))
-            user_info = requests.get(f'{self.BaseUrl}/user', headers=self.headers()).json()
+
+            user_info_response = client.request(f'{self.BaseUrl}/user', headers=self.headers())
+            user_info = json.loads(user_info_response)
             control.setSetting('realdebrid.username', user_info['username'])
             control.setSetting('realdebrid.auth.status', user_info['type'])
             control.log('refreshed realdebrid.token')
         else:
-            control.log(f"realdebrid.refresh: {repr(r)}", 'warning')
+            control.log(f"realdebrid.refresh: {repr(response)}", 'warning')
 
     def addMagnet(self, magnet):
         postData = {'magnet': magnet}
-        response = requests.post(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers(), data=postData).json()
+        response = client.request(f'{self.BaseUrl}/torrents/addMagnet', headers=self.headers(), post=postData)
+        response = json.loads(response)
         return response
 
     def list_torrents(self):
-        response = requests.get(f'{self.BaseUrl}/torrents', headers=self.headers()).json()
+        response = client.request(f'{self.BaseUrl}/torrents', headers=self.headers())
+        response = json.loads(response)
         return response
 
     def torrentInfo(self, torrent_id):
-        return requests.get(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers()).json()
+        response = client.request(f'{self.BaseUrl}/torrents/info/{torrent_id}', headers=self.headers())
+        response = json.loads(response)
+        return response
 
     def torrentSelect(self, torrentid, fileid='all'):
         postData = {'files': fileid}
-        r = requests.post(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers(), data=postData)
-        return r.ok
+        response = client.request(f'{self.BaseUrl}/torrents/selectFiles/{torrentid}', headers=self.headers(), post=postData)
+        return response is not None
 
     def resolve_hoster(self, link):
         postData = {'link': link}
-        response = requests.post(f'{self.BaseUrl}/unrestrict/link', headers=self.headers(), data=postData).json()
+        response = client.request(f'{self.BaseUrl}/unrestrict/link', headers=self.headers(), post=postData)
+        response = json.loads(response)
         return response['download']
 
     def deleteTorrent(self, torrent_id):
-        requests.delete(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.headers(), timeout=10)
-
-    def resolve_single_magnet(self, hash_, magnet, episode, pack_select=False):
-        pass
+        response = client.request(f'{self.BaseUrl}/torrents/delete/{torrent_id}', headers=self.headers(), method='DELETE', timeout=10)
+        return response is not None
 
     @staticmethod
     def resolve_cloud(source, pack_select):
@@ -159,7 +165,8 @@ class RealDebrid:
                     return source['torrent_info']['links'][f_index]
 
     def resolve_single_magnet(self, hash_, magnet, episode='', pack_select=False):
-        hashCheck = requests.get(f'{self.BaseUrl}/torrents/instantAvailability/{hash_}', headers=self.__headers()).json()
+        hashCheck = client.request(f'{self.BaseUrl}/torrents/instantAvailability/{hash_}', headers=self.__headers())
+        hashCheck = json.loads(hashCheck)
         stream_link = None
         for _ in hashCheck[hash_]['rd']:
             torrent = self.addMagnet(magnet)

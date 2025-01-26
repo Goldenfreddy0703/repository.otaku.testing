@@ -2474,9 +2474,9 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="clear_history" type="action" label="30013" help="">
+                <setting id="clear_search_history" type="action" label="30013" help="">
                     <level>2</level>
-                    <data>RunPlugin(plugin://plugin.video.otaku.testing/clear_history?setting=true)</data>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/clear_search_history?setting=true)</data>
                     <control type="button" format="action">
                         <close>true</close>
                     </control>

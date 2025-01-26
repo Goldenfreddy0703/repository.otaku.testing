@@ -92,7 +92,7 @@ class SourceSelect(BaseWindow):
     def doModal(self):
         super(SourceSelect, self).doModal()
         return self.stream_link
-    
+
     def handle_action(self, action_id):
         # Implement the logic for handling the action here
         # For now, you can just log the action_id

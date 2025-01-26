@@ -4,13 +4,14 @@ import random
 import re
 import string
 import time
-import six
+import urllib.error
+import urllib.parse
 import xbmcvfs
 import os
 
 from resources.lib.ui import client, control, jsunpack
 from resources.lib.ui.pyaes import AESModeOfOperationCBC, Decrypter, Encrypter
-from six.moves import urllib_error, urllib_parse
+
 
 _EMBED_EXTRACTORS = {}
 _EDGE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62'
@@ -52,7 +53,7 @@ def load_video_from_url(in_url):
             print(f"Parsed headers: {headers}")
 
             for header in headers:
-                headers[header] = urllib_parse.unquote_plus(headers[header])
+                headers[header] = urllib.parse.unquote_plus(headers[header])
                 print(f"Decoded header: {header} = {headers[header]}")
 
         reqObj = client.request(in_url, headers=headers, output='extended')
@@ -61,7 +62,7 @@ def load_video_from_url(in_url):
         return found_extractor['parser'](reqObj[5],
                                          reqObj[0],
                                          reqObj[2].get('Referer'))
-    except urllib_error.URLError:
+    except urllib.error.URLError:
         return None  # Dead link, Skip result
     except:
         raise
@@ -87,7 +88,7 @@ def __get_packed_data(html):
 
 
 def __append_headers(headers):
-    return '|%s' % '&'.join(['%s=%s' % (key, urllib_parse.quote_plus(headers[key])) for key in headers])
+    return '|%s' % '&'.join(['%s=%s' % (key, urllib.parse.quote_plus(headers[key])) for key in headers])
 
 
 def __check_video_list(refer_url, vidlist, add_referer=False,
@@ -148,7 +149,7 @@ def __extract_mp4upload(url, page_content, referer=None):
 def __extract_lulu(url, page_content, referer=None):
     page_content += __get_packed_data(page_content)
     r = re.search(r'''sources:\s*\[{file:\s*["']([^"']+)''', page_content)
-    ref = urllib_parse.urljoin(url, '/')
+    ref = urllib.parse.urljoin(url, '/')
     headers = {'User-Agent': _FF_UA,
                'Referer': ref,
                'Origin': ref[:-1]}
@@ -171,7 +172,7 @@ def __extract_okru(url, page_content, referer=None):
     host, media_id = re.findall(pattern, url)[0]
     aurl = "http://www.ok.ru/dk"
     data = {'cmd': 'videoPlayerMetadata', 'mid': media_id}
-    data = urllib_parse.urlencode(data)
+    data = urllib.parse.urlencode(data)
     html = client.request(aurl, post=data)
     json_data = json.loads(html)
     if 'error' in json_data:
@@ -236,14 +237,14 @@ def __extract_dood(url, page_content, referer=None):
         t = string.ascii_letters + string.digits
         return pdata + ''.join([random.choice(t) for _ in range(10)])
 
-    pattern = r'(?://|\.)((?:do*ds?(?:tream)?|ds2(?:play|video))\.(?:com?|watch|to|s[ho]|cx|l[ai]|w[sf]|pm|re|yt|stream|pro))/(?:d|e)/([0-9a-zA-Z]+)'
+    pattern = r'(?://|\.)((?:do*ds?(?:tream|ter)?|ds2(?:play|video))\.(?:com?|watch|to|s[ho]|cx|l[ai]|w[sf]|pm|re|yt|stream|pro))/(?:d|e)/([0-9a-zA-Z]+)'
     match = re.search(r'''dsplayer\.hotkeys[^']+'([^']+).+?function\s*makePlay.+?return[^?]+([^"]+)''', page_content, re.DOTALL)
     if match:
         host, media_id = re.findall(pattern, url)[0]
         token = match.group(2)
         nurl = 'https://{0}{1}'.format(host, match.group(1))
         html = client.request(nurl, referer=url)
-        if html != '{}':
+        if html:
             headers = {'User-Agent': _EDGE_UA,
                        'Referer': url}
             return dood_decode(html) + token + str(int(time.time() * 1000)) + __append_headers(headers)
@@ -308,20 +309,20 @@ def __extract_voe(url, page_content, referer=None):
 
 def __extract_goload(url, page_content, referer=None):
     def _encrypt(msg, key, iv):
-        key = six.ensure_binary(key)
+        key = control.bin(key)
         encrypter = Encrypter(AESModeOfOperationCBC(key, iv))
         ciphertext = encrypter.feed(msg)
         ciphertext += encrypter.feed()
         ciphertext = base64.b64encode(ciphertext)
-        return six.ensure_str(ciphertext)
+        return ciphertext.decode()
 
     def _decrypt(msg, key, iv):
         ct = base64.b64decode(msg)
-        key = six.ensure_binary(key)
+        key = control.bin(key)
         decrypter = Decrypter(AESModeOfOperationCBC(key, iv))
         decrypted = decrypter.feed(ct)
         decrypted += decrypter.feed()
-        return six.ensure_str(decrypted)
+        return decrypted.decode()
 
     pattern = r'(?://|\.)((?:gogo-(?:play|stream)|streamani|go(?:load|one|gohd)|vidstreaming|gembedhd|playgo1|anihdplay|(?:play|emb|go|s3|s3emb)taku1?)\.' \
               r'(?:io|pro|net|com|cc|online))/(?:streaming|embed(?:plus)?|ajax|load)(?:\.php)?\?id=([a-zA-Z0-9-]+)'
@@ -329,7 +330,7 @@ def __extract_goload(url, page_content, referer=None):
     if r:
         host, media_id = re.findall(pattern, url)[0]
         keys = ['37911490979715163134003223491201', '54674138327930866480207815084989']
-        iv = six.ensure_binary('3134003223491201')
+        iv = control.bin('3134003223491201')
         params = _decrypt(r.group(1), keys[0], iv)
         eurl = 'https://{0}/encrypt-ajax.php?id={1}&alias={2}'.format(
             host, _encrypt(media_id, keys[0], iv), params)
@@ -380,7 +381,7 @@ def __relative_url(original_url, new_url):
     if new_url.startswith("//"):
         return "http:%s" % new_url
     else:
-        return urllib_parse.urljoin(original_url, new_url)
+        return urllib.parse.urljoin(original_url, new_url)
 
 
 def get_sub(sub_url, sub_lang):
@@ -447,6 +448,7 @@ __register_extractor(["https://dood.wf/",
                       "https://dood.re/",
                       "https://dood.yt/",
                       "https://dood.stream/",
+                      "https://dooodster.com",
                       "https://dood.watch/",
                       "https://doods.pro/",
                       "https://dooood.com/",

@@ -57,6 +57,7 @@ get_region = xbmc.getRegion
 trakt_gmt_format = '%Y-%m-%dT%H:%M:%S.000Z'
 progressDialog = xbmcgui.DialogProgress()
 playList = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+sleep = xbmc.sleep
 
 
 def closeBusyDialog():
@@ -76,6 +77,10 @@ def log(msg, level="info"):
     else:
         level = xbmc.LOGNONE
     xbmc.log(f'{ADDON_NAME.upper()} ({HANDLE}): {msg}', level)
+
+
+def bin(s):
+    return s.encode('latin-1')
 
 
 def enabled_debrid():
