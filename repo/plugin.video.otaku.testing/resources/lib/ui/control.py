@@ -362,7 +362,7 @@ def draw_items(video_data, content_type=''):
     if getBool('interface.viewtype'):
         if getBool('interface.viewidswitch'):
             # Use integer view types
-            if content_type == '':
+            if content_type == '' or content_type == 'addons':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.addon.view.id')))
             elif content_type == 'tvshows':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.show.view.id')))
@@ -370,7 +370,7 @@ def draw_items(video_data, content_type=''):
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % int(getSetting('interface.episode.view.id')))
         else:
             # Use optional view types
-            if content_type == '':
+            if content_type == '' or content_type == 'addons':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % get_view_type(getSetting('interface.addon.view')))
             elif content_type == 'tvshows':
                 xbmc.executebuiltin('Container.SetViewMode(%d)' % get_view_type(getSetting('interface.show.view')))

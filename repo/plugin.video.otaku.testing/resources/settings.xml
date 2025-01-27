@@ -71,6 +71,11 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="interface.content_type" type="boolean" label="30642" help="30643">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
                 <setting id="interface.viewtype" type="boolean" label="30537" help="">
 					<level>0</level>
 					<default>false</default>

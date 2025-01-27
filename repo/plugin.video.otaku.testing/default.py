@@ -391,8 +391,9 @@ def GENRE_THRILLER(payload, params):
 @Route('search_history')
 def SEARCH_HISTORY(payload, params):
     history = database.getSearchHistory('show')
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
     if control.getInt('searchhistory') == 0:
-        control.draw_items(utils.search_history(history))
+        control.draw_items(utils.search_history(history), view_type)
     else:
         SEARCH(payload, params)
 
@@ -607,7 +608,8 @@ def LIST_MENU(payload, params):
     for i in MENU_ITEMS:
         if control.getBool(i[1]):
             enabled_menu_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_menu_items])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_menu_items], view_type)
 
 
 # @Route('movies')
@@ -676,7 +678,8 @@ def TRENDING_MENU(payload, params):
     for i in TRENDING_ITEMS:
         if control.getBool(i[1]):
             enabled_trending_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_trending_items])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_trending_items], view_type)
 
 
 @Route('popular')
@@ -693,7 +696,8 @@ def POPULAR_MENU(payload, params):
     for i in POPULAR_ITEMS:
         if control.getBool(i[1]):
             enabled_popular_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_popular_items])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_popular_items], view_type)
 
 
 @Route('voted')
@@ -710,7 +714,8 @@ def VOTED_MENU(payload, params):
     for i in VOTED_ITEMS:
         if control.getBool(i[1]):
             enabled_voted_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_voted_items])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_voted_items], view_type)
 
 
 @Route('favourites')
@@ -727,7 +732,8 @@ def FAVOURITES_MENU(payload, params):
     for i in FAVOURITES_ITEMS:
         if control.getBool(i[1]):
             enabled_favourites_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_favourites_items])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_favourites_items], view_type)
 
 
 @Route('genres')
@@ -759,8 +765,9 @@ def GENRES_MENU(payload, params):
     for i in GENRES_ITEMS:
         if control.getBool(i[1]):
             enabled_genres_items.append(i)
-    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_genres_items])
-
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_genres_items], view_type)
+    
 
 # @Route('search')
 # def SEARCH_MENU(payload, params):
@@ -787,7 +794,8 @@ def TOOLS_MENU(payload, params):
         (control.lang(30018), 'clear_selected_fanart', 'wipe_addon_data.png', {}),
     ]
 
-    control.draw_items([utils.allocate_item(name, url, False, False, [], image, info) for name, url, image, info in TOOLS_ITEMS])
+    view_type = 'addons' if control.getBool('interface.content_type') else ''
+    control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in TOOLS_ITEMS], view_type)
 
 
 # def update_menu_paths(menu_items, base_path):

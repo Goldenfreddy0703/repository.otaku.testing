@@ -1500,3 +1500,11 @@ msgstr ""
 msgctxt "#30641"
 msgid "Provides more sources but will increase scraping time"
 msgstr ""
+
+msgctxt "#30642"
+msgid "Use Addon Content Type for Menus"
+msgstr ""
+
+msgctxt "#30643"
+msgid "Changes Viewtypes for Main Menu. Note: This will disable plot or description."
+msgstr ""

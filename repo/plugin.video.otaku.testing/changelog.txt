@@ -1,7 +1,10 @@
-Changelog v5.1.52 (2024-01-25):
+Changelog v5.1.53 (2024-01-27):
+- Added New ViewType Setting
+
+Changelog v5.1.52 (2024-01-26):
 - Fix bug with Mal Calendar
 
-Changelog v5.1.51 (2024-01-25):
+Changelog v5.1.51 (2024-01-26):
 - Requests are a lot faster now
 - Removed Request Module
 - Removed Six Module
