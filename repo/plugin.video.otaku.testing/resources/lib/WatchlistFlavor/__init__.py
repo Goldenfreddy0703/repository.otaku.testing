@@ -80,7 +80,7 @@ class WatchlistFlavor:
             control.setSetting('%s.%s' % (flavor, _id), str(value))
         control.refresh()
         return control.ok_dialog('Login', 'Success')
-    
+
     @staticmethod
     def watchlist_anime_entry_request(mal_id):
         return WatchlistFlavor.get_update_flavor().get_watchlist_anime_entry(mal_id)

@@ -1,7 +1,7 @@
 import threading
 
 from copy import deepcopy
-from resources.lib.debrid import real_debrid, all_debrid,  debrid_link, premiumize, torbox
+from resources.lib.debrid import real_debrid, all_debrid, debrid_link, premiumize, torbox
 from resources.lib.ui import control
 
 premiumizeCached = []

@@ -78,7 +78,6 @@ class AniListBrowser(BrowserBase):
 
         return season, year
 
-
     def get_airing_calendar(self, page=1):
         import datetime
         import time
@@ -110,7 +109,6 @@ class AniListBrowser(BrowserBase):
         results = list(itertools.chain(*results))
         return results
 
-
     def get_airing_last_season(self, page):
         season, year = self.get_season_year('last')
         variables = {
@@ -139,7 +137,6 @@ class AniListBrowser(BrowserBase):
 
         airing = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(airing, "airing_last_season?page=%d", page)
-
 
     def get_airing_this_season(self, page):
         season, year = self.get_season_year('this')
@@ -170,7 +167,6 @@ class AniListBrowser(BrowserBase):
         airing = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(airing, "airing_this_season?page=%d", page)
 
-
     def get_airing_next_season(self, page):
         season, year = self.get_season_year('next')
         variables = {
@@ -200,7 +196,6 @@ class AniListBrowser(BrowserBase):
         airing = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(airing, "airing_next_season?page=%d", page)
 
-
     def get_trending_last_year(self, page):
         season, year = self.get_season_year('')
         variables = {
@@ -229,7 +224,6 @@ class AniListBrowser(BrowserBase):
         trending = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(trending, "trending_last_year?page=%d", page)
 
-
     def get_trending_this_year(self, page):
         season, year = self.get_season_year('')
         variables = {
@@ -257,7 +251,6 @@ class AniListBrowser(BrowserBase):
 
         trending = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(trending, "trending_this_year?page=%d", page)
-
 
     def get_trending_last_season(self, page):
         season, year = self.get_season_year('last')
@@ -288,7 +281,6 @@ class AniListBrowser(BrowserBase):
         trending = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(trending, "trending_last_season?page=%d", page)
 
-
     def get_trending_this_season(self, page):
         season, year = self.get_season_year('this')
         variables = {
@@ -318,7 +310,6 @@ class AniListBrowser(BrowserBase):
         trending = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(trending, "trending_this_season?page=%d", page)
 
-
     def get_all_time_trending(self, page):
         variables = {
             'page': page,
@@ -344,7 +335,6 @@ class AniListBrowser(BrowserBase):
 
         trending = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(trending, "all_time_trending?page=%d", page)
-
 
     def get_popular_last_year(self, page):
         season, year = self.get_season_year('')
@@ -374,9 +364,6 @@ class AniListBrowser(BrowserBase):
         popular = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(popular, "popular_last_year?page=%d", page)
 
-
-    import logging
-
     def get_popular_this_year(self, page):
         season, year = self.get_season_year('')
         variables = {
@@ -404,7 +391,6 @@ class AniListBrowser(BrowserBase):
 
         popular = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(popular, "popular_this_year?page=%d", page)
-
 
     def get_popular_last_season(self, page):
         season, year = self.get_season_year('last')
@@ -435,7 +421,6 @@ class AniListBrowser(BrowserBase):
         popular = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(popular, "popular_last_season?page=%d", page)
 
-
     def get_popular_this_season(self, page):
         season, year = self.get_season_year('this')
         variables = {
@@ -465,7 +450,6 @@ class AniListBrowser(BrowserBase):
         popular = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(popular, "popular_this_season?page=%d", page)
 
-
     def get_all_time_popular(self, page):
         variables = {
             'page': page,
@@ -491,7 +475,6 @@ class AniListBrowser(BrowserBase):
 
         popular = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(popular, "all_time_popular?page=%d", page)
-
 
     def get_voted_last_year(self, page):
         season, year = self.get_season_year('')
@@ -521,7 +504,6 @@ class AniListBrowser(BrowserBase):
         voted = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(voted, "voted_last_year?page=%d", page)
 
-
     def get_voted_this_year(self, page):
         season, year = self.get_season_year('')
         variables = {
@@ -549,7 +531,6 @@ class AniListBrowser(BrowserBase):
 
         voted = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(voted, "voted_this_year?page=%d", page)
-
 
     def get_voted_last_season(self, page):
         season, year = self.get_season_year('last')
@@ -580,7 +561,6 @@ class AniListBrowser(BrowserBase):
         voted = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(voted, "voted_last_season?page=%d", page)
 
-
     def get_voted_this_season(self, page):
         season, year = self.get_season_year('this')
         variables = {
@@ -610,7 +590,6 @@ class AniListBrowser(BrowserBase):
         voted = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(voted, "voted_this_season?page=%d", page)
 
-
     def get_all_time_voted(self, page):
         variables = {
             'page': page,
@@ -636,7 +615,6 @@ class AniListBrowser(BrowserBase):
 
         voted = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(voted, "all_time_voted?page=%d", page)
-
 
     def get_favourites_last_year(self, page):
         season, year = self.get_season_year('')
@@ -666,7 +644,6 @@ class AniListBrowser(BrowserBase):
         favourites = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(favourites, "favourites_last_year?page=%d", page)
 
-
     def get_favourites_this_year(self, page):
         season, year = self.get_season_year('')
         variables = {
@@ -694,7 +671,6 @@ class AniListBrowser(BrowserBase):
 
         favourites = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(favourites, "favourites_this_year?page=%d", page)
-
 
     def get_favourites_last_season(self, page):
         season, year = self.get_season_year('last')
@@ -725,7 +701,6 @@ class AniListBrowser(BrowserBase):
         favourites = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(favourites, "favourites_last_season?page=%d", page)
 
-
     def get_favourites_this_season(self, page):
         season, year = self.get_season_year('this')
         variables = {
@@ -755,7 +730,6 @@ class AniListBrowser(BrowserBase):
         favourites = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(favourites, "favourites_this_season?page=%d", page)
 
-
     def get_all_time_favourites(self, page):
         variables = {
             'page': page,
@@ -781,7 +755,6 @@ class AniListBrowser(BrowserBase):
 
         favourites = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(favourites, "all_time_favourites?page=%d", page)
-
 
     def get_top_100(self, page):
         variables = {
@@ -809,7 +782,6 @@ class AniListBrowser(BrowserBase):
         top_100 = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(top_100, "top_100?page=%d", page)
 
-
     def get_genre_action(self, page):
         variables = {
             'page': page,
@@ -830,7 +802,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_action?page=%d", page)
-
 
     def get_genre_adventure(self, page):
         variables = {
@@ -853,7 +824,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_adventure?page=%d", page)
 
-
     def get_genre_comedy(self, page):
         variables = {
             'page': page,
@@ -874,7 +844,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_comedy?page=%d", page)
-
 
     def get_genre_drama(self, page):
         variables = {
@@ -897,7 +866,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_drama?page=%d", page)
 
-
     def get_genre_ecchi(self, page):
         variables = {
             'page': page,
@@ -918,7 +886,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_ecchi?page=%d", page)
-
 
     def get_genre_fantasy(self, page):
         variables = {
@@ -941,7 +908,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_fantasy?page=%d", page)
 
-
     def get_genre_hentai(self, page):
         variables = {
             'page': page,
@@ -962,7 +928,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_hentai?page=%d", page)
-
 
     def get_genre_horror(self, page):
         variables = {
@@ -985,7 +950,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_horror?page=%d", page)
 
-
     def get_genre_shoujo(self, page):
         variables = {
             'page': page,
@@ -1006,7 +970,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_shoujo?page=%d", page)
-
 
     def get_genre_mecha(self, page):
         variables = {
@@ -1029,7 +992,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_mecha?page=%d", page)
 
-
     def get_genre_music(self, page):
         variables = {
             'page': page,
@@ -1050,7 +1012,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_music?page=%d", page)
-
 
     def get_genre_mystery(self, page):
         variables = {
@@ -1073,7 +1034,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_mystery?page=%d", page)
 
-
     def get_genre_psychological(self, page):
         variables = {
             'page': page,
@@ -1094,7 +1054,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_psychological?page=%d", page)
-
 
     def get_genre_romance(self, page):
         variables = {
@@ -1117,7 +1076,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_romance?page=%d", page)
 
-
     def get_genre_sci_fi(self, page):
         variables = {
             'page': page,
@@ -1138,7 +1096,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_sci_fi?page=%d", page)
-
 
     def get_genre_slice_of_life(self, page):
         variables = {
@@ -1161,7 +1118,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_slice_of_life?page=%d", page)
 
-
     def get_genre_sports(self, page):
         variables = {
             'page': page,
@@ -1182,7 +1138,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_sports?page=%d", page)
-
 
     def get_genre_supernatural(self, page):
         variables = {
@@ -1205,7 +1160,6 @@ class AniListBrowser(BrowserBase):
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_supernatural?page=%d", page)
 
-
     def get_genre_thriller(self, page):
         variables = {
             'page': page,
@@ -1226,7 +1180,6 @@ class AniListBrowser(BrowserBase):
 
         genre = database.get(self.get_base_res, 24, variables)
         return self.process_anilist_view(genre, "genre_thriller?page=%d", page)
-
 
     def get_search(self, query, page=1):
         variables = {
@@ -1947,7 +1900,12 @@ class AniListBrowser(BrowserBase):
             desc = desc.replace('\n', '')
 
         info = {
-            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'anilist_id': str(anilist_id),
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(anilist_id, 'anilist_id'),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'genre': res.get('genres'),
             'title': title,
             'plot': desc,
@@ -2087,7 +2045,6 @@ class AniListBrowser(BrowserBase):
             desc = desc.replace('<b>', '[B]').replace('</b>', '[/B]')
             desc = desc.replace('<br>', '[CR]')
             desc = desc.replace('\n', '')
-
 
         kodi_meta = {
             'name': name,

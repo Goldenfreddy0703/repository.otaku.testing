@@ -141,7 +141,14 @@ class SimklWLF(WatchlistFlavorBase):
             title = res['show']['title']
 
         info = {
-            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id), 'kitsu_id': str(kitsu_id)},
+            'UniqueIDs': {
+                'anilist_id': str(anilist_id),
+                'mal_id': str(mal_id),
+                'kitsu_id': str(kitsu_id),
+                **database.get_mapping_ids(anilist_id, 'anilist_id'),
+                **database.get_mapping_ids(mal_id, 'mal_id'),
+                **database.get_mapping_ids(kitsu_id, 'kitsu_id')
+            },
             'title': title,
             'mediatype': 'tvshow',
             'year': res['show']['year'],
@@ -212,7 +219,14 @@ class SimklWLF(WatchlistFlavorBase):
             plot = aired = None
 
         info = {
-            'UniqueIDs': {'anilist_id': str(anilist_id), 'mal_id': str(mal_id), 'kitsu_id': str(kitsu_id)},
+            'UniqueIDs': {
+                'anilist_id': str(anilist_id),
+                'mal_id': str(mal_id),
+                'kitsu_id': str(kitsu_id),
+                **database.get_mapping_ids(anilist_id, 'anilist_id'),
+                **database.get_mapping_ids(mal_id, 'mal_id'),
+                **database.get_mapping_ids(kitsu_id, 'kitsu_id')
+            },
             'episode': next_up,
             'title': title,
             'tvshowtitle': base_title,

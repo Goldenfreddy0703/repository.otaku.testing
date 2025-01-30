@@ -127,12 +127,13 @@ class Sources(BrowserBase):
 
             list_ = [
                 {
-                 'magnet': magnet,
-                 'name': name,
-                 'size': size.replace('i', ''),
-                 'downloads': int(downloads),
-                 'seeders': int(seeders)
-                 } for magnet, name, size, downloads, seeders in search_results]
+                    'magnet': magnet,
+                    'name': name,
+                    'size': size.replace('i', ''),
+                    'downloads': int(downloads),
+                    'seeders': int(seeders)
+                } for magnet, name, size, downloads, seeders in search_results
+            ]
 
             for idx, torrent in enumerate(list_):
                 torrent['hash'] = re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0]

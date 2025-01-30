@@ -1,8 +1,7 @@
 import pickle
 
-from resources.lib import indexers
 from resources.lib.indexers import simkl, anizip, jikanmoe, kitsu
-from resources.lib.ui import control, database, utils
+from resources.lib.ui import control, database
 
 if control.settingids.browser_api == 'mal':
     from resources.lib.MalBrowser import MalBrowser

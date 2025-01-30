@@ -26,7 +26,10 @@ class SIMKLAPI:
             title = f'Episode {episode}'
         image = self.imagePath % res['img'] if res.get('img') else poster
         info = {
-            'UniqueIDs': {'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'plot': res.get('description', 'No plot available'),
             'title': title,
             'season': season,
@@ -34,6 +37,7 @@ class SIMKLAPI:
             'tvshowtitle': tvshowtitle,
             'mediatype': 'episode'
         }
+
         if eps_watched and int(eps_watched) >= episode:
             info['playcount'] = 1
 

@@ -37,14 +37,16 @@ if control.ADDON_VERSION != control.getSetting('version'):
     control.setSetting('version', control.ADDON_VERSION)
 
 
-
 def add_last_watched(items):
     mal_id = control.getSetting("addon.last_watched")
     try:
         kodi_meta = pickle.loads(database.get_show(mal_id)['kodi_meta'])
         last_watched = "%s[I]%s[/I]" % (control.lang(30000), kodi_meta['title_userPreferred'])
         info = {
-            'UniqueIDs': {'mal_id': mal_id},
+            'UniqueIDs': {
+                'mal_id': mal_id,
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'title': kodi_meta['title_userPreferred'],
             'plot': kodi_meta['plot'],
             # 'mpaa': kodi_meta[''],
@@ -59,7 +61,6 @@ def add_last_watched(items):
     except TypeError:
         pass
     return items
-
 
 
 @Route('animes/*')
@@ -470,7 +471,7 @@ def PLAY_MOVIE(payload, params):
     mal_id, eps_watched = payload.rsplit("/")
     source_select = bool(params.get('source_select'))
     rescrape = bool(params.get('rescrape'))
-    resume_time = params.get('resume') 
+    resume_time = params.get('resume')
     params['path'] = f"{control.addon_url(f'play_movie/{payload}')}"
     if resume_time:
         resume_time = float(resume_time)
@@ -572,12 +573,12 @@ def FANART(payload, params):
     fanart = pickle.loads(episode['kodi_meta'])['image']['fanart'] or []
     fanart_display = fanart + ["None", "Random"]
     fanart += ["None", ""]
-    fanart_all = control.getSetting(f'fanart.all').split(',')
+    fanart_all = control.getSetting('fanart.all').split(',')
     if '' in fanart_all:
         fanart_all.remove('')
     fanart_all += [str(mal_id)]
     control.setSetting(f'fanart.select.{mal_id}', fanart[int(select)])
-    control.setSetting(f'fanart.all', ",".join(fanart_all))
+    control.setSetting('fanart.all', ",".join(fanart_all))
     control.ok_dialog(control.ADDON_NAME, f"Fanart Set to {fanart_display[int(select)]}")
 
 
@@ -767,7 +768,7 @@ def GENRES_MENU(payload, params):
             enabled_genres_items.append(i)
     view_type = 'addons' if control.getBool('interface.content_type') else ''
     control.draw_items([utils.allocate_item(name, url, True, False, [], image, info) for name, url, image, info in enabled_genres_items], view_type)
-    
+
 
 # @Route('search')
 # def SEARCH_MENU(payload, params):
@@ -844,7 +845,7 @@ def CLEAR_SELECTED_FANART(payload, params):
     if confirm == 0:
         return
 
-    fanart_all = control.getSetting(f'fanart.all').split(',')
+    fanart_all = control.getSetting('fanart.all').split(',')
     for i in fanart_all:
         control.setSetting(f'fanart.select.{i}', '')
     control.setSetting('fanart.all', '')

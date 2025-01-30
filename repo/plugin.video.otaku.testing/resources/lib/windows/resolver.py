@@ -371,3 +371,18 @@ def _HLS_HOOK(item):
         item.setMimeType('application/vnd.apple.mpegstream_url')
         item.setContentLookup(False)
     return item
+
+
+@HookMimetype('video/MP2T')
+def _HLS_HOOK(item):
+    if control.getBool('inputstreamadaptive.enabled'):
+        stream_url = item.getPath()
+        import inputstreamhelper
+        is_helper = inputstreamhelper.Helper('hls')
+        if '|' not in stream_url and is_helper.check_inputstream():
+            item.setProperty('inputstream', is_helper.inputstream_addon)
+            item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        item.setProperty('MimeType', 'application/vnd.apple.mpegurl')
+        item.setMimeType('application/vnd.apple.mpegstream_url')
+        item.setContentLookup(False)
+    return item

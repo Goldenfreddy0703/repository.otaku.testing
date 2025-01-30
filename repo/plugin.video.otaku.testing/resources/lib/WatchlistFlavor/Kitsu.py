@@ -160,7 +160,12 @@ class KitsuWLF(WatchlistFlavorBase):
         dub = True if mal_dub and mal_dub.get(str(mal_id)) else False
 
         info = {
-            'UniqueIDs': {'kitsu_id': str(kitsu_id), 'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'kitsu_id': str(kitsu_id),
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(kitsu_id, 'kitsu_id'),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'plot': eres['attributes'].get('synopsis'),
             'title': eres["attributes"]["titles"].get(self.__get_title_lang(), eres["attributes"]['canonicalTitle']),
             'mpaa': eres['attributes']['ageRating'],
@@ -231,7 +236,12 @@ class KitsuWLF(WatchlistFlavorBase):
             aired = next_up_meta.get('aired')
 
         info = {
-            'UniqueIDs': {'kitsu_id': str(kitsu_id), 'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'kitsu_id': str(kitsu_id),
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(kitsu_id, 'kitsu_id'),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'episode': next_up,
             'title': title,
             'tvshowtitle': anime_title,

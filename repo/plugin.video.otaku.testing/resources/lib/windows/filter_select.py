@@ -5,7 +5,6 @@ from resources.lib.windows.base_window import BaseWindow
 from resources.lib.ui import control
 
 
-
 class FilterSelect(BaseWindow):
     """
     Dialog to provide filter settings
@@ -20,7 +19,7 @@ class FilterSelect(BaseWindow):
         self.audiochannels_list = None
         self.misc_list = None
 
-        filter_string = g.get_setting("general.filters")
+        filter_string = control.get_setting("general.filters")
         self.current_filters = set() if filter_string is None else set(filter_string.split(","))
 
     def onInit(self):

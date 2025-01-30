@@ -14,8 +14,11 @@ def get_backup(mal_id, source):
         "type": "myanimelist",
         "id": mal_id
     }
-    r = client.request("https://arm2.vercel.app/api/kaito-b", params=params)
-    return json.loads(r.content).get('Pages', {}).get(source, {}) if r.ok else {}
+    result = client.request("https://arm2.vercel.app/api/kaito-b", params=params)
+    if result:
+        result = json.loads(result)
+        result = result.get('Pages', {}).get(source, {})
+    return result
 
 
 class Sources(BrowserBase):

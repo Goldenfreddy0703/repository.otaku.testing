@@ -51,7 +51,10 @@ class JikanAPI:
             title = res["episode"]
         image = res['images']['jpg']['image_url'] if res.get('images') else poster
         info = {
-            'UniqueIDs': {'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'title': title,
             'season': season,
             'episode': episode,
@@ -59,6 +62,7 @@ class JikanAPI:
             'tvshowtitle': tvshowtitle,
             'mediatype': 'episode'
         }
+
         if eps_watched and int(eps_watched) >= episode:
             info['playcount'] = 1
 

@@ -9,7 +9,6 @@ import sys
 import json
 
 from urllib import parse
-from resources.lib.ui import database
 
 try:
     HANDLE = int(sys.argv[1])
@@ -280,21 +279,13 @@ def set_videotags(li, info):
         vinfo.setTrailer(trailer)
 
     if uniqueids := info.get('UniqueIDs'):
-        if isinstance(uniqueids, dict):
-            # Retrieve additional IDs
-            for id_type in ['anilist_id', 'mal_id', 'kitsu_id']:
-                if id_value := uniqueids.get(id_type):
-                    additional_ids = database.get_mapping_ids(id_value, id_type)
-                    uniqueids.update(additional_ids)
-
-            # Convert all values in uniqueids to strings
-            uniqueids = {key: str(value) for key, value in uniqueids.items()}
-
-            vinfo.setUniqueIDs(uniqueids)
-            if 'imdb' in uniqueids:
-                vinfo.setIMDBNumber(uniqueids['imdb'])
-            for key, value in uniqueids.items():
-                li.setProperty(key, value)
+        uniqueids = {key: str(value) for key, value in uniqueids.items()}
+        vinfo.setUniqueIDs(uniqueids)
+        if 'imdb' in uniqueids:
+            vinfo.setIMDBNumber(uniqueids['imdb'])
+        for key, value in uniqueids.items():
+            if value is not None:
+                li.setProperty(key, str(value))
 
     if resume := info.get('resume'):
         vinfo.setResumePoint(float(resume), 1)

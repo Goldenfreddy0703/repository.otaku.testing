@@ -24,11 +24,12 @@ class Sources(BrowserBase):
 
         all_results = []
         items = []
-        srcs = ['sub', 'dub']
+        srcs = ['sub', 'dub', 's-sub']
         if control.getSetting('general.source') == 'Sub':
             srcs.remove('dub')
         elif control.getSetting('general.source') == 'Dub':
             srcs.remove('sub')
+            srcs.remove('s-sub')
 
         headers = {'Referer': self._BASE_URL}
         params = {'keyword': title}
@@ -128,7 +129,7 @@ class Sources(BrowserBase):
                     for src in srcs:
                         edata_id = src.get('data-link-id')
                         edata_name = src.text
-                        if self.clean_title(edata_name) in self.embeds():
+                        if any(x in self.clean_title(edata_name) for x in self.embeds()):
                             vrf = self.generate_vrf(edata_id)
                             params = {'vrf': vrf}
                             r = self._get_request(

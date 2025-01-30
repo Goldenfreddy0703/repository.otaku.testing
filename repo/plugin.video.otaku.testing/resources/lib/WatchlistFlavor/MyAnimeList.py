@@ -163,7 +163,10 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         image = res['node']['main_picture'].get('large', res['node']['main_picture']['medium'])
 
         info = {
-            'UniqueIDs': {'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'title': title,
             'plot': res['node']['synopsis'],
             'rating': {'score': res['node'].get('mean', 0)},
@@ -237,7 +240,10 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             plot = aired = None
 
         info = {
-            'UniqueIDs': {'mal_id': str(mal_id)},
+            'UniqueIDs': {
+                'mal_id': str(mal_id),
+                **database.get_mapping_ids(mal_id, 'mal_id')
+            },
             'episode': next_up,
             'title': title,
             'tvshowtitle': base_title,

@@ -25,14 +25,14 @@ def allocate_item(name, url, isfolder, isplayable, cm, image='', info=None, fana
         'info': info,
         'cm': cm,
         'image': {
-                'poster': poster,
-                'icon': image,
-                'thumb': image,
-                'fanart': fanart,
-                'landscape': landscape,
-                'banner': banner,
-                'clearart': clearart,
-                'clearlogo': clearlogo
+            'poster': poster,
+            'icon': image,
+            'thumb': image,
+            'fanart': fanart,
+            'landscape': landscape,
+            'banner': banner,
+            'clearart': clearart,
+            'clearlogo': clearlogo
         }
     }
 
