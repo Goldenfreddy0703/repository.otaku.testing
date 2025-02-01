@@ -40,6 +40,7 @@ downloads_json = os.path.join(dataPath, 'downloads.json')
 completed_json = os.path.join(dataPath, 'completed.json')
 genre_json = os.path.join(dataPath, 'genres.json')
 sort_options_json = os.path.join(dataPath, 'sort_options.json')
+embeds_json = os.path.join(dataPath, 'embeds.json')
 
 IMAGES_PATH = os.path.join(ADDON_PATH, 'resources', 'images')
 OTAKU_LOGO_PATH = os.path.join(ADDON_PATH, 'resources', 'images', 'trans-goku.png')
@@ -216,8 +217,8 @@ def input_dialog(title, input_='', option=0):
     return xbmcgui.Dialog().input(title, input_, option)
 
 
-def multiselect_dialog(title, dialog_list):
-    return xbmcgui.Dialog().multiselect(title, dialog_list)
+def multiselect_dialog(title, dialog_list, preselect=None):
+    return xbmcgui.Dialog().multiselect(title, dialog_list, preselect=preselect)
 
 
 def select_dialog(title, dialog_list):

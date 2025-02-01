@@ -656,6 +656,13 @@
 
             <!-- Embeds -->
             <group id="2" label="30333" help="">
+                <setting id="embed.config" type="action" label="30644" help="">
+					<level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/embed_config?setting=true)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
                 <setting id="provider.animepahe" type="boolean" label="30404" help="">
                     <level>0</level>
                     <default>true</default>

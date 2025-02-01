@@ -1,3 +1,6 @@
+Changelog v5.1.55 (2024-02-01):
+- Added Configuration for Embed Servers
+
 Changelog v5.1.54 (2024-01-30):
 - Added MP2T Support for InputStream Helper
 - Fixed Gogo Backup Function

@@ -2091,7 +2091,7 @@ class AniListBrowser(BrowserBase):
             tags_list = [x['name'] for x in results['data']['tags'] if not x['isAdult']]
         except KeyError:
             tags_list = []
-        multiselect = control.multiselect_dialog(control.lang(30934), genres_list + tags_list)
+        multiselect = control.multiselect_dialog(control.lang(30934), genres_list + tags_list, preselect=[])
         if not multiselect:
             return []
         genre_display_list = []
@@ -2236,7 +2236,7 @@ class AniListBrowser(BrowserBase):
         except KeyError:
             tags_list = []
 
-        multiselect = control.multiselect_dialog(control.lang(30934), genres_list + tags_list)
+        multiselect = control.multiselect_dialog(control.lang(30934), genres_list + tags_list, preselect=[])
         if not multiselect:
             return [], []
 

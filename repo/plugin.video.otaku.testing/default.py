@@ -246,6 +246,44 @@ def TOP_100(payload, params):
     control.draw_items(BROWSER.get_top_100(page), 'tvshows')
 
 
+@Route('embed_config')
+def EMBED_CONFIG(payload, params):
+    import os
+
+    # Default embed providers
+    default_embed_providers = [
+        'doodstream', 'filelions', 'filemoon', 'hd-2', 'iga', 'kwik',
+        'megaf', 'moonf', 'mp4upload', 'mp4u', 'mycloud', 'noads', 'noadsalt',
+        'swish', 'streamtape', 'streamwish', 'vidcdn', 'vidplay', 'vidstream',
+        'yourupload', 'zto'
+    ]
+
+    # Load the embed providers from the JSON file if it exists
+    if os.path.exists(control.embeds_json):
+        with open(control.embeds_json, 'r') as f:
+            embed_providers = json.load(f)
+    else:
+        embed_providers = default_embed_providers
+
+    # Ensure embed_providers is not None
+    if embed_providers is None:
+        embed_providers = default_embed_providers
+
+    # Determine preselected indices (enabled providers)
+    preselect = [i for i, provider in enumerate(default_embed_providers) if provider in embed_providers]
+
+    # Show the multi-select dialog to the user
+    selected_indices = control.multiselect_dialog('Select Embed Providers', default_embed_providers, preselect=preselect)
+
+    if selected_indices is not None:
+        # Get the selected providers
+        selected_providers = [default_embed_providers[i] for i in selected_indices]
+
+        # Save the selected providers to the JSON file
+        with open(control.embeds_json, 'w') as f:
+            json.dump(selected_providers, f)
+
+
 @Route('genres/*')
 def GENRES_PAGES(payload, params):
     genres, tags = payload.rsplit("/")

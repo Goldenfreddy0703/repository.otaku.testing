@@ -1401,7 +1401,7 @@ class MalBrowser(BrowserBase):
         genres_list = []
         for x in genre:
             genres_list.append(x['name'])
-        multiselect = control.multiselect_dialog(control.lang(30911), genres_list)
+        multiselect = control.multiselect_dialog(control.lang(30911), genres_list, preselect=[])
         if not multiselect:
             return []
         genre_display_list = []
@@ -1614,7 +1614,7 @@ class MalBrowser(BrowserBase):
         genre = res['data']
         genres_list = [x['name'] for x in genre]
 
-        multiselect = control.multiselect_dialog(control.lang(30911), genres_list)
+        multiselect = control.multiselect_dialog(control.lang(30911), genres_list, preselect=[])
         if not multiselect:
             return []
 

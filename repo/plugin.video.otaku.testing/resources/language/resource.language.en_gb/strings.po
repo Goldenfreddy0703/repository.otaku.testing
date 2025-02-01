@@ -1508,3 +1508,7 @@ msgstr ""
 msgctxt "#30643"
 msgid "Changes Viewtypes for Main Menu. Note: This will disable plot or description."
 msgstr ""
+
+msgctxt "#30644"
+msgid "Configure Embed Servers"
+msgstr ""
