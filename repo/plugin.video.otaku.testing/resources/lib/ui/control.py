@@ -135,6 +135,10 @@ def getStr(key):
     return ADDON.getSettingString(key)
 
 
+def getStringList(settingid):
+    return settings.getStringList(settingid)
+
+
 def setSetting(settingid, value):
     ADDON.setSetting(settingid, value)
 
@@ -149,6 +153,10 @@ def setInt(settingid, value):
 
 def setStr(settingid, value):
     ADDON.setSettingString(settingid, value)
+
+
+def setStringList(settingid, value):
+    return settings.setStringList(settingid, value)
 
 
 def setGlobalProp(property, value):

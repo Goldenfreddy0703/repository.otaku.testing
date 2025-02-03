@@ -656,11 +656,40 @@
 
             <!-- Embeds -->
             <group id="2" label="30333" help="">
-                <setting id="embed.config" type="action" label="30644" help="">
-					<level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.otaku.testing/embed_config?setting=true)</data>
-                    <control type="button" format="action">
-                        <close>false</close>
+                <setting id="embed.config" type="list[string]" label="30644" help="">
+                    <level>0</level>
+                    <default>doodstream,filelions,filemoon,hd-2,iga,kwik,megaf,moonf,mp4upload,mp4u,mycloud,noads,noadsalt,swish,streamtape,streamwish,vidcdn,vidplay,vidstream,yourupload,zto</default>
+                    <constraints>
+                        <options sort="ascending">
+                            <option>doodstream</option>
+                            <option>filelions</option>
+                            <option>filemoon</option>
+                            <option>hd-2</option>
+                            <option>iga</option>
+                            <option>kwik</option>
+                            <option>megaf</option>
+                            <option>moonf</option>
+                            <option>mp4upload</option>
+                            <option>mp4u</option>
+                            <option>mycloud</option>
+                            <option>noads</option>
+                            <option>noadsalt</option>
+                            <option>swish</option>
+                            <option>streamtape</option>
+                            <option>streamwish</option>
+                            <option>vidcdn</option>
+                            <option>vidplay</option>
+                            <option>vidstream</option>
+                            <option>yourupload</option>
+                            <option>zto</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30644</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
                     </control>
                 </setting>
                 <setting id="provider.animepahe" type="boolean" label="30404" help="">
@@ -2678,6 +2707,38 @@
 
             <!-- Integer Settings -->
             <group id="7" label="" help="">
+                <setting id="otaku.version" type="string" label="" help="">
+                    <level>4</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                </setting>
+                <setting id="fanart.all" type="list[String]" help="">
+                    <level>4</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                </setting>
+                <setting id="DMIndex" type="list[String]" help="">
+                    <level>4</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                </setting>
+                <setting id="last_played" type="string" label="" help="">
+                    <level>4</level>
+                    <default>0</default>
+                </setting>
+                <setting id="addon.last_watched" type="string" label="" help="">
+                    <level>4</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                </setting>
                 <setting id="update.time.30" type="integer" label="" help="">
                     <level>4</level>
                     <default>0</default>

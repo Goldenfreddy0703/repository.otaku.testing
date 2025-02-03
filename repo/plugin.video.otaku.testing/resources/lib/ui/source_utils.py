@@ -251,6 +251,78 @@ def get_best_match(dict_key, dictionary_list, episode, pack_select=False):
     return files[0]
 
 
+def filter_sources(provider, list_, season, episode, anidb_id=None, part=None):
+    import itertools
+
+    regex_season = r"(?i)\b(?:s(?:eason)?[ ._-]?(\d{1,2}))(?=\D|$)"
+    rex_season = re.compile(regex_season)
+
+    regex_ep = r"(?i)(?:s(?:eason)?\s?\d{1,2})?[ ._-]?(?:e(?:p)?\s?(\d{1,4})(?:v\d+)?(?:[ ._-]?[-~][ ._-]?e?(?:p)?\s?(\d{1,4}))?)"
+    rex_ep = re.compile(regex_ep)
+
+    if part:
+        regex_part = r"part ?(\d+)"
+        rex_part = re.compile(regex_part)
+    else:
+        rex_part = None
+
+    filtered_list = []
+    for torrent in list_:
+        if provider == 'animetosho':
+            try:
+                torrent['hash'] = re.match(r'https://animetosho.org/storage/torrent/([^/]+)', torrent['torrent']).group(1)
+            except AttributeError:
+                continue
+        elif provider == 'nyaa':
+            torrent['hash'] = re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0]
+        else:
+            continue
+        title = torrent['name'].lower()
+
+        # filter parts
+        if rex_part and 'part' in title:
+            part_match = rex_part.search(title)
+            if part_match:
+                part_match = int(part_match.group(1).strip())
+                if part_match != part:
+                    continue
+
+        # filter episode number
+        ep_match = rex_ep.findall(clean_text(title))
+        ep_match = list(map(int, list(filter(None, itertools.chain(*ep_match)))))
+
+        if not ep_match:
+            regex_batch = r"(?i)\b(batch|complete|season\s*\d+\b|s\d{1,2}\s*(?:-\s*\d{2,})?(?=\s*\[?\d{2,}])|\d{2,}\s*episodes?)\b"
+            batch_math = re.search(regex_batch, title)
+            if not batch_math:
+                continue
+        elif ep_match and ep_match[0] != episode:
+            if not (len(ep_match) > 1 and ep_match[0] <= episode <= ep_match[1]):
+                continue
+
+        # filter season
+        if anidb_id:
+            filtered_list.append(torrent)
+        else:
+            season_match = rex_season.findall(title)
+            season_match = list(map(int, list(filter(None, itertools.chain(season_match)))))
+            if season_match:
+                if season_match[0] <= season <= season_match[-1]:
+                    filtered_list.append(torrent)
+            else:
+                filtered_list.append(torrent)
+        # control.log(f'{season_match=}\t| {ep_match=}\t| {bool(batch_math)=}')
+        # control.log(title)
+
+    return filtered_list
+
+
+def clean_text(text):
+    text = re.sub(r"\[.*?\]|\(.*?\)", "", text).strip()  # Remove brackets
+    text = re.sub(r"\b(?:480p|720p|1080p|2160p|4k|h\.264|x264|x265|hevc|web-dl|webrip|bluray|hdr)\b", "", text, flags=re.I)  # Remove resolutions
+    return text
+
+
 def cleanTitle(title):
     title = title.lower()
     result = ''.join(char for char in title if char in string.printable)
@@ -286,5 +358,5 @@ def user_select(files, dict_key):
 
 
 def get_embedhost(url):
-    s = re.search(r'(?://|\.)([^\.]+)\.', url)
+    s = re.search(r'(?://|\.)([^.]+)\.', url)
     return s.group(1)

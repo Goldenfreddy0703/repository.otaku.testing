@@ -1,4 +1,3 @@
-import itertools
 import re
 import pickle
 import json
@@ -14,6 +13,7 @@ class Sources(BrowserBase):
     _BASE_URL = 'https://nyaa-si.translate.goog/?_x_tr_sl=es&_x_tr_tl=en&_x_tr_hl=en/' if control.getBool('provider.nyaaalt') else 'https://nyaa.si/'
 
     def __init__(self):
+        self.media_type = None
         self.cached = []
         self.uncached = []
         self.sources = []
@@ -33,38 +33,11 @@ class Sources(BrowserBase):
                  'seeders': int(i.find_all('td', {'class': 'text-center'})[-3].text)
                  } for i in soup.select("tr.danger,tr.default,tr.success")
             ]
-            regex = r'\ss(\d+)|season\s(\d+)|(\d+)+(?:st|[nr]d|th)\sseason'
-            regex_ep = r'\de(\d+)\b|\se(\d+)\b|\s-\s(\d{1,3})\b'
-            rex = re.compile(regex)
-            rex_ep = re.compile(regex_ep)
-            filtered_list = []
-            for torrent in list_:
-                torrent['hash'] = re.findall(r'btih:(.*?)(?:&|$)', torrent['magnet'])[0]
-                title = torrent['name'].lower()
-                if part:
-                    if 'part' in title:
-                        part_match = re.search(r'part ?(\d+)', title)
-                        part_match = int(part_match.group(1).strip())
-                        if part_match != part:
-                            continue
-                if season_zfill:
-                    ep_match = rex_ep.findall(title)
-                    ep_match = list(map(int, list(filter(None, itertools.chain(*ep_match)))))
 
-                    if ep_match and ep_match[0] != int(episode_zfill):
-                        regex_ep_range = r'\s\d+-\d+|\s\d+~\d+|\s\d+\s-\s\d+|\s\d+\s~\s\d+'
-                        rex_ep_range = re.compile(regex_ep_range)
-
-                        if not rex_ep_range.search(title):
-                            continue
-
-                    match = rex.findall(title)
-                    match = list(map(int, list(filter(None, itertools.chain(*match)))))
-
-                    if not match or match[0] == int(season_zfill):
-                        filtered_list.append(torrent)
-                else:
-                    filtered_list.append(torrent)
+            if self.media_type != 'movie':
+                filtered_list = source_utils.filter_sources('nyaa', list_, int(season_zfill), int(episode_zfill), part=part)
+            else:
+                filtered_list = list_
 
             cache_list, uncashed_list_ = debrid.torrentCacheCheck(filtered_list)
             cache_list = sorted(cache_list, key=lambda k: k['downloads'], reverse=True)
@@ -146,6 +119,7 @@ class Sources(BrowserBase):
 
     def get_sources(self, query, mal_id, episode, status, media_type, rescrape):
         query = self._clean_title(query).replace('-', ' ')
+        self.media_type = media_type
         if media_type == 'movie':
             return self.get_movie_sources(query, mal_id)
 
@@ -208,6 +182,14 @@ class Sources(BrowserBase):
                 'o': 'desc'
             }
             nyaa_sources += self.process_nyaa_episodes(self._BASE_URL, params, episode_zfill, season_zfill, part)
+
+        params = {
+            'f': '0',
+            'c': '1_0',
+            'q': query.replace(' ', '+')
+        }
+        nyaa_sources += self.process_nyaa_episodes(self._BASE_URL, params, episode_zfill, season_zfill, part)
+
         show = show.lower()
         if 'season' in show:
             query1, query2 = show.rsplit('|', 2)
@@ -257,11 +239,8 @@ class Sources(BrowserBase):
 
         query = f'{show} "- {episode_zfill}"'
 
-        if season:
-            season_zfill = str(season['season']).zfill(2)
-            query += f'|"S{season_zfill}E{episode_zfill}"'
-        else:
-            season_zfill = None
+        season_zfill = str(season['season']).zfill(2)
+        query += f'|"S{season_zfill}E{episode_zfill}"'
 
         params = {
             'f': '0',

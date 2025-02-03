@@ -1,3 +1,9 @@
+Changelog v5.1.56 (2024-02-02):
+- Improved the crap out of Scraping
+- Small Fix for Premiumize
+- Fixed major episode meta bug
+- Moved some files around
+
 Changelog v5.1.55 (2024-02-01):
 - Added Configuration for Embed Servers
 

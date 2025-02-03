@@ -1,12 +1,10 @@
 import pickle
 import datetime
-import time
 import json
 
 from functools import partial
 from resources.lib.ui import database, utils, control, client
 from resources.lib import indexers
-from resources import jz
 
 
 class SIMKLAPI:
@@ -50,19 +48,8 @@ class SIMKLAPI:
             filler = filler_data[episode - 1]
         except (IndexError, TypeError):
             filler = ''
-        code = jz.get_second_label(info, dub_data)
-        if not code and control.settingids.filler:
-            filler = code = control.colorstr(filler, color="red") if filler == 'Filler' else filler
-        info['code'] = code
 
-        parsed = utils.allocate_item(title, f"play/{url}", False, True, [], image, info, fanart, poster)
-        kodi_meta = pickle.dumps(parsed)
-        if not episodes or kodi_meta != episodes[episode - 1]['kodi_meta']:
-            database.update_episode(mal_id, season, episode, update_time, kodi_meta, filler)
-
-        if control.settingids.clean_titles and info.get('playcount') != 1:
-            parsed['info']['title'] = f'Episode {res["episode"]}'
-            parsed['info']['plot'] = None
+        parsed = indexers.update_database(mal_id, update_time, res, url, image, info, season, episode, episodes, title, fanart, poster, dub_data, filler)
         return parsed
 
     def process_episode_view(self, mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data):
@@ -72,7 +59,7 @@ class SIMKLAPI:
             return []
 
         title_list = [name['name'] for name in result.get('alt_titles', [])]
-        season = utils.get_season(title_list, mal_id) if int(result.get('season', 1)) == 1 else int(result['season'])
+        season = utils.get_season(title_list, mal_id)
         result_meta = self.get_episode_meta(mal_id)
 
         result_ep = [x for x in result_meta if x['type'] == 'episode']
@@ -90,10 +77,7 @@ class SIMKLAPI:
         return all_results
 
     def append_episodes(self, mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, dub_data=None):
-        update_time = datetime.date.today().isoformat()
-        last_updated = datetime.datetime.fromtimestamp(time.mktime(time.strptime(episodes[0].get('last_updated'), '%Y-%m-%d')))
-        diff = (datetime.datetime.today() - last_updated).days
-
+        update_time, diff = indexers.get_diff(episodes[-1])
         if diff >= control.getInt('interface.check.updates'):
             result_meta = self.get_episode_meta(mal_id)
             result_ep = [x for x in result_meta if x['type'] == 'episode']
@@ -102,7 +86,6 @@ class SIMKLAPI:
             all_results = list(map(mapfunc2, result_ep))
             control.notify("SIMKL Appended", f'{tvshowtitle} Appended to Database', icon=poster)
         else:
-            database.update_episode(mal_id, episodes[0]['season'], episodes[0]['number'], update_time, episodes[0]['kodi_meta'], episodes[0]['filler'])
             mapfunc1 = partial(indexers.parse_episodes, eps_watched=eps_watched, dub_data=dub_data)
             all_results = list(map(mapfunc1, episodes))
         return all_results
@@ -128,7 +111,7 @@ class SIMKLAPI:
                 return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, dub_data)
             return indexers.process_episodes(episodes, eps_watched, dub_data)
         if kodi_meta['episodes'] is None or kodi_meta['episodes'] > 99:
-            from resources.jz import anime_filler
+            from resources.lib.endpoints import anime_filler
             filler_data = anime_filler.get_data(kodi_meta['ename'])
         else:
             filler_data = None

@@ -246,44 +246,6 @@ def TOP_100(payload, params):
     control.draw_items(BROWSER.get_top_100(page), 'tvshows')
 
 
-@Route('embed_config')
-def EMBED_CONFIG(payload, params):
-    import os
-
-    # Default embed providers
-    default_embed_providers = [
-        'doodstream', 'filelions', 'filemoon', 'hd-2', 'iga', 'kwik',
-        'megaf', 'moonf', 'mp4upload', 'mp4u', 'mycloud', 'noads', 'noadsalt',
-        'swish', 'streamtape', 'streamwish', 'vidcdn', 'vidplay', 'vidstream',
-        'yourupload', 'zto'
-    ]
-
-    # Load the embed providers from the JSON file if it exists
-    if os.path.exists(control.embeds_json):
-        with open(control.embeds_json, 'r') as f:
-            embed_providers = json.load(f)
-    else:
-        embed_providers = default_embed_providers
-
-    # Ensure embed_providers is not None
-    if embed_providers is None:
-        embed_providers = default_embed_providers
-
-    # Determine preselected indices (enabled providers)
-    preselect = [i for i, provider in enumerate(default_embed_providers) if provider in embed_providers]
-
-    # Show the multi-select dialog to the user
-    selected_indices = control.multiselect_dialog('Select Embed Providers', default_embed_providers, preselect=preselect)
-
-    if selected_indices is not None:
-        # Get the selected providers
-        selected_providers = [default_embed_providers[i] for i in selected_indices]
-
-        # Save the selected providers to the JSON file
-        with open(control.embeds_json, 'w') as f:
-            json.dump(selected_providers, f)
-
-
 @Route('genres/*')
 def GENRES_PAGES(payload, params):
     genres, tags = payload.rsplit("/")
@@ -605,18 +567,16 @@ def FANART_SELECT(payload, params):
 
 
 @Route('fanart/*')
-def FANART(payload, params):
-    mal_id, select = payload.rsplit('/', 2)
+def FANART(payload: str, params: dict):
+    mal_id, select = payload.rsplit('/', 1)
     episode = database.get_episode(mal_id)
     fanart = pickle.loads(episode['kodi_meta'])['image']['fanart'] or []
     fanart_display = fanart + ["None", "Random"]
     fanart += ["None", ""]
-    fanart_all = control.getSetting('fanart.all').split(',')
-    if '' in fanart_all:
-        fanart_all.remove('')
-    fanart_all += [str(mal_id)]
+    fanart_all = control.getStringList(f'fanart.all')
+    fanart_all.append(str(mal_id))
     control.setSetting(f'fanart.select.{mal_id}', fanart[int(select)])
-    control.setSetting('fanart.all', ",".join(fanart_all))
+    control.setStringList(f'fanart.all', fanart_all)
     control.ok_dialog(control.ADDON_NAME, f"Fanart Set to {fanart_display[int(select)]}")
 
 
@@ -883,10 +843,10 @@ def CLEAR_SELECTED_FANART(payload, params):
     if confirm == 0:
         return
 
-    fanart_all = control.getSetting('fanart.all').split(',')
+    fanart_all = control.getStringList(f'fanart.all')
     for i in fanart_all:
         control.setSetting(f'fanart.select.{i}', '')
-    control.setSetting('fanart.all', '')
+    control.setStringList('fanart.all', [])
     if not silent:
         control.notify(f'{control.ADDON_NAME}: Fanart', 'Fanart Successfully Cleared', sound=False)
 

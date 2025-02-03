@@ -6,7 +6,6 @@ import json
 from functools import partial
 from resources.lib.ui import utils, database, control
 from resources.lib import indexers
-from resources import jz
 from resources.lib.ui import client
 
 
@@ -76,19 +75,7 @@ class KitsuAPI:
         except (IndexError, TypeError):
             filler = ''
 
-        code = jz.get_second_label(info, dub_data)
-        if not code and control.settingids.filler:
-            filler = code = control.colorstr(filler, color="red") if filler == 'Filler' else filler
-        info['code'] = code
-
-        parsed = utils.allocate_item(title, f"play/{url}", False, True, [], image, info, fanart, poster)
-        kodi_meta = pickle.dumps(parsed)
-        if not episodes or kodi_meta != episodes[episode - 1]['kodi_meta']:
-            database.update_episode(mal_id, season, episode, update_time, kodi_meta, filler)
-
-        if control.settingids.clean_titles and info.get('playcount') != 1:
-            parsed['info']['title'] = f'Episode {episode}'
-            parsed['info']['plot'] = None
+        parsed = indexers.update_database(mal_id, update_time, res, url, image, info, season, episode, episodes, title, fanart, poster, dub_data, filler)
         return parsed
 
     def process_episode_view(self, mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data):
@@ -123,9 +110,7 @@ class KitsuAPI:
         if not kitsu_id:
             return []
 
-        update_time = datetime.date.today().isoformat()
-        last_updated = datetime.datetime.fromtimestamp(time.mktime(time.strptime(episodes[0].get('last_updated'), '%Y-%m-%d')))
-        diff = (datetime.datetime.today() - last_updated).days
+        update_time, diff = indexers.get_diff(episodes[-1])
         if diff > control.getInt('interface.check.updates'):
             result = self.get_episode_meta(kitsu_id)
             season = episodes[0]['season']
@@ -159,13 +144,13 @@ class KitsuAPI:
         dub_data = indexers.process_dub(mal_id, kodi_meta['ename']) if control.getBool('jz.dub') else None
         if episodes:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
-                from resources.jz import anime_filler
+                from resources.lib.endpoints import anime_filler
                 filler_data = anime_filler.get_data(kodi_meta['ename'])
                 return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data, dub_data)
             return indexers.process_episodes(episodes, eps_watched, dub_data)
 
         if kodi_meta['episodes'] is None or kodi_meta['episodes'] > 99:
-            from resources.jz import anime_filler
+            from resources.lib.endpoints import anime_filler
             filler_data = anime_filler.get_data(kodi_meta['ename'])
         else:
             filler_data = None

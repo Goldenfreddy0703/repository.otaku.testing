@@ -2,8 +2,6 @@
 import base64
 import re
 import urllib.parse
-import os
-import json
 
 from resources.lib.ui import client, control, utils
 
@@ -122,18 +120,4 @@ class BrowserBase(object):
 
     @staticmethod
     def embeds():
-        default_embed_providers = [
-            'doodstream', 'filelions', 'filemoon', 'hd-2', 'iga', 'kwik',
-            'megaf', 'moonf', 'mp4upload', 'mp4u', 'mycloud', 'noads', 'noadsalt',
-            'swish', 'streamtape', 'streamwish', 'vidcdn', 'vidplay', 'vidstream',
-            'yourupload', 'zto'
-        ]
-
-        # Load the embed providers from the JSON file if it exists
-        if os.path.exists(control.embeds_json):
-            with open(control.embeds_json, 'r') as f:
-                embed_providers = json.load(f)
-        else:
-            embed_providers = default_embed_providers
-
-        return embed_providers
+        return control.getStringList('embed.config')

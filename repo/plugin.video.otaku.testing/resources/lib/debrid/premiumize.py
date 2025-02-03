@@ -241,7 +241,8 @@ class Premiumize:
 
             if stream_link and self.addtocloud:
                 self.add_to_cloud(stream_link)
-
+        else:
+            self.delete_torrent(transfer_id)
         if runinforground:
             control.progressDialog.close()
         return stream_link

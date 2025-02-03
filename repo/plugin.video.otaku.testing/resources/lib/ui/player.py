@@ -5,7 +5,7 @@ import service
 import json
 
 from resources.lib.ui import control, database
-from resources.lib.indexers import aniskip, anime_skip
+from resources.lib.endpoints import aniskip, anime_skip
 from resources.lib import WatchlistIntegration, indexers
 
 playList = control.playList
