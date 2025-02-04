@@ -92,7 +92,7 @@ class Sources(GetSources):
 
         # local #
         if control.getBool('provider.localfiles'):
-            t = threading.Thread(target=self.user_local_inspection, args=(query, mal_id, episode, rescrape))
+            t = threading.Thread(target=self.user_local_inspection, args=(query, mal_id, episode))
             t.start()
             self.threads.append(t)
         else:
@@ -223,19 +223,21 @@ class Sources(GetSources):
         self.remainingProviders.remove('hianime')
 
     # Local & Cloud #
-    def user_local_inspection(self, query, mal_id, episode, rescrape):
-        self.local_files += localfiles.Sources().get_sources(query, mal_id, episode)
+    def user_local_inspection(self, query, mal_id, episode):
+        season = database.get_episode(mal_id)['season']
+        self.local_files += localfiles.Sources().get_sources(query, mal_id, episode, season)
         self.remainingProviders.remove('Local Inspection')
 
     def user_cloud_inspection(self, query, mal_id, episode):
         debrid = {}
         enabled_debrids = control.enabled_debrid()
+        season = database.get_episode(mal_id)['season']
 
         for debrid_name, is_enabled in enabled_debrids.items():
             if is_enabled and control.getBool(f'{debrid_name}.cloudInspection'):
                 debrid[debrid_name] = True
 
-        self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode)
+        self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode, season)
         self.remainingProviders.remove('Cloud Inspection')
 
     @staticmethod

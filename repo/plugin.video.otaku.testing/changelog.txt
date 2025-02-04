@@ -1,5 +1,10 @@
+Changelog v5.1.57 (2024-02-03):
+- Improved Cloud Scraping
+- Improved Local Scraping
+- Improved Filtering
+
 Changelog v5.1.56 (2024-02-02):
-- Improved the crap out of Scraping
+- Improved the crap out of Debrid Scraping
 - Small Fix for Premiumize
 - Fixed major episode meta bug
 - Moved some files around
