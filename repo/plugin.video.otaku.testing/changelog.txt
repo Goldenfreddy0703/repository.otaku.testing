@@ -1,3 +1,6 @@
+Changelog v5.1.59 (2024-02-05):
+- Fixed Autoplay for Embeds
+
 Changelog v5.1.58 (2024-02-04):
 - Fixed Gogo
 

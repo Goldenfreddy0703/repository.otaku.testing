@@ -72,9 +72,11 @@ class Resolver(BaseWindow):
             episode_value = str(self.episode)
             episode_value_length = len(episode_value)  # Get the length of episode_value
             for index, source in enumerate(sources):
-                if source['type'] in ['embed', 'direct'] and str(source['provider']) + " ".join(map(str, source['info'])) == last_played:
-                    sources.insert(0, sources.pop(index))
-                    break
+                if source['type'] in ['embed', 'direct']:
+                    concatenated_info = str(source['provider']) + " ".join(map(str, source['info']))
+                    if concatenated_info == last_played:
+                        sources.insert(0, sources.pop(index))
+                        break
                 elif source['type'] in ['torrent', 'cloud', 'hoster', 'local']:
                     release_title = str(source['release_title'])
                     chars = list(last_played)
@@ -313,7 +315,7 @@ class Resolver(BaseWindow):
             else:
                 super(Resolver, self).doModal()
 
-            if self.sources[0]['type'] == 'embed':
+            if self.sources[0]['type'] in ['embed', 'direct']:
                 control.setSetting('last_played_source', str(self.sources[0]['provider']) + " ".join(map(str, self.sources[0]['info'])))
             else:
                 control.setSetting('last_played_source', str(self.sources[0]['release_title']))
