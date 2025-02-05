@@ -141,7 +141,7 @@ class Sources(BrowserBase):
                     'seeders': 0,
                     'byte_size': 0,
                     'info': [f"{server.upper()} {lang.upper()}"],
-                    'lang': 2 if lang == 'dub' else 0,
+                    'lang': 3 if lang == 'dub' else 2,
                     'channel': source_utils.getAudio_channel(title),
                     'sub': source_utils.getSubtitle_lang(title),
                 }
