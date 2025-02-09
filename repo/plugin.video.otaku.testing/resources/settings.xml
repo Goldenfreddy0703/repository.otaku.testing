@@ -1876,7 +1876,7 @@
                 </setting>
                 <setting id="watchlist.sync.enabled" type="boolean" label="30368" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                     <dependencies>
                         <dependency type="visible" setting="watchlist.update.enabled">true</dependency>
