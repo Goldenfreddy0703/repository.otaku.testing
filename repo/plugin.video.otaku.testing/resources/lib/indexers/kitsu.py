@@ -2,6 +2,7 @@ import pickle
 import datetime
 import time
 import json
+import random
 
 from functools import partial
 from resources.lib.ui import utils, database, control
@@ -44,7 +45,7 @@ class KitsuAPI:
         return res_data
 
     @staticmethod
-    def parse_episode_view(res, mal_id, season, poster, fanart, eps_watched, update_time, tvshowtitle, dub_data, filler_data, episodes=None):
+    def parse_episode_view(res, mal_id, season, poster, fanart, clearart, clearlogo, eps_watched, update_time, tvshowtitle, dub_data, filler_data, episodes=None):
         episode = res['attributes']['number']
         url = f"{mal_id}/{episode}"
         title = res['attributes'].get('canonicalTitle', f'Episode {episode}')
@@ -75,10 +76,10 @@ class KitsuAPI:
         except (IndexError, TypeError):
             filler = ''
 
-        parsed = indexers.update_database(mal_id, update_time, res, url, image, info, season, episode, episodes, title, fanart, poster, dub_data, filler)
+        parsed = indexers.update_database(mal_id, update_time, res, url, image, info, season, episode, episodes, title, fanart, poster, clearart, clearlogo, dub_data, filler)
         return parsed
 
-    def process_episode_view(self, mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data):
+    def process_episode_view(self, mal_id, poster, fanart, clearart, clearlogo, eps_watched, tvshowtitle, dub_data, filler_data):
         kitsu_id = self.get_kitsu_id(mal_id)
         if not kitsu_id:
             return []
@@ -98,14 +99,14 @@ class KitsuAPI:
         #     if len(result_ep) != kodi_episodes:
         #         return []
 
-        mapfunc = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data)
+        mapfunc = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, clearart=clearart, clearlogo=clearlogo, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data)
         all_results = sorted(list(map(mapfunc, result_ep)), key=lambda x: x['info']['episode'])
 
         if control.getBool('override.meta.api') and control.getBool('override.meta.notify'):
             control.notify("Kitsu", f'{tvshowtitle} Added to Database', icon=poster)
         return all_results
 
-    def append_episodes(self, mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data=None, dub_data=None):
+    def append_episodes(self, mal_id, episodes, eps_watched, poster, fanart, clearart, clearlogo, tvshowtitle, filler_data=None, dub_data=None):
         kitsu_id = self.get_kitsu_id(mal_id)
         if not kitsu_id:
             return []
@@ -114,7 +115,7 @@ class KitsuAPI:
         if diff > control.getInt('interface.check.updates'):
             result = self.get_episode_meta(kitsu_id)
             season = episodes[0]['season']
-            mapfunc2 = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data, episodes=episodes)
+            mapfunc2 = partial(self.parse_episode_view, mal_id=mal_id, season=season, poster=poster, fanart=fanart, clearart=clearart, clearlogo=clearlogo, eps_watched=eps_watched, update_time=update_time, tvshowtitle=tvshowtitle, dub_data=dub_data, filler_data=filler_data, episodes=episodes)
             all_results = list(map(mapfunc2, result))
             control.notify("Kitsu", f'{tvshowtitle} Appended to Database', icon=poster)
         else:
@@ -131,6 +132,8 @@ class KitsuAPI:
         kodi_meta.update(pickle.loads(show_meta['art']))
         fanart = kodi_meta.get('fanart')
         poster = kodi_meta.get('poster')
+        clearart = random.choice(kodi_meta.get('clearart', ['']))
+        clearlogo = random.choice(kodi_meta.get('clearlogo', ['']))
         tvshowtitle = kodi_meta['title_userPreferred']
         if not (eps_watched := kodi_meta.get('eps_watched')) and control.settingids.watchlist_data:
             from resources.lib.WatchlistFlavor import WatchlistFlavor
@@ -146,7 +149,7 @@ class KitsuAPI:
             if kodi_meta['status'] not in ["FINISHED", "Finished Airing"]:
                 from resources.lib.endpoints import anime_filler
                 filler_data = anime_filler.get_data(kodi_meta['ename'])
-                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, tvshowtitle, filler_data, dub_data)
+                return self.append_episodes(mal_id, episodes, eps_watched, poster, fanart, clearart, clearlogo, tvshowtitle, filler_data, dub_data)
             return indexers.process_episodes(episodes, eps_watched, dub_data)
 
         if kodi_meta['episodes'] is None or kodi_meta['episodes'] > 99:
@@ -154,7 +157,7 @@ class KitsuAPI:
             filler_data = anime_filler.get_data(kodi_meta['ename'])
         else:
             filler_data = None
-        return self.process_episode_view(mal_id, poster, fanart, eps_watched, tvshowtitle, dub_data, filler_data)
+        return self.process_episode_view(mal_id, poster, fanart, clearart, clearlogo,  eps_watched, tvshowtitle, dub_data, filler_data)
 
     def get_anime(self, filter_type, page):
         perpage = 25
