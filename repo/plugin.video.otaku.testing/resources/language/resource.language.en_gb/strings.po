@@ -1512,3 +1512,7 @@ msgstr ""
 msgctxt "#30644"
 msgid "Configure Embed Servers"
 msgstr ""
+
+msgctxt "#30645"
+msgid "Replace Anilist Posters with Mal Posters"
+msgstr ""

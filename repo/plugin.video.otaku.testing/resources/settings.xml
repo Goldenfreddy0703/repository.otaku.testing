@@ -571,6 +571,14 @@
 					</constraints>
 					<control type="spinner" format="string"/>
 				</setting>
+                <setting id="general.malposters" type="boolean" label="30645" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="browser.api">anilist</dependency>
+                    </dependencies>
+                </setting>
                 <setting id="interface.fanart.disable" type="boolean" label="30317" help="">
                     <level>0</level>
                     <default>false</default>

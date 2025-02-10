@@ -1355,6 +1355,19 @@ class AniListBrowser(BrowserBase):
 
         json_res = results.get('data', {}).get('Page')
 
+        if control.getBool('general.malposters'):
+            try:
+                for anime in json_res['ANIME']:
+                    anilist_id = anime['id']
+                    mal_mapping = database.get_mappings(anilist_id, 'anilist_id')
+                    if mal_mapping and 'mal_picture' in mal_mapping:
+                        mal_picture = mal_mapping['mal_picture']
+                        mal_picture_url = mal_picture.rsplit('.', 1)[0] + 'l.' + mal_picture.rsplit('.', 1)[1]
+                        mal_picture_url = 'https://cdn.myanimelist.net/images/anime/' + mal_picture_url
+                        anime['coverImage']['extraLarge'] = mal_picture_url
+            except Exception:
+                pass
+
         if json_res:
             return json_res
 
@@ -1447,6 +1460,19 @@ class AniListBrowser(BrowserBase):
 
         json_res = results.get('data', {}).get('Page')
 
+        if control.getBool('general.malposters'):
+            try:
+                for anime in json_res['ANIME']:
+                    anilist_id = anime['id']
+                    mal_mapping = database.get_mappings(anilist_id, 'anilist_id')
+                    if mal_mapping and 'mal_picture' in mal_mapping:
+                        mal_picture = mal_mapping['mal_picture']
+                        mal_picture_url = mal_picture.rsplit('.', 1)[0] + 'l.' + mal_picture.rsplit('.', 1)[1]
+                        mal_picture_url = 'https://cdn.myanimelist.net/images/anime/' + mal_picture_url
+                        anime['coverImage']['extraLarge'] = mal_picture_url
+            except Exception:
+                pass
+
         if json_res:
             return json_res
 
@@ -1535,6 +1561,20 @@ class AniListBrowser(BrowserBase):
 
         json_res = results.get('data', {}).get('Media', {}).get('recommendations')
 
+        if control.getBool('general.malposters'):
+            try:
+                for recommendation in json_res['edges']:
+                    anime = recommendation['node']['mediaRecommendation']
+                    anilist_id = anime['id']
+                    mal_mapping = database.get_mappings(anilist_id, 'anilist_id')
+                    if mal_mapping and 'mal_picture' in mal_mapping:
+                        mal_picture = mal_mapping['mal_picture']
+                        mal_picture_url = mal_picture.rsplit('.', 1)[0] + 'l.' + mal_picture.rsplit('.', 1)[1]
+                        mal_picture_url = 'https://cdn.myanimelist.net/images/anime/' + mal_picture_url
+                        anime['coverImage']['extraLarge'] = mal_picture_url
+            except Exception:
+                pass
+
         if json_res:
             return json_res
 
@@ -1615,6 +1655,20 @@ class AniListBrowser(BrowserBase):
             return
 
         json_res = results.get('data', {}).get('Media', {}).get('relations')
+
+        if control.getBool('general.malposters'):
+            try:
+                for relation in json_res['edges']:
+                    anime = relation['node']
+                    anilist_id = anime['id']
+                    mal_mapping = database.get_mappings(anilist_id, 'anilist_id')
+                    if mal_mapping and 'mal_picture' in mal_mapping:
+                        mal_picture = mal_mapping['mal_picture']
+                        mal_picture_url = mal_picture.rsplit('.', 1)[0] + 'l.' + mal_picture.rsplit('.', 1)[1]
+                        mal_picture_url = 'https://cdn.myanimelist.net/images/anime/' + mal_picture_url
+                        anime['coverImage']['extraLarge'] = mal_picture_url
+            except Exception:
+                pass
 
         if json_res:
             return json_res
@@ -2207,6 +2261,20 @@ class AniListBrowser(BrowserBase):
         results = json.loads(r)
         anime_res = results['data']['Page']['ANIME']
         hasNextPage = results['data']['Page']['pageInfo']['hasNextPage']
+
+        if control.getBool('general.malposters'):
+            try:
+                for anime in anime_res:
+                    anilist_id = anime['id']
+                    mal_mapping = database.get_mappings(anilist_id, 'anilist_id')
+                    if mal_mapping and 'mal_picture' in mal_mapping:
+                        mal_picture = mal_mapping['mal_picture']
+                        mal_picture_url = mal_picture.rsplit('.', 1)[0] + 'l.' + mal_picture.rsplit('.', 1)[1]
+                        mal_picture_url = 'https://cdn.myanimelist.net/images/anime/' + mal_picture_url
+                        anime['coverImage']['extraLarge'] = mal_picture_url
+            except Exception:
+                pass
+
         mapfunc = partial(self.base_anilist_view, completed=self.open_completed())
         get_meta.collect_meta(anime_res)
         all_results = list(map(mapfunc, anime_res))
