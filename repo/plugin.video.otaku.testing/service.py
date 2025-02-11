@@ -40,6 +40,16 @@ def refresh_apis():
             MyAnimeList.MyAnimeListWLF().refresh_token()
 
 
+def update_calendars():
+    control.log("### Updating Calendars")
+    from resources.lib.endpoints import simkl_calendar, anilist
+    from resources.lib import MalBrowser
+    simkl_calendar.SimklCalendar().update_calendar()
+    anilist.Anilist().update_calendar()
+    MalBrowser.MalBrowser().update_calendar()
+    control.log("### Calendars updated successfully")
+
+
 def update_mappings_db():
     control.log("### Updating Mappings")
     url = 'https://github.com/Goldenfreddy0703/Otaku-Mappings/raw/refs/heads/main/anime_mappings.db'
@@ -159,6 +169,7 @@ if __name__ == "__main__":
     version_check()
     database_sync.SyncDatabase()
     refresh_apis()
+    update_calendars()
     if control.getSetting('update.time.30') == '' or control.getSetting('update.time.7') == '':
         update_mappings_db()
         update_dub_json()

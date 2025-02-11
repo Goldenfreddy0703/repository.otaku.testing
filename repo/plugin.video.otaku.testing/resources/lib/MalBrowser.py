@@ -9,6 +9,7 @@ import datetime
 
 from bs4 import BeautifulSoup
 from functools import partial
+from resources.lib.endpoints.simkl_calendar import SimklCalendar
 from resources.lib.ui import database, control, client, utils, get_meta
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.ui.divide_flavors import div_flavor
@@ -27,8 +28,6 @@ class MalBrowser(BrowserBase):
         self.rating = ['g', 'pg', 'pg13', 'r17', 'r', 'rx'][control.getInt('contentrating.menu.mal')] if control.getBool('contentrating.bool') else ''
         self.adult = 'true' if control.getSetting('search.adult') == "false" else 'false'
         self.genre = self.load_genres_from_json() if control.getBool('contentgenre.bool') else ''
-
-        self.simkl_cache = None
 
     def load_genres_from_json(self):
         if os.path.exists(control.genre_json):
@@ -141,7 +140,7 @@ class MalBrowser(BrowserBase):
                 season_start_date_last, season_end_date_last, year_start_date_last, year_end_date_last,
                 season_start_date_next, season_end_date_next, year_start_date_next, year_end_date_next)
 
-    def get_airing_calendar(self, page=1):
+    def update_calendar(self, page=1):
         days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         list_ = []
 
@@ -177,6 +176,49 @@ class MalBrowser(BrowserBase):
 
             day_results.reverse()
             list_.extend(day_results)
+            self.set_cached_data(list_)
+
+    def get_airing_calendar(self, page=1):
+        days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        list_ = []
+
+        mal_cache = self.get_cached_data()
+        if mal_cache:
+            list_ = mal_cache
+        else:
+            for day in days_of_week:
+                day_results = []
+                current_page = page
+                request_count = 0
+
+                while True:
+                    retries = 3
+                    popular = None
+                    while retries > 0:
+                        popular = self.get_airing_calendar_res(day, current_page)
+                        if popular and 'data' in popular:
+                            break
+                        retries -= 1
+                        time.sleep(1)  # Add delay before retrying
+
+                    if not popular or 'data' not in popular:
+                        break
+
+                    day_results.extend(popular['data'])
+
+                    if not popular['pagination']['has_next_page']:
+                        break
+
+                    current_page += 1
+                    request_count += 1
+
+                    if request_count >= 3:
+                        time.sleep(1)  # Add delay to respect API rate limit
+                        request_count = 0
+
+                day_results.reverse()
+                list_.extend(day_results)
+                self.set_cached_data(list_)
 
         # Wrap the results in a dictionary that mimics the API response structure
         wrapped_results = {
@@ -195,6 +237,16 @@ class MalBrowser(BrowserBase):
 
         airing = self.process_airing_view(wrapped_results)
         return airing
+
+    def get_cached_data(self):
+        if os.path.exists(control.mal_calendar_json):
+            with open(control.mal_calendar_json, 'r') as f:
+                return json.load(f)
+        return None
+
+    def set_cached_data(self, data):
+        with open(control.mal_calendar_json, 'w') as f:
+            json.dump(data, f)
 
     def get_anime(self, mal_id):
         res = database.get(self.get_base_res, 24, f"{self._BASE_URL}/anime/{mal_id}")
@@ -1514,20 +1566,6 @@ class MalBrowser(BrowserBase):
             return utils.parse_view(base, False, True, dub)
         return utils.parse_view(base, True, False, dub)
 
-    def fetch_and_find_simkl_entry(self, mal_id):
-        if self.simkl_cache is None:
-            url = 'https://data.simkl.in/calendar/anime.json'
-            response = client.request(url)
-            if response:
-                self.simkl_cache = json.loads(response)
-            else:
-                return None
-
-        for entry in self.simkl_cache:
-            if entry['ids']['mal'] == str(mal_id):
-                return entry
-        return None
-
     def base_airing_view(self, res, ts):
         airingAt = datetime.datetime.fromisoformat(res['aired']['from'].replace('Z', '+00:00'))
         airingAt_day = airingAt.strftime('%A')
@@ -1544,7 +1582,7 @@ class MalBrowser(BrowserBase):
         rating = res['score']
 
         # Find Simkl entry
-        simkl_entry = self.fetch_and_find_simkl_entry(res['mal_id'])
+        simkl_entry = SimklCalendar().fetch_and_find_simkl_entry(res['mal_id'])
         if simkl_entry:
             episode = simkl_entry['episode']['episode']
             rating = simkl_entry['ratings']['simkl']['rating']

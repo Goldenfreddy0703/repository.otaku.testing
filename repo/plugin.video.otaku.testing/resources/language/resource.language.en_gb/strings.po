@@ -1516,3 +1516,7 @@ msgstr ""
 msgctxt "#30645"
 msgid "Replace Anilist Posters with Mal Posters"
 msgstr ""
+
+msgctxt "#30646"
+msgid "Allow Unaired Episodes in the Playlist"
+msgstr ""

@@ -7,6 +7,8 @@ import json
 from resources.lib.ui import control, database
 from resources.lib.endpoints import aniskip, anime_skip
 from resources.lib import WatchlistIntegration, indexers
+from resources.lib.endpoints import simkl_calendar, anilist
+
 
 playList = control.playList
 player = xbmc.Player
@@ -92,6 +94,16 @@ class WatchlistPlayer(player):
 
     def build_playlist(self):
         episodes = database.get_episode_list(self.mal_id)
+
+        if not control.getBool('playlist.unaired'):
+            airing_episode = simkl_calendar.SimklCalendar().get_calendar_data(self.mal_id)
+            if not airing_episode:
+                airing_episode = anilist.Anilist().get_airing_calendar(self.mal_id)
+
+            if airing_episode:
+                if isinstance(airing_episode, int):
+                    episodes = episodes[:airing_episode]
+
         video_data = indexers.process_episodes(episodes, '') if episodes else []
         playlist = control.bulk_dir_list(video_data, True)[self.episode:]
         for i in playlist:

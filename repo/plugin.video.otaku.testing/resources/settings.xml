@@ -1003,6 +1003,11 @@
 						</dependency>
 					</dependencies>
 				</setting>
+                <setting id="playlist.unaired" type="boolean" label="30646" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
             </group>
 
             <!-- Skip Intro Dialog -->
