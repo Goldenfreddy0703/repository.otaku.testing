@@ -300,7 +300,7 @@ class AniListWLF(WatchlistFlavorBase):
                 airing_episode = anilist.Anilist().get_airing_calendar(mal_id)
 
             if airing_episode:
-                episode_count = airing_episode
+                episode_count = airing_episode - 1
 
         base_title = res['title'].get(self.title_lang) or res['title'].get('userPreferred')
         title = f"{base_title} - {next_up}/{episode_count}"

@@ -1,3 +1,7 @@
+Changelog v5.1.64 (2024-02-13):
+- Small Fix with New Playback Setting
+- Added Genres to Episode Meta
+
 Changelog v5.1.63 (2024-02-11):
 - Added New Playback Setting for Playlist
 - Made Calendars loading Faster

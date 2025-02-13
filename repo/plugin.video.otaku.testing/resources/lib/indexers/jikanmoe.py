@@ -44,6 +44,7 @@ class JikanAPI:
 
     @staticmethod
     def parse_episode_view(res, mal_id, season, poster, fanart, clearart, clearlogo, eps_watched, update_time, tvshowtitle, dub_data, filler_data, episodes=None):
+        kodi_meta = pickle.loads(database.get_show(mal_id)['kodi_meta'])
         episode = res['mal_id']
         url = f"{mal_id}/{episode}"
         title = res.get('title')
@@ -60,7 +61,8 @@ class JikanAPI:
             'episode': episode,
             'plot': 'No plot available',
             'tvshowtitle': tvshowtitle,
-            'mediatype': 'episode'
+            'mediatype': 'episode',
+            'genre': kodi_meta.get('genre'),
         }
 
         if eps_watched and int(eps_watched) >= episode:

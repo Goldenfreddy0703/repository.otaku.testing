@@ -102,6 +102,7 @@ class WatchlistPlayer(player):
 
             if airing_episode:
                 if isinstance(airing_episode, int):
+                    airing_episode -= 1  # Subtract 1 from airing_episode
                     episodes = episodes[:airing_episode]
 
         video_data = indexers.process_episodes(episodes, '') if episodes else []

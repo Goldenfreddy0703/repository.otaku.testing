@@ -203,7 +203,7 @@ class SimklWLF(WatchlistFlavorBase):
                 airing_episode = anilist.Anilist().get_airing_calendar(mal_id)
 
             if airing_episode:
-                episode_count = airing_episode
+                episode_count = airing_episode - 1
 
         if 0 < episode_count < next_up:
             return

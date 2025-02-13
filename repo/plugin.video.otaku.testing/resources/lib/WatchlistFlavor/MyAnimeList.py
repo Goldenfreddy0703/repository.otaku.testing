@@ -225,7 +225,7 @@ class MyAnimeListWLF(WatchlistFlavorBase):
                 airing_episode = anilist.Anilist().get_airing_calendar(mal_id)
 
             if airing_episode:
-                eps_total = airing_episode
+                eps_total = airing_episode - 1
 
         if 0 < eps_total < next_up:
             return

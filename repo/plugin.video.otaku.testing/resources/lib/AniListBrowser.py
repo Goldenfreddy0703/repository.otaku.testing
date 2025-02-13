@@ -2111,7 +2111,8 @@ class AniListBrowser(BrowserBase):
             'status': res.get('status'),
             'format': res.get('format', ''),
             'plot': desc,
-            'duration': duration
+            'duration': duration,
+            'genre': res.get('genres'),
         }
 
         try:

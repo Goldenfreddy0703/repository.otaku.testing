@@ -1636,7 +1636,8 @@ class MalBrowser(BrowserBase):
             'status': res.get('status'),
             'format': res.get('type'),
             'plot': res.get('synopsis'),
-            'duration': self.duration_to_seconds(res.get('duration'))
+            'duration': self.duration_to_seconds(res.get('duration')),
+            'genre': [x['name'] for x in res.get('genres', [])],
         }
 
         if isinstance(res.get('score'), float):

@@ -230,7 +230,7 @@ class KitsuWLF(WatchlistFlavorBase):
                 airing_episode = anilist.Anilist().get_airing_calendar(mal_id)
 
             if airing_episode:
-                episode_count = airing_episode
+                episode_count = airing_episode - 1
 
         title = '%s - %d/%d' % (anime_title, next_up, episode_count)
         poster = image = eres["attributes"]['posterImage'].get('large', eres["attributes"]['posterImage']['original'])

@@ -33,7 +33,7 @@ class SimklCalendar:
         for item in self.simkl_cache:
             if item.get('ids', {}).get('mal') == str(mal_id):
                 airing_episode = item.get('episode', {}).get('episode')
-                self.anime_cache[mal_id] = airing_episode
+                self.anime_cache[mal_id] = airing_episode - 1
                 return airing_episode
         return None
 
