@@ -1326,6 +1326,12 @@ class AniListBrowser(BrowserBase):
                     duration
                     countryOfOrigin
                     averageScore
+                    stats {
+                        scoreDistribution {
+                            score
+                            amount
+                        }
+                    }
                     trailer {
                         id
                         site
@@ -1431,6 +1437,12 @@ class AniListBrowser(BrowserBase):
                     duration
                     countryOfOrigin
                     averageScore
+                    stats {
+                        scoreDistribution {
+                            score
+                            amount
+                        }
+                    }
                     trailer {
                         id
                         site
@@ -1539,6 +1551,12 @@ class AniListBrowser(BrowserBase):
                         id
                         site
                     }
+                    stats {
+                        scoreDistribution {
+                            score
+                            amount
+                        }
+                    }
                     characters (perPage: 10) {
                       edges {
                         node {
@@ -1634,6 +1652,12 @@ class AniListBrowser(BrowserBase):
                   trailer {
                     id
                     site
+                  }
+                  stats {
+                    scoreDistribution {
+                        score
+                        amount
+                    }
                   }
                   characters (perPage: 10) {
                     edges {
@@ -1749,6 +1773,12 @@ class AniListBrowser(BrowserBase):
                     id
                     site
                 }
+                stats {
+                    scoreDistribution {
+                        score
+                        amount
+                    }
+                }
             }
         }
         '''
@@ -1851,6 +1881,12 @@ class AniListBrowser(BrowserBase):
             duration
             countryOfOrigin
             averageScore
+            stats {
+                scoreDistribution {
+                    score
+                    amount
+                }
+            }
             characters (
                 page: 1,
                 sort: ROLE,
@@ -2009,6 +2045,9 @@ class AniListBrowser(BrowserBase):
 
         try:
             info['rating'] = {'score': res.get('averageScore') / 10.0}
+            if res.get('stats') and res['stats'].get('scoreDistribution'):
+                total_votes = sum([score['amount'] for score in res['stats']['scoreDistribution']])
+                info['rating']['votes'] = total_votes
         except TypeError:
             pass
         
@@ -2148,6 +2187,9 @@ class AniListBrowser(BrowserBase):
 
         try:
             kodi_meta['rating'] = {'score': res.get('averageScore') / 10.0}
+            if res.get('stats') and res['stats'].get('scoreDistribution'):
+                total_votes = sum([score['amount'] for score in res['stats']['scoreDistribution']])
+                kodi_meta['rating']['votes'] = total_votes
         except TypeError:
             pass
 
@@ -2236,6 +2278,12 @@ class AniListBrowser(BrowserBase):
                     isAdult
                     countryOfOrigin
                     averageScore
+                    stats {
+                        scoreDistribution {
+                            score
+                            amount
+                        }
+                    }
                     trailer {
                         id
                         site
