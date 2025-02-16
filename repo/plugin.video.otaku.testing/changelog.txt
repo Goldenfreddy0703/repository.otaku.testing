@@ -1,3 +1,7 @@
+Changelog v5.1.67 (2024-02-16):
+- Improved Scraping for Animetosho
+- Rescrape works as intended now
+
 Changelog v5.1.66 (2024-02-13):
 - Added Votes with Ratings for Anilist
 
