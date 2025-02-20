@@ -47,15 +47,20 @@ def add_last_watched(items):
                 'mal_id': mal_id,
                 **database.get_mapping_ids(mal_id, 'mal_id')
             },
-            'title': kodi_meta['title_userPreferred'],
-            'plot': kodi_meta['plot'],
-            # 'mpaa': kodi_meta[''],
-            # 'duration': self.duration_to_seconds(res.get('duration')),
-            # 'genre': [x['name'] for x in res.get('genres', [])],
-            # 'studio': [x['name'] for x in res.get('studios', [])],
-            # 'status': res.get('status'),
+            'title': kodi_meta.get('title_userPreferred', ''),
+            'plot': kodi_meta.get('plot', ''),
+            'mpaa': kodi_meta.get('mpaa', ''),
+            'duration': kodi_meta.get('duration', 0),
+            'genre': kodi_meta.get('genre', []),
+            'studio': kodi_meta.get('studio', []),
+            'status': kodi_meta.get('status', ''),
             'mediatype': 'tvshow',
-            'rating': kodi_meta['rating']
+            'rating': kodi_meta.get('rating', {}),
+            'cast': kodi_meta.get('cast', []),
+            'country': kodi_meta.get('country', []),
+            'trailer': kodi_meta.get('trailer', ''),
+            'year': kodi_meta.get('year', ''),
+            'premiered': kodi_meta.get('premiered', ''),
         }
         items.append((last_watched, f'animes/{mal_id}/', kodi_meta['poster'], info))
     except TypeError:

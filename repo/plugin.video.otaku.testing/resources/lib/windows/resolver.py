@@ -57,6 +57,9 @@ class Resolver(BaseWindow):
         self.context = actionArgs.get('context')
         self.silent = actionArgs.get('silent')
         self.params = actionArgs.get('params', {})
+        self.autoruninbackground = control.getBool('uncached.autoruninbackground')
+        self.autoruninforground = control.getBool('uncached.autoruninforground')
+        self.autoskipuncached = control.getBool('uncached.autoskipuncached')
         self.abort = False
 
         if self.source_select:
@@ -126,10 +129,17 @@ class Resolver(BaseWindow):
             self.setProperty('source_resolution', source_utils.res[i['quality']])
             self.setProperty('source_info', " ".join(i['info']))
             self.setProperty('source_type', i['type'])
+            # Here we add a persistent setting for the source type
+            control.setSetting('source_type', str(self.sources[0]['type']))
 
             if 'uncached' in i['type']:
-                self.return_data['link'] = self.resolve_uncache(i)
-                break
+                if not self.autoskipuncached:
+                    self.return_data['link'] = self.resolve_uncache(i)
+                else:
+                    stream_link = self.resolve_uncache(i)
+                    if stream_link:
+                        self.return_data['link'] = stream_link
+                        break
 
             if i['type'] in ['torrent', 'cloud', 'hoster']:
                 if i['type'] == 'cloud' and i['debrid_provider'] == 'Alldebrid':
@@ -256,32 +266,56 @@ class Resolver(BaseWindow):
 
     def resolve_uncache(self, source):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
+        status = None
+        api = self.resolvers[source['debrid_provider']]()
         f_string = (f"[I]{source['release_title']}[/I][CR]"
                     f"[CR]"
                     f"This source is not cached. Would you like to cache it now?")
 
         if source['debrid_provider'] == 'Debrid-Link':
-            control.ok_dialog(heading, 'Cache Reolver Has not been added for Debrid-Link')
+            control.ok_dialog(heading, 'Cache Resolver has not been added for Debrid-Link')
             return
 
+        if source['debrid_provider'] in ['Alldebrid', 'Real-Debrid']:
+            # Get an instance of the debrid API and check torrent status early.
+            torrent_status = api.get_torrent_status(source['magnet'])
+            # torrent_status returns (torrent_id, status, torrent_info)
+            if torrent_status is None or torrent_status[0] is None:
+                # Torrent selection failed.
+                return
+
+            torrent_id, status, torrent_info = torrent_status
+            if source['debrid_provider'] == 'Alldebrid':
+                api.delete_magnet(torrent_id)
+            else:
+                api.deleteTorrent(torrent_id)
+
+        # If the file is already cached, bypass any prompting.
+        if status in ['downloaded', 'Ready']:
+            runbackground = False
+            runinforground = False
         else:
-            if control.getBool('uncached.autoruninbackground'):
+            # Not yet cached: decide based on settings or prompt the user.
+            if self.autoruninbackground:
                 runbackground = True
                 runinforground = False
-            elif control.getBool('uncached.autoruninforground'):
+            elif self.autoruninforground:
                 runbackground = False
                 runinforground = True
+            elif self.autoskipuncached:
+                # Auto-skip uncached: simply return nothing.
+                return
             else:
                 yesnocustom = control.yesnocustom_dialog(
-                    heading, f_string, "Cancel", "Run in Background", "Run in Foreground", defaultbutton=xbmcgui.DLG_YESNO_YES_BTN
+                    heading, f_string, "Cancel", "Run in Background", "Run in Foreground",
+                    defaultbutton=xbmcgui.DLG_YESNO_YES_BTN
                 )
                 if yesnocustom == -1 or yesnocustom == 2:
                     self.canceled = True
                     return
-                runbackground = yesnocustom == 0
-                runinforground = yesnocustom == 1
+                runbackground = (yesnocustom == 0)
+                runinforground = (yesnocustom == 1)
 
-        api = self.resolvers[source['debrid_provider']]()
         try:
             resolved_cache = api.resolve_uncached_source(source, runbackground, runinforground, self.pack_select)
         except Exception as e:
@@ -291,7 +325,7 @@ class Resolver(BaseWindow):
             control.log(traceback.format_exc(), 'error')
             return
 
-        if not resolved_cache:
+        if not resolved_cache or not self.autoskipuncached:
             self.canceled = True
         return resolved_cache
 

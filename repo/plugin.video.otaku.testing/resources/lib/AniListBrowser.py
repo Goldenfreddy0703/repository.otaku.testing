@@ -2173,6 +2173,13 @@ class AniListBrowser(BrowserBase):
         }
 
         try:
+            start_date = res.get('startDate')
+            kodi_meta['premiered'] = '{}-{:02}-{:02}'.format(start_date['year'], start_date['month'], start_date['day'])
+            kodi_meta['year'] = start_date['year']
+        except TypeError:
+            pass
+
+        try:
             cast = []
             for i, x in enumerate(res['characters']['edges']):
                 role = x['node']['name']['userPreferred']
@@ -2191,6 +2198,14 @@ class AniListBrowser(BrowserBase):
                 total_votes = sum([score['amount'] for score in res['stats']['scoreDistribution']])
                 kodi_meta['rating']['votes'] = total_votes
         except TypeError:
+            pass
+
+        try:
+            if res['trailer']['site'] == 'youtube':
+                kodi_meta['trailer'] = f"plugin://plugin.video.youtube/play/?video_id={res['trailer']['id']}"
+            else:
+                kodi_meta['trailer'] = f"plugin://plugin.video.dailymotion_com/?url={res['trailer']['id']}&mode=playVideo"
+        except (KeyError, TypeError):
             pass
 
         database.update_show(mal_id, pickle.dumps(kodi_meta))

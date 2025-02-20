@@ -199,6 +199,22 @@ class RealDebrid:
             self.deleteTorrent(torrent['id'])
             return stream_link
 
+    def get_torrent_status(self, magnet):
+        """
+        Given a magnet link, get torrent data needed for further resolution.
+        Returns a tuple: (torrent_id, status, torrent_info)
+        If the torrent cannot be selected, returns (None, None, None).
+        """
+        magnet_data = self.addMagnet(magnet)
+        if not self.torrentSelect(magnet_data['id']):
+            self.deleteTorrent(magnet_data['id'])
+            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
+            return None, None, None
+        torrent_id = magnet_data['id']
+        torrent_info = self.torrentInfo(torrent_id)
+        status = torrent_info.get('status', 'error')
+        return torrent_id, status, torrent_info
+
     def resolve_uncached_source(self, source, runinbackground, runinforground, pack_select):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
         if runinforground:

@@ -1,3 +1,9 @@
+Changelog v5.1.70 (2024-02-20):
+- Added New Setting "Skip UnCached Sources (Real-Debrid, AllDebrid)"
+- Added more meta to last Watched
+- Fixed Caching for Embeds hopefully
+- Fixed Batch Search for Mal Meta
+
 Changelog v5.1.69 (2024-02-20):
 - Added Anidb Episode Meta
 

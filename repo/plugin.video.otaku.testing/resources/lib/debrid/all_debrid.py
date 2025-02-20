@@ -154,6 +154,27 @@ class AllDebrid:
         r = client.request(f'{self.base_url}/magnet/delete', params=params)
         return r is not None
 
+    def get_torrent_status(self, magnet):
+        """
+        Given a magnet link, get magnet status data needed for further resolution.
+        Returns a tuple: (magnet_id, status, status_data)
+        If the magnet cannot be processed correctly, returns (None, None, None).
+        """
+        magnet_data = self.addMagnet(magnet)
+        if not magnet_data or 'magnets' not in magnet_data or not magnet_data['magnets']:
+            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
+            return None, None, None
+
+        magnet_id = magnet_data['magnets'][0]['id']
+        status_data = self.magnet_status(magnet_id)
+        if not status_data or 'magnets' not in status_data:
+            self.delete_magnet(magnet_id)
+            control.ok_dialog(control.ADDON_NAME, "BAD LINK")
+            return None, None, None
+
+        status = status_data['magnets']['status']
+        return magnet_id, status, status_data
+
     def resolve_uncached_source(self, source, runinbackground, runinforground, pack_select):
         heading = f'{control.ADDON_NAME}: Cache Resolver'
         if runinforground:

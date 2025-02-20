@@ -67,7 +67,7 @@ class Sources(BrowserBase):
             params['page'] = page
             self.sources += self.process_animetosho_episodes(f'{self._BASE_URL}/search', params, episode, season)
 
-        if status == 'FINISHED':
+        if status in ["FINISHED", "Finished Airing"]:
             batch_terms = ["Batch", "Complete Series"]
             episodes = pickle.loads(database.get_show(mal_id)['kodi_meta'])['episodes']
             if episodes:

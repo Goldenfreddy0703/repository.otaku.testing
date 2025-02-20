@@ -802,6 +802,7 @@
                     <dependencies>
                         <dependency type="visible" setting="show.uncached">true</dependency>
                         <dependency type="enable" setting="uncached.autoruninbackground">false</dependency>
+                        <dependency type="enable" setting="uncached.autoskipuncached">false</dependency>
                     </dependencies>
                 </setting>
                 <setting id="uncached.autoruninbackground" type="boolean" label="30635" help="" parent="show.uncached">
@@ -811,6 +812,17 @@
                     <dependencies>
                         <dependency type="visible" setting="show.uncached">true</dependency>
                         <dependency type="enable" setting="uncached.autoruninforground">false</dependency>
+                        <dependency type="enable" setting="uncached.autoskipuncached">false</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="uncached.autoskipuncached" type="boolean" label="30652" help="" parent="show.uncached">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="show.uncached">true</dependency>
+                        <dependency type="enable" setting="uncached.autoruninforground">false</dependency>
+                        <dependency type="enable" setting="uncached.autoruninbackground">false</dependency>
                     </dependencies>
                 </setting>
             </group>

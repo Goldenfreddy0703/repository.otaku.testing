@@ -146,6 +146,7 @@ class WatchlistPlayer(player):
         self.media_type = self.vtag.getMediaType()
         self.total_time = int(self.getTotalTime())
         unique_ids = database.get_mapping_ids(self.mal_id, 'mal_id')
+        source_type = control.getSetting('source_type')
 
         # Trakt scrobbling support
         if control.getBool('trakt.enabled'):
@@ -164,7 +165,7 @@ class WatchlistPlayer(player):
             control.log('Not playing Video', 'warning')
             return
 
-        if control.getSetting('general.kodi_language') == 'false':
+        if not control.getBool('general.kodi_language') or source_type not in ['embed', 'direct']:
             query = {
                 'jsonrpc': '2.0',
                 "method": "Player.GetProperties",
@@ -293,6 +294,33 @@ class WatchlistPlayer(player):
                         self.showSubtitles(False)
                     else:
                         self.showSubtitles(True)
+
+        elif source_type in ['embed', 'direct']:
+            subtitle_lang = self.getAvailableSubtitleStreams()
+            subtitles = [
+                "none", "eng", "jpn", "spa", "fre", "ger",
+                "ita", "dut", "rus", "por", "kor", "chi",
+                "ara", "hin", "tur", "pol", "swe", "nor",
+                "dan", "fin"
+            ]
+            preferred_subtitle_setting = int(control.getSetting('general.subtitles'))
+
+            if 0 <= preferred_subtitle_setting < len(subtitles):
+                preferred_subtitle = subtitles[preferred_subtitle_setting]
+            else:
+                preferred_subtitle = "eng"
+
+            try:
+                subtitle_int = subtitle_lang.index(preferred_subtitle)
+                self.setSubtitleStream(subtitle_int)
+            except ValueError:
+                subtitle_int = 0
+                self.setSubtitleStream(subtitle_int)
+
+            if preferred_subtitle == "none":
+                self.showSubtitles(False)
+            else:
+                self.showSubtitles(True)
 
         if self.media_type == 'movie':
             self.onWatchedPercent()

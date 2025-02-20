@@ -1604,10 +1604,21 @@ class MalBrowser(BrowserBase):
             'mpaa': res.get('rating'),
         }
 
+
+        try:
+            start_date = res['aired']['from']
+            kodi_meta['premiered'] = start_date[:10]
+            kodi_meta['year'] = res.get('year', int(start_date[:3]))
+        except TypeError:
+            pass
+
         if isinstance(res.get('score'), float):
             kodi_meta['rating'] = {'score': res['score']}
             if isinstance(res.get('scored_by'), int):
                 kodi_meta['rating']['votes'] = res['scored_by']
+
+        if res.get('trailer'):
+            kodi_meta['trailer'] = f"plugin://plugin.video.youtube/play/?video_id={res['trailer']['youtube_id']}"
 
         database.update_show(mal_id, pickle.dumps(kodi_meta))
 

@@ -31,7 +31,6 @@ class ANIDBAPI:
         alt_titles = []
         episodes = []
         if response:
-            control.log(response)
             root = ET.fromstring(response)
             # Parse the <titles> element for alternative titles.
             titles_elem = root.find('titles')
