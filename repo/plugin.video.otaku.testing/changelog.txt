@@ -1,3 +1,6 @@
+Changelog v5.1.69 (2024-02-20):
+- Added Anidb Episode Meta
+
 Changelog v5.1.68 (2024-02-17):
 - Added Trakt Scrobbler Settings to Watchlist
 

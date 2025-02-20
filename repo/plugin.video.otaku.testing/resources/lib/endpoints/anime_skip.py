@@ -1,11 +1,12 @@
 import json
+from resources.lib.ui import client, database
 
-from resources.lib.ui import client
-
+api_info = database.get_info('Anime-Skip')
+client_id = api_info['client_id']
 base_url = "https://api.anime-skip.com/graphql"
 
 headers = {
-    "X-Client-ID": "buT57NJMu4G65vxGJWdj4UXgnq65Agfi"
+    "X-Client-ID": client_id
 }
 
 

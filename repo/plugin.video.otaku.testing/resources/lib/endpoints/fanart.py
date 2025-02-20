@@ -1,10 +1,11 @@
 import json
+from resources.lib.ui import client, control, database
 
-from resources.lib.ui import client, control
-
+api_info = database.get_info('Fanart-TV')
+api_key = api_info['api_key']
 baseUrl = "https://webservice.fanart.tv/v3"
 lang = ['en', 'ja', '']
-headers = {'Api-Key': "dfe6380e34f49f9b2b9518184922b49c"}
+headers = {'Api-Key': api_key}
 language = ["ja", 'en'][control.getInt("titlelanguage")]
 
 

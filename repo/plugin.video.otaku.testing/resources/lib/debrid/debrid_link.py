@@ -1,11 +1,12 @@
 import json
 import time
-from resources.lib.ui import client, control, source_utils
+from resources.lib.ui import client, control, source_utils, database
 
 
 class DebridLink:
     def __init__(self):
-        self.ClientID = 'sdpBuYFQo6L53s3B4apluw'
+        api_info = database.get_info('Debrid-Link')
+        self.ClientID = api_info['client_id']
         self.USER_AGENT = 'Otaku'
         self.token = control.getSetting('debridlink.token')
         self.refresh = control.getSetting('debridlink.refresh')

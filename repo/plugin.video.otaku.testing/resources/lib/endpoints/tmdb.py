@@ -1,8 +1,8 @@
 import json
+from resources.lib.ui import client, database
 
-from resources.lib.ui import client
-
-apiKey = "6974ec27debf5cce1218136e2a36f64b"
+api_info = database.get_info('TMDB')
+apiKey = api_info['api_key']
 baseUrl = "https://api.themoviedb.org/3/"
 thumbPath = "https://image.tmdb.org/t/p/w500"
 backgroundPath = "https://image.tmdb.org/t/p/original"

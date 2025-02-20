@@ -242,6 +242,7 @@
                             <option label="simkl">simkl</option>
                             <option label="anizip">anizip</option>
                             <option label="jikanmoe">jikanmoe</option>
+                            <option label="anidb">anidb</option>
                             <option label="kitsu">kitsu</option>
                         </options>
                     </constraints>

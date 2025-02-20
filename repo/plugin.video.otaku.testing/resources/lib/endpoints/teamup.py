@@ -3,9 +3,10 @@ import re
 import time
 import json
 
-from resources.lib.ui import client
+from resources.lib.ui import client, database
 
-api_key = '7d05c918d14d9a89347492f8916e3a76457de61dd3303e9a31aecb971d6c8149'
+api_info = database.get_info('Teamup')
+api_key = api_info['api_key']
 headers = {'Content-Type': "application/json", 'Teamup-Token': api_key}
 token = "ksdhpfjcouprnauwda"
 api_url = "https://api.teamup.com"

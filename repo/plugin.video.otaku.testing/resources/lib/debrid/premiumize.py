@@ -1,13 +1,13 @@
 import json
 import urllib.parse
 
-from resources.lib.ui import source_utils, client, control
+from resources.lib.ui import source_utils, client, control, database
 
 
 class Premiumize:
     def __init__(self):
-        # self.client_id = "855400527"      # Swag
-        self.client_id = '807831898'        # Otaku
+        api_info = database.get_info('Premiumize')
+        self.client_id = api_info['client_id']
         self.token = control.getSetting('premiumize.token')
         self.addtocloud = control.getBool('premiumize.addToCloud')
         self.autodelete = control.getBool('premiumize.autodelete')

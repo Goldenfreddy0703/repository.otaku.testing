@@ -1,14 +1,15 @@
 import time
 import json
 
-from resources.lib.ui import client, control, source_utils
+from resources.lib.ui import client, control, source_utils, database
 
 
 class RealDebrid:
     def __init__(self):
         self.ClientID = control.getSetting('realdebrid.client_id')
         if self.ClientID == '':
-            self.ClientID = 'X245A4XAIBGVM'
+            api_info = database.get_info('Real-Debrid')
+            self.ClientID = api_info['client_id']
         self.ClientSecret = control.getSetting('realdebrid.secret')
         self.token = control.getSetting('realdebrid.token')
         self.refresh = control.getSetting('realdebrid.refresh')
@@ -42,7 +43,8 @@ class RealDebrid:
         return r is not None
 
     def auth(self):
-        self.ClientID = 'X245A4XAIBGVM'
+        api_info = database.get_info('Real-Debrid')
+        self.ClientID = api_info['client_id']
         self.ClientSecret = ''
         params = {
             'client_id': self.ClientID,

@@ -31,8 +31,11 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         code_verifier = params.get('state')
 
         oauth_url = 'https://myanimelist.net/v1/oauth2/token'
+        api_info = database.get_info('MyAnimeList')
+        client_id = api_info['client_id']
+
         data = {
-            'client_id': 'a8d85a4106b259b8c9470011ce2f76bc',
+            'client_id': client_id,
             'code': code,
             'code_verifier': code_verifier,
             'grant_type': 'authorization_code'
@@ -57,8 +60,11 @@ class MyAnimeListWLF(WatchlistFlavorBase):
     @staticmethod
     def refresh_token():
         oauth_url = 'https://myanimelist.net/v1/oauth2/token'
+        api_info = database.get_info('MyAnimeList')
+        client_id = api_info['client_id']
+
         data = {
-            'client_id': 'a8d85a4106b259b8c9470011ce2f76bc',
+            'client_id': client_id,
             'grant_type': 'refresh_token',
             'refresh_token': control.getSetting('mal.refresh')
         }

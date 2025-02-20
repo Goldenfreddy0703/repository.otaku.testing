@@ -1,11 +1,13 @@
-from resources.lib.ui import client
+from resources.lib.ui import client, database
 import xml.etree.ElementTree as ET
 
+api_info = database.get_info('AniDB')
+client_name = api_info['client_id']
 base_url = 'http://api.anidb.net:9001/httpapi'
 
 params = {
     'request': 'anime',
-    'client': 'otakukodi',
+    'client': client_name,
     'clientver': 1,
     'protover': 1
 }

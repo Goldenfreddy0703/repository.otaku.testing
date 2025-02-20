@@ -179,6 +179,13 @@ def remove_from_database(table, mal_id):
         cursor.connection.commit()
 
 
+def get_info(api_name):
+    with SQL(control.infoDB) as cursor:
+        cursor.execute('SELECT * FROM info WHERE api_name=?', (api_name,))
+        api_info = cursor.fetchone()
+        return api_info
+
+
 def get_mappings(anime_id, send_id):
     with SQL(control.mappingDB) as cursor:
         cursor.execute(f'SELECT * FROM anime WHERE {send_id}=?', (anime_id,))

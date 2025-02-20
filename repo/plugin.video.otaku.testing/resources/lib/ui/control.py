@@ -30,6 +30,11 @@ pathExists = xbmcvfs.exists
 dataPath = xbmcvfs.translatePath(addonInfo('profile'))
 kodi_version = xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')
 
+context_addon_id = 'context.otaku.testing'
+context_addon = xbmcaddon.Addon(context_addon_id)
+context_addon_path = context_addon.getAddonInfo('path')
+infoDB = os.path.join(context_addon_path, 'info.db')
+
 cacheFile = os.path.join(dataPath, 'cache.db')
 searchHistoryDB = os.path.join(dataPath, 'search.db')
 malSyncDB = os.path.join(dataPath, 'malSync.db')
