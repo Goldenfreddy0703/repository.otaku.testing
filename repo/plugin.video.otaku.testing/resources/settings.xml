@@ -1859,6 +1859,67 @@
                     </dependencies>
                 </setting>
             </group>
+            
+            <!-- EasyDebrid -->
+            <group id="6" label="30653" help="">
+                <setting id="easydebrid.enabled" type="boolean" label="30654" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="easydebrid.username" type="string" label="30655" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                        <control type="edit" format="string"/>
+                    <enable>false</enable>
+                    <dependencies>
+                        <dependency type="visible" setting="easydebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="easydebrid.auth.status" type="string" label="30656" help="">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string"/>
+                    <enable>false</enable>
+                    <dependencies>
+                        <dependency type="visible" setting="easydebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="easydebrid.auth_start" type="action" label="30657" help="">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/auth/easydebrid)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                    <dependencies>
+                        <dependency type="visible" setting="easydebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <!-- <setting id="easydebrid.refresh.token" type="action" label="30658" help="">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.otaku.testing/refresh/easydebrid)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                    <dependencies>
+                        <dependency type="visible" setting="easydebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting>
+                <setting id="easydebrid.autodelete" type="boolean" label="30636" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="visible" setting="easydebrid.enabled">true</dependency>
+                    </dependencies>
+                </setting> -->
+            </group>
         </category>
 
         <!-- Watchlist -->

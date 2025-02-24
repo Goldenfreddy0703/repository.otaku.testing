@@ -12,8 +12,8 @@ SORT_METHODS = ['none', 'source type', 'debrid provider', 'audio', 'subtitles', 
 SORT_OPTIONS = {
     'sortmethod': SORT_METHODS,
     'none': [],
-    "source type": ['files', 'cloud', 'torrent', 'embeds', "none"],
-    "debrid provider": ['Real-Debrid', 'Premiumize', 'Alldebrid', 'Debrid-Link', 'Torbox', 'none'],
+    "source type": ['files', 'cloud', 'torrent', 'hoster', 'embeds', "none"],
+    "debrid provider": ['Real-Debrid', 'Premiumize', 'Alldebrid', 'Debrid-Link', 'Torbox', 'EasyDebrid', 'none'],
     "audio": ['multi-audio', 'dual-audio', 'sub', 'dub', 'none'],
     "subtitles": ['multi sub', 'none'],
     "resolution": [],
@@ -29,10 +29,10 @@ audio = [0, 1, 2, 3, 'none']
 subtitles = [0, 'none']
 
 # Define debrid provider mapping
-debrid_provider = [['Real-Debrid'], ['Premiumize'], ['Alldebrid'], ['Debrid-Link'], ['Torbox'], ['none']]
+debrid_provider = [['Real-Debrid'], ['Premiumize'], ['Alldebrid'], ['Debrid-Link'], ['Torbox'], ['EasyDebrid'], ['none']]
 
 # Define source type mapping
-source_type = [['local'], ['cloud'], ['torrent', 'torrent (uncached)'], ['direct', 'embed'], ['none']]
+source_type = [['local'], ['cloud'], ['torrent', 'torrent (uncached)'], ['hoster'], ['direct', 'embed'], ['none']]
 
 # Define default sort options
 default_sort_options = {
@@ -57,14 +57,16 @@ default_sort_options = {
     'source type.1': 0,  # files
     'source type.2': 1,  # cloud
     'source type.3': 2,  # torrent
-    'source type.4': 3,  # embeds
-    'source type.5': 4,  # none
+    'source type.4': 3,  # hoster
+    'source type.5': 4,  # embeds
+    'source type.6': 5,  # none
     'debrid provider.1': 0,  # Real-Debrid
     'debrid provider.2': 1,  # Premiumize
     'debrid provider.3': 2,  # Alldebrid
     'debrid provider.4': 3,  # Debrid-Link
     'debrid provider.5': 4,  # Torbox
-    'debrid provider.6': 5,  # none
+    'debrid provider.6': 5,  # EasyDebrid
+    'debrid provider.7': 6,  # none
     'audio.1': 0,  # multi-audio
     'audio.2': 1,  # dual-audio
     'audio.3': 2,  # sub

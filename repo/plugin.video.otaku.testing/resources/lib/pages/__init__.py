@@ -20,10 +20,11 @@ def getSourcesHelper(actionArgs):
 class Sources(GetSources):
     def __init__(self, xml_file, location, actionArgs=None):
         super(Sources, self).__init__(xml_file, location, actionArgs)
-        self.torrentProviders = ['nyaa', 'animetosho', 'Cloud Inspection']
+        self.torrentProviders = ['nyaa', 'animetosho']
         self.embedProviders = ['animepahe', 'aniwave', 'gogo', 'hianime']
+        self.CloudProviders = ['Cloud Inspection']
         self.localProviders = ['Local Inspection']
-        self.remainingProviders = self.embedProviders + self.torrentProviders + self.localProviders
+        self.remainingProviders = self.embedProviders + self.torrentProviders + self.localProviders + self.CloudProviders
 
         self.torrents_qual_len = [0, 0, 0, 0, 0]
         self.embeds_qual_len = [0, 0, 0, 0, 0]
@@ -67,11 +68,15 @@ class Sources(GetSources):
         control.setInt('aniwave.skipoutro.end', -1)
 
         enabled_debrids = control.enabled_debrid()
-        if any(enabled_debrids.values()):
-            t = threading.Thread(target=self.user_cloud_inspection, args=(query, mal_id, episode))
-            t.start()
-            self.threads.append(t)
+        enabled_clouds = control.enabled_cloud()
 
+        # Activate cloud inspection only if the same debrid service is enabled for both
+        common_debrids = [
+            service for service, is_enabled in enabled_debrids.items()
+            if is_enabled and enabled_clouds.get(service, False)
+        ]
+
+        if any(enabled_debrids.values()):
             if control.getBool('provider.nyaa'):
                 t = threading.Thread(target=self.nyaa_worker, args=(query, mal_id, episode, status, media_type, rescrape))
                 t.start()
@@ -89,6 +94,14 @@ class Sources(GetSources):
         else:
             for provider in self.torrentProviders:
                 self.remainingProviders.remove(provider)
+
+        # cloud #
+        if common_debrids:
+            t = threading.Thread(target=self.user_cloud_inspection, args=(query, mal_id, episode))
+            t.start()
+            self.threads.append(t)
+        else:
+            self.remainingProviders.remove('Cloud Inspection')
 
         # local #
         if control.getBool('provider.localfiles'):
@@ -250,15 +263,8 @@ class Sources(GetSources):
         self.remainingProviders.remove('Local Inspection')
 
     def user_cloud_inspection(self, query, mal_id, episode):
-        debrid = {}
-        enabled_debrids = control.enabled_debrid()
         season = database.get_episode(mal_id)['season']
-
-        for debrid_name, is_enabled in enabled_debrids.items():
-            if is_enabled and control.getBool(f'{debrid_name}.cloudInspection'):
-                debrid[debrid_name] = True
-
-        self.cloud_files += debrid_cloudfiles.Sources().get_sources(debrid, query, episode, season)
+        self.cloud_files += debrid_cloudfiles.Sources().get_sources(query, episode, season)
         self.remainingProviders.remove('Cloud Inspection')
 
     @staticmethod

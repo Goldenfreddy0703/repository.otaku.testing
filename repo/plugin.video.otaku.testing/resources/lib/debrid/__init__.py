@@ -1,7 +1,7 @@
 import threading
 
 from copy import deepcopy
-from resources.lib.debrid import real_debrid, all_debrid, debrid_link, premiumize, torbox
+from resources.lib.debrid import real_debrid, all_debrid, debrid_link, premiumize, torbox, easydebrid
 from resources.lib.ui import control
 
 premiumizeCached = []
@@ -9,6 +9,7 @@ realdebridCached = []
 alldebridCached = []
 debridlinkCached = []
 torboxCached = []
+easydebridCached = []
 
 premiumizeUnCached = []
 realdebridUnCached = []
@@ -45,10 +46,15 @@ def torrentCacheCheck(torrent_list):
         t.start()
         threads.append(t)
 
+    if enabled_debrids['easydebrid']:
+        t = threading.Thread(target=easydebrid_worker, args=(deepcopy(torrent_list),))
+        t.start()
+        threads.append(t)
+
     for i in threads:
         i.join()
 
-    cached_list = realdebridCached + premiumizeCached + alldebridCached + debridlinkCached + torboxCached
+    cached_list = realdebridCached + premiumizeCached + alldebridCached + debridlinkCached + torboxCached + easydebridCached
     uncached_list = realdebridUnCached + premiumizeUnCached + alldebridUnCached + debridlinkUnCached + torboxUnCached
     return cached_list, uncached_list
 
@@ -104,3 +110,15 @@ def torbox_worker(torrent_list):
                 torboxCached.append(torrent)
             else:
                 torboxUnCached.append(torrent)
+
+
+def easydebrid_worker(torrent_list):
+    # Prepend the magnet prefix to each hash within torrent_list
+    hash_list = ["magnet:?xt=urn:btih:" + i['hash'] for i in torrent_list]
+    if len(hash_list) != 0:
+        response = easydebrid.EasyDebrid().lookup_link(hash_list)
+        cached_flags = response.get("cached", [])
+        for torrent, is_cached in zip(torrent_list, cached_flags):
+            torrent['debrid_provider'] = 'EasyDebrid'
+            if is_cached:
+                easydebridCached.append(torrent)

@@ -323,12 +323,18 @@ class Sources(BrowserBase):
             'cached': cached,
             'seeders': res['seeders']
         }
+
+        # If the debrid provider is EasyDebrid, treat it as a hoster link
+        if source.get('debrid_provider', '').lower() == 'easydebrid':
+            source['type'] = 'hoster'
+
         match = re.match(r'(\d+).(\d+) (\w+)', res['size'])
         if match:
             source['byte_size'] = source_utils.convert_to_bytes(float(f'{match.group(1)}.{match.group(2)}'), match.group(3))
         if not cached:
             source['magnet'] = res['magnet']
             source['type'] += ' (uncached)'
+
         return source
 
     def append_cache_uncached_noduplicates(self):

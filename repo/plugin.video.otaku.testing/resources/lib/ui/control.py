@@ -92,8 +92,13 @@ def bin(s):
 
 
 def enabled_debrid():
-    debrids = ['realdebrid', 'debridlink', 'alldebrid', 'premiumize', 'torbox']
+    debrids = ['realdebrid', 'debridlink', 'alldebrid', 'premiumize', 'torbox', 'easydebrid']
     return {x: getSetting(f'{x}.token') != '' and getBool(f'{x}.enabled') for x in debrids}
+
+
+def enabled_cloud():
+    clouds = ['realdebrid', 'alldebrid', 'premiumize', 'torbox']
+    return {x: getSetting(f'{x}.token') != '' and getBool(f'{x}.cloudInspection') for x in clouds}
 
 
 def enabled_watchlists():

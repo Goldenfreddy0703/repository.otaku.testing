@@ -1544,3 +1544,27 @@ msgstr ""
 msgctxt "#30652"
 msgid "Skip UnCached Sources (Real-Debrid, AllDebrid)"
 msgstr ""
+
+msgctxt "#30653"
+msgid "EasyDebrid"
+msgstr ""
+
+msgctxt "#30654"
+msgid "Enable EasyDebrid"
+msgstr ""
+
+msgctxt "#30655"
+msgid "EasyDebrid Username"
+msgstr ""
+
+msgctxt "#30656"
+msgid "EasyDebrid Status"
+msgstr ""
+
+msgctxt "#30657"
+msgid "Authorize EasyDebrid..."
+msgstr ""
+
+msgctxt "#30658"
+msgid "Refresh EasyDebrid Token"
+msgstr ""

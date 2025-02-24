@@ -2,7 +2,7 @@ import re
 import threading
 import json
 
-from resources.lib.ui import source_utils, client
+from resources.lib.ui import source_utils, client, control
 from resources.lib.ui.BrowserBase import BrowserBase
 from resources.lib.debrid import real_debrid, premiumize, all_debrid, torbox
 
@@ -12,20 +12,22 @@ class Sources(BrowserBase):
         self.cloud_files = []
         self.threads = []
 
-    def get_sources(self, debrid, query, episode, season):
-        if debrid.get('realdebrid'):
+    def get_sources(self, query, episode, season):
+        debrid = control.enabled_debrid()
+        cloud = control.enabled_cloud()
+        if debrid.get('realdebrid') and cloud.get('realdebrid'):
             t = threading.Thread(target=self.rd_cloud_inspection, args=(query, episode, season))
             t.start()
             self.threads.append(t)
-        if debrid.get('premiumize'):
+        if debrid.get('premiumize') and cloud.get('premiumize'):
             t = threading.Thread(target=self.premiumize_cloud_inspection, args=(query, episode, season))
             t.start()
             self.threads.append(t)
-        if debrid.get('alldebrid'):
+        if debrid.get('alldebrid') and cloud.get('alldebrid'):
             t = threading.Thread(target=self.alldebrid_cloud_inspection, args=(query, episode, season))
             t.start()
             self.threads.append(t)
-        if debrid.get('torbox'):
+        if debrid.get('torbox') and cloud.get('torbox'):
             t = threading.Thread(target=self.torbox_cloud_inspection, args=(query, episode, season))
             t.start()
             self.threads.append(t)

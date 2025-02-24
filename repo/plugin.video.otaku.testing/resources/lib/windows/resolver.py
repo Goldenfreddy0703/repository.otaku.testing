@@ -4,7 +4,7 @@ import xbmc
 import urllib.parse
 
 from resources.lib.WatchlistIntegration import watchlist_update_episode
-from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid, torbox
+from resources.lib.debrid import all_debrid, debrid_link, premiumize, real_debrid, torbox, easydebrid
 from resources.lib.ui import client, control, source_utils, player
 from resources.lib.windows.base_window import BaseWindow
 
@@ -45,7 +45,8 @@ class Resolver(BaseWindow):
             'Debrid-Link': debrid_link.DebridLink,
             'Premiumize': premiumize.Premiumize,
             'Real-Debrid': real_debrid.RealDebrid,
-            'TorBox': torbox.TorBox
+            'TorBox': torbox.TorBox,
+            'EasyDebrid': easydebrid.EasyDebrid
         }
         self.source_select = source_select
         self.pack_select = False
@@ -236,10 +237,15 @@ class Resolver(BaseWindow):
         stream_link = {}
         if source['type'] == 'torrent':
             stream_link = api.resolve_single_magnet(hash_, magnet, source['episode_re'], self.pack_select)
-        elif source['type'] == 'cloud' or source['type'] == 'hoster':
+        elif source['type'] == 'cloud':
             hash_ = api.resolve_cloud(source, self.pack_select)
             if hash_:
                 stream_link = api.resolve_hoster(hash_)
+        elif source['type'] == 'hoster':
+            # Get the hoster links from EasyDebrid.
+            hoster_response = api.resolve_hoster(magnet, source['episode_re'], self.pack_select)
+            if hoster_response:
+                stream_link = hoster_response
         return stream_link
 
     @staticmethod

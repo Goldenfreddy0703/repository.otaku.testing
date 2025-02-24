@@ -544,6 +544,9 @@ def AUTH(payload, params):
     elif payload == 'torbox':
         from resources.lib.debrid.torbox import TorBox
         TorBox().auth()
+    elif payload == 'easydebrid':
+        from resources.lib.debrid.easydebrid import EasyDebrid
+        EasyDebrid().auth()
 
 
 @Route('refresh/*')
@@ -554,9 +557,6 @@ def REFRESH(payload, params):
     elif payload == 'debridlink':
         from resources.lib.debrid.debrid_link import DebridLink
         DebridLink().refreshToken()
-    # elif payload == 'torbox':
-    #     from resources.lib.debrid.torbox import TorBox
-    #     TorBox().refreshToken()
 
 
 @Route('fanart_select/*')
