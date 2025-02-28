@@ -13,235 +13,275 @@ msgstr ""
 
 ######MAIN MENU DIRECTORY#######
 msgctxt "#30900"
-msgid "Last Watched: "
+msgid "Last Watched"
 msgstr ""
 
 msgctxt "#30901"
-msgid "Airing Last Season"
+msgid "Airing Anime Calendar"
 msgstr ""
 
 msgctxt "#30902"
-msgid "Airing This Season"
+msgid "Airing Last Season"
 msgstr ""
 
 msgctxt "#30903"
-msgid "Airing Next Season"
+msgid "Airing This Season"
 msgstr ""
 
 msgctxt "#30904"
-msgid "Movies"
+msgid "Airing Next Season"
 msgstr ""
 
 msgctxt "#30905"
-msgid "TV Shows"
+msgid "Movies"
 msgstr ""
 
 msgctxt "#30906"
-msgid "Trending"
+msgid "TV Shows"
 msgstr ""
 
 msgctxt "#30907"
-msgid "Popular"
+msgid "TV Shorts"
 msgstr ""
 
 msgctxt "#30908"
-msgid "Voted"
+msgid "Specials"
 msgstr ""
 
 msgctxt "#30909"
-msgid "Favourites"
+msgid "OVAs"
 msgstr ""
 
 msgctxt "#30910"
-msgid "Top 100"
+msgid "ONAs"
 msgstr ""
 
 msgctxt "#30911"
-msgid "Genres & Tags"
+msgid "Music Videos"
 msgstr ""
 
 msgctxt "#30912"
-msgid "Search"
+msgid "Trending"
 msgstr ""
 
 msgctxt "#30913"
-msgid "Tools"
+msgid "Popular"
 msgstr ""
 
 msgctxt "#30914"
-msgid "Trending Last Year"
+msgid "Voted"
 msgstr ""
 
 msgctxt "#30915"
-msgid "Trending This Year"
+msgid "Favourites"
 msgstr ""
 
 msgctxt "#30916"
-msgid "Trending Last Season"
+msgid "Top 100"
 msgstr ""
 
 msgctxt "#30917"
-msgid "Trending This Season"
+msgid "Genres & Tags"
 msgstr ""
 
 msgctxt "#30918"
-msgid "All Time Trending"
+msgid "Search"
 msgstr ""
 
 msgctxt "#30919"
-msgid "Popular Last Year"
+msgid "Tools"
 msgstr ""
 
 msgctxt "#30920"
-msgid "Popular This Year"
+msgid "Trending Last Year"
 msgstr ""
 
 msgctxt "#30921"
-msgid "Popular Last Season"
+msgid "Trending This Year"
 msgstr ""
 
 msgctxt "#30922"
-msgid "Popular This Season"
+msgid "Trending Last Season"
 msgstr ""
 
 msgctxt "#30923"
-msgid "All Time Popular"
+msgid "Trending This Season"
 msgstr ""
 
 msgctxt "#30924"
-msgid "Voted Last Year"
+msgid "All Time Trending"
 msgstr ""
 
 msgctxt "#30925"
-msgid "Voted This Year"
+msgid "Popular Last Year"
 msgstr ""
 
 msgctxt "#30926"
-msgid "Voted Last Season"
+msgid "Popular This Year"
 msgstr ""
 
 msgctxt "#30927"
-msgid "Voted This Season"
+msgid "Popular Last Season"
 msgstr ""
 
 msgctxt "#30928"
-msgid "All Time Voted"
+msgid "Popular This Season"
 msgstr ""
 
 msgctxt "#30929"
-msgid "Favourites Last Year"
+msgid "All Time Popular"
 msgstr ""
 
 msgctxt "#30930"
-msgid "Favourites This Year"
+msgid "Voted Last Year"
 msgstr ""
 
 msgctxt "#30931"
-msgid "Favourites Last Season"
+msgid "Voted This Year"
 msgstr ""
 
 msgctxt "#30932"
-msgid "Favourites This Season"
+msgid "Voted Last Season"
 msgstr ""
 
 msgctxt "#30933"
-msgid "All Time Favourites"
+msgid "Voted This Season"
 msgstr ""
 
 msgctxt "#30934"
-msgid "Multi Select..."
+msgid "All Time Voted"
 msgstr ""
 
 msgctxt "#30935"
-msgid "Action"
+msgid "Favourites Last Year"
 msgstr ""
 
 msgctxt "#30936"
-msgid "Adventure"
+msgid "Favourites This Year"
 msgstr ""
 
 msgctxt "#30937"
-msgid "Comedy"
+msgid "Favourites Last Season"
 msgstr ""
 
 msgctxt "#30938"
-msgid "Drama"
+msgid "Favourites This Season"
 msgstr ""
 
 msgctxt "#30939"
-msgid "Ecchi"
+msgid "All Time Favourites"
 msgstr ""
 
 msgctxt "#30940"
-msgid "Fantasy"
+msgid "Multi Select..."
 msgstr ""
 
 msgctxt "#30941"
-msgid "Hentai"
+msgid "Action"
 msgstr ""
 
 msgctxt "#30942"
-msgid "Horror"
+msgid "Adventure"
 msgstr ""
 
 msgctxt "#30943"
-msgid "Shoujo"
+msgid "Comedy"
 msgstr ""
 
 msgctxt "#30944"
-msgid "Mecha"
+msgid "Drama"
 msgstr ""
 
 msgctxt "#30945"
-msgid "Music"
+msgid "Ecchi"
 msgstr ""
 
 msgctxt "#30946"
-msgid "Mystery"
+msgid "Fantasy"
 msgstr ""
 
 msgctxt "#30947"
-msgid "Psychological"
+msgid "Hentai"
 msgstr ""
 
 msgctxt "#30948"
-msgid "Romance"
+msgid "Horror"
 msgstr ""
 
 msgctxt "#30949"
-msgid "Sci-Fi"
+msgid "Shoujo"
 msgstr ""
 
 msgctxt "#30950"
-msgid "Slice of Life"
+msgid "Mecha"
 msgstr ""
 
 msgctxt "#30951"
-msgid "Sports"
+msgid "Music"
 msgstr ""
 
 msgctxt "#30952"
-msgid "Supernatural"
+msgid "Mystery"
 msgstr ""
 
 msgctxt "#30953"
-msgid "Thriller"
+msgid "Psychological"
 msgstr ""
 
 msgctxt "#30954"
-msgid "Search Both"
+msgid "Romance"
 msgstr ""
 
 msgctxt "#30955"
-msgid "Search Movies"
+msgid "Sci-Fi"
 msgstr ""
 
 msgctxt "#30956"
-msgid "Search TV Shows"
+msgid "Slice of Life"
 msgstr ""
 
 msgctxt "#30957"
-msgid "Airing Anime Calendar"
+msgid "Sports"
+msgstr ""
+
+msgctxt "#30958"
+msgid "Supernatural"
+msgstr ""
+
+msgctxt "#30959"
+msgid "Thriller"
+msgstr ""
+
+msgctxt "#30960"
+msgid "Search Both"
+msgstr ""
+
+msgctxt "#30961"
+msgid "Search Movies"
+msgstr ""
+
+msgctxt "#30962"
+msgid "Search TV Shows"
+msgstr ""
+
+msgctxt "#30963"
+msgid "Search TV Shorts"
+msgstr ""
+
+msgctxt "#30964"
+msgid "Search Specials"
+msgstr ""
+
+msgctxt "#30965"
+msgid "Search OVAs"
+msgstr ""
+
+msgctxt "#30966"
+msgid "Search ONAs"
+msgstr ""
+
+msgctxt "#30967"
+msgid "Search Music Videos"
 msgstr ""
 
 ######TOOLS & SEARCH DIRECTORY#######
@@ -650,7 +690,7 @@ msgid "MUSIC"
 msgstr ""
 
 msgctxt "#30381"
-msgid "Main Menu Items"
+msgid ""
 msgstr ""
 
 msgctxt "#30382"
@@ -1238,23 +1278,23 @@ msgid "Notify When Anime is Added to Database"
 msgstr ""
 
 msgctxt "#30576"
-msgid "Sub Menu - Trending"
+msgid ""
 msgstr ""
 
 msgctxt "#30577"
-msgid "Sub Menu - Popular"
+msgid ""
 msgstr ""
 
 msgctxt "#30578"
-msgid "Sub Menu - Voted"
+msgid ""
 msgstr ""
 
 msgctxt "#30579"
-msgid "Sub Menu - Favourites"
+msgid ""
 msgstr ""
 
 msgctxt "#30580"
-msgid "Genres Menu"
+msgid ""
 msgstr ""
 
 msgctxt "#30581"
@@ -1567,4 +1607,48 @@ msgstr ""
 
 msgctxt "#30658"
 msgid "Refresh EasyDebrid Token"
+msgstr ""
+
+msgctxt "#30659"
+msgid "Main Menu Items"
+msgstr ""
+
+msgctxt "#30660"
+msgid "Sub Menu Items"
+msgstr ""
+
+msgctxt "#30661"
+msgid "Genre Menu Items"
+msgstr ""
+
+msgctxt "#30662"
+msgid "Main Menus"
+msgstr ""
+
+msgctxt "#30663"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30664"
+msgid "TV Shows"
+msgstr ""
+
+msgctxt "#30665"
+msgid "TV Shorts"
+msgstr ""
+
+msgctxt "#30666"
+msgid "Specials"
+msgstr ""
+
+msgctxt "#30667"
+msgid "OVAs"
+msgstr ""
+
+msgctxt "#30668"
+msgid "ONAs"
+msgstr ""
+
+msgctxt "#30669"
+msgid "Music Videos"
 msgstr ""

@@ -213,13 +213,17 @@ def get_mapping_ids(anime_id, send_id):
         return {}
 
 
-def getSearchHistory(media_type='show'):
+def ensure_tables_and_indexes(cursor):
+    tables = ['anime', 'movie', 'tv_show', 'tv_short', 'special', 'ova', 'ona', 'music']
+    for table in tables:
+        cursor.execute(f'CREATE TABLE IF NOT EXISTS {table} (value TEXT)')
+        cursor.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON {table} (value)')
+
+
+def getSearchHistory(media_type):
     with SQL(control.searchHistoryDB) as cursor:
-        cursor.execute('CREATE TABLE IF NOT EXISTS show (value TEXT)')
-        cursor.execute('CREATE TABLE IF NOT EXISTS movie (value TEXT)')
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON movie (value)")
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON show (value)")
-        cursor.execute("SELECT * FROM %s" % media_type)
+        ensure_tables_and_indexes(cursor)
+        cursor.execute(f"SELECT * FROM {media_type}")
         history = cursor.fetchall()
         history.reverse()
         history = history[:50]
@@ -232,22 +236,33 @@ def getSearchHistory(media_type='show'):
 
 def addSearchHistory(search_string, media_type):
     with SQL(control.searchHistoryDB) as cursor:
-        cursor.execute('CREATE TABLE IF NOT EXISTS show (value TEXT)')
-        cursor.execute('CREATE TABLE IF NOT EXISTS movie (value TEXT)')
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON movie (value)")
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON show (value)")
-        cursor.execute("REPLACE INTO %s Values (?)" % media_type, (search_string,))
+        ensure_tables_and_indexes(cursor)
+        cursor.execute(f"REPLACE INTO {media_type} VALUES (?)", (search_string,))
         cursor.connection.commit()
 
 
 def clearSearchHistory():
-    confirmation = control.yesno_dialog(control.ADDON_NAME, "Clear search history?")
+    confirmation = control.yesno_dialog(control.ADDON_NAME, "Clear all search history?")
     if not confirmation:
         return
     with SQL(control.searchHistoryDB) as cursor:
-        cursor.execute("DROP TABLE IF EXISTS movie")
-        cursor.execute("DROP TABLE IF EXISTS show")
-        cursor.execute("VACCUM")
+        tables = ['anime', 'movie', 'tv_show', 'tv_short', 'special', 'ova', 'ona', 'music']
+        for table in tables:
+            cursor.execute(f'DROP TABLE IF EXISTS {table}')
+        cursor.execute("VACUUM")
+        cursor.connection.commit()
+        control.refresh()
+        control.notify(control.ADDON_NAME, "Search History has been cleared", time=5000)
+
+
+def clearSearchCatagory(media_type):
+    confirmation = control.yesno_dialog(control.ADDON_NAME, f"Clear search history?")
+    if not confirmation:
+        return
+    with SQL(control.searchHistoryDB) as cursor:
+        cursor.execute(f'DROP TABLE IF EXISTS {media_type}')
+        cursor.execute(f'CREATE TABLE IF NOT EXISTS {media_type} (value TEXT)')
+        cursor.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS ix_history ON {media_type} (value)")
         cursor.connection.commit()
         control.refresh()
         control.notify(control.ADDON_NAME, "Search History has been cleared", time=5000)

@@ -51,6 +51,7 @@ class Resolver(BaseWindow):
         self.source_select = source_select
         self.pack_select = False
         self.mal_id = actionArgs['mal_id']
+        # self.season = database.get_episode(self.mal_id)['season']
         self.episode = int(actionArgs.get('episode', 1))
         self.play = actionArgs.get('play')
         self.source_select_close = actionArgs.get('close')
@@ -62,6 +63,9 @@ class Resolver(BaseWindow):
         self.autoruninforground = control.getBool('uncached.autoruninforground')
         self.autoskipuncached = control.getBool('uncached.autoskipuncached')
         self.abort = False
+
+        # if self.season:
+        #     control.setStr('resolve_season', str(self.season))
 
         if self.source_select:
             control.setSetting('last_played_source', None)

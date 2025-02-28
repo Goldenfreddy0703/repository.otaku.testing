@@ -37,15 +37,48 @@ def allocate_item(name, url, isfolder, isplayable, cm, image='', info=None, fana
     }
 
 
+def get_format_to_url_mappings():
+    format_to_url = {
+        'anime': 'search_anime/',
+        'tv_show': 'search_tv_show/',
+        'movie': 'search_movie/',
+        'tv_short': 'search_tv_short/',
+        'special': 'search_special/',
+        'ova': 'search_ova/',
+        'ona': 'search_ona/',
+        'music': 'search_music/'
+    }
+
+    format_to_url_2 = {
+        'anime': 'clear_search_history_anime',
+        'tv_show': 'clear_search_history_tv_show',
+        'movie': 'clear_search_history_movie',
+        'tv_short': 'clear_search_history_tv_short',
+        'special': 'clear_search_history_special',
+        'ova': 'clear_search_history_ova',
+        'ona': 'clear_search_history_ona',
+        'music': 'clear_search_history_music'
+    }
+
+    return format_to_url, format_to_url_2
+
+
 def parse_history_view(res, cm):
-    return allocate_item(res, f'search/{res}', True, False, cm, 'search.png', {})
+    format = control.getSetting('format')
+    format_to_url, _ = get_format_to_url_mappings()
+
+    url = format_to_url.get(format)
+    if url:
+        return allocate_item(res, f'{url}{res}', True, False, cm, 'search.png', {})
 
 
-def search_history(search_array):
+def search_history(search_array, format):
     cm = [('Remove from Item', 'remove_search_item'), ("Edit Search Item...", "edit_search_item")]
-    result = [allocate_item("New Search", "search/", True, False, [], 'new_search.png', {})]
+    format_to_url, format_to_url_2 = get_format_to_url_mappings()
+
+    result = [allocate_item("New Search", format_to_url.get(format), True, False, [], 'new_search.png', {})]
     mapfun = partial(parse_history_view, cm=cm)
-    result.append(allocate_item("Clear Search History...", "clear_search_history", False, False, [], 'clear_search_history.png', {}))
+    result.append(allocate_item("Clear Search History...", format_to_url_2.get(format), False, False, [], 'clear_search_history.png', {}))
     result += list(map(mapfun, search_array))
     return result
 

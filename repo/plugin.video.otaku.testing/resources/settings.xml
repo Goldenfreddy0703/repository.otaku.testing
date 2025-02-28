@@ -2253,307 +2253,813 @@
 
         <!-- Menu Customization -->
         <category id="Menu Customization" label="30546" help="">
-            <!-- Main Menu Items -->
-            <group id="1" label="30381" help="">
-                <setting id="menu.lastwatched" type="boolean" label="30900" help="">
+            <!-- Main Menus -->
+            <group id="1" label="30662" help="">
+                <setting id="menu.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
+                    <default>last_watched,airing_calendar,airing_last_season,airing_this_season,airing_next_season,trending,popular,voted,favourites,top_100,genres,search,tools</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched</option>
+                            <option label="30901">airing_calendar</option>
+                            <option label="30902">airing_last_season</option>
+                            <option label="30903">airing_this_season</option>
+                            <option label="30904">airing_next_season</option>
+                            <option label="30905">movies</option>
+                            <option label="30906">tv_shows</option>
+                            <option label="30907">tv_shorts</option>
+                            <option label="30908">specials</option>
+                            <option label="30909">ovas</option>
+                            <option label="30910">onas</option>
+                            <option label="30911">music</option>
+                            <option label="30912">trending</option>
+                            <option label="30913">popular</option>
+                            <option label="30914">voted</option>
+                            <option label="30915">favourites</option>
+                            <option label="30916">top_100</option>
+                            <option label="30917">genres</option>
+                            <option label="30918">search</option>
+                            <option label="30919">tools</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="airing_calendar" type="boolean" label="30957" help="">
+                <setting id="menu.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year,trending_this_year,trending_last_season,trending_this_season,all_time_trending,popular_last_year,popular_this_year,popular_last_season,popular_this_season,all_time_popular,voted_last_year,voted_this_year,voted_last_season,voted_this_season,all_time_voted,favourites_last_year,favourites_this_year,favourites_last_season,favourites_this_season,all_time_favourites</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year</option>
+                            <option label="30921">trending_this_year</option>
+                            <option label="30922">trending_last_season</option>
+                            <option label="30923">trending_this_season</option>
+                            <option label="30924">all_time_trending</option>
+                            <option label="30925">popular_last_year</option>
+                            <option label="30926">popular_this_year</option>
+                            <option label="30927">popular_last_season</option>
+                            <option label="30928">popular_this_season</option>
+                            <option label="30929">all_time_popular</option>
+                            <option label="30930">voted_last_year</option>
+                            <option label="30931">voted_this_year</option>
+                            <option label="30932">voted_last_season</option>
+                            <option label="30933">voted_this_season</option>
+                            <option label="30934">all_time_voted</option>
+                            <option label="30935">favourites_last_year</option>
+                            <option label="30936">favourites_this_year</option>
+                            <option label="30937">favourites_last_season</option>
+                            <option label="30938">favourites_this_season</option>
+                            <option label="30939">all_time_favourites</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="airing_last_season" type="boolean" label="30901" help="">
+                <setting id="menu.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="airing_this_season" type="boolean" label="30902" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="airing_next_season" type="boolean" label="30903" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="movies" type="boolean" label="30904" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                </setting>
-                <setting id="tv_shows" type="boolean" label="30905" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                </setting>
-                <setting id="trending" type="boolean" label="30906" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="popular" type="boolean" label="30907" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="voted" type="boolean" label="30908" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="favourites" type="boolean" label="30909" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="top_100" type="boolean" label="30910" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genres" type="boolean" label="30911" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="search_history" type="boolean" label="30912" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                </setting>
-                <setting id="tools" type="boolean" label="30913" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                    <visible>false</visible>
-                </setting>
-            </group>
-
-            <!-- Sub Menu - Trending Items -->
-            <group id="2" label="30576" help="">
-                <setting id="trending_last_year" type="boolean" label="30914" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trending_this_year" type="boolean" label="30915" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trending_last_season" type="boolean" label="30916" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="trending_this_season" type="boolean" label="30917" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="all_time_trending" type="boolean" label="30918" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres//,genre_action,genre_adventure,genre_comedy,genre_drama,genre_ecchi,genre_fantasy,genre_horror,genre_shoujo,genre_mecha,genre_music,genre_mystery,genre_psychological,genre_romance,genre_sci_fi,genre_slice_of_life,genre_sports,genre_supernatural,genre_thriller</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres//</option>
+                            <option label="30941">genre_action</option>
+                            <option label="30942">genre_adventure</option>
+                            <option label="30943">genre_comedy</option>
+                            <option label="30944">genre_drama</option>
+                            <option label="30945">genre_ecchi</option>
+                            <option label="30946">genre_fantasy</option>
+                            <option label="30947">genre_hentai</option>
+                            <option label="30948">genre_horror</option>
+                            <option label="30949">genre_shoujo</option>
+                            <option label="30950">genre_mecha</option>
+                            <option label="30951">genre_music</option>
+                            <option label="30952">genre_mystery</option>
+                            <option label="30953">genre_psychological</option>
+                            <option label="30954">genre_romance</option>
+                            <option label="30955">genre_sci_fi</option>
+                            <option label="30956">genre_slice_of_life</option>
+                            <option label="30957">genre_sports</option>
+                            <option label="30958">genre_supernatural</option>
+                            <option label="30959">genre_thriller</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
             </group>
 
-            <!-- Sub Menu - Popular -->
-            <group id="3" label="30577" help="">
-                <setting id="popular_last_year" type="boolean" label="30919" help="">
+            <!-- Movies -->
+            <group id="2" label="30663" help="">
+                <setting id="movie.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_movie,airing_last_season_movie,airing_this_season_movie,airing_next_season_movie,trending_movie,popular_movie,voted_movie,favourites_movie,top_100_movie,genres_movie,search_history_movie</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_movie</option>
+                            <option label="30902">airing_last_season_movie</option>
+                            <option label="30903">airing_this_season_movie</option>
+                            <option label="30904">airing_next_season_movie</option>
+                            <option label="30912">trending_movie</option>
+                            <option label="30913">popular_movie</option>
+                            <option label="30914">voted_movie</option>
+                            <option label="30915">favourites_movie</option>
+                            <option label="30916">top_100_movie</option>
+                            <option label="30917">genres_movie</option>
+                            <option label="30918">search_history_movie</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="popular_this_year" type="boolean" label="30920" help="">
+                <setting id="movie.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="popular_last_season" type="boolean" label="30921" help="">
+                    <default>trending_last_year_movie,trending_this_year_movie,trending_last_season_movie,trending_this_season_movie,all_time_trending_movie,popular_last_year_movie,popular_this_year_movie,popular_last_season_movie,popular_this_season_movie,all_time_popular_movie,voted_last_year_movie,voted_this_year_movie,voted_last_season_movie,voted_this_season_movie,all_time_voted_movie,favourites_last_year_movie,favourites_this_year_movie,favourites_last_season_movie,favourites_this_season_movie,all_time_favourites_movie</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_movie</option>
+                            <option label="30921">trending_this_year_movie</option>
+                            <option label="30922">trending_last_season_movie</option>
+                            <option label="30923">trending_this_season_movie</option>
+                            <option label="30924">all_time_trending_movie</option>
+                            <option label="30925">popular_last_year_movie</option>
+                            <option label="30926">popular_this_year_movie</option>
+                            <option label="30927">popular_last_season_movie</option>
+                            <option label="30928">popular_this_season_movie</option>
+                            <option label="30929">all_time_popular_movie</option>
+                            <option label="30930">voted_last_year_movie</option>
+                            <option label="30931">voted_this_year_movie</option>
+                            <option label="30932">voted_last_season_movie</option>
+                            <option label="30933">voted_this_season_movie</option>
+                            <option label="30934">all_time_voted_movie</option>
+                            <option label="30935">favourites_last_year_movie</option>
+                            <option label="30936">favourites_this_year_movie</option>
+                            <option label="30937">favourites_last_season_movie</option>
+                            <option label="30938">favourites_this_season_movie</option>
+                            <option label="30939">all_time_favourites_movie</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list"
+                        format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
+                </setting> 
+                <setting id="movie.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="popular_this_season" type="boolean" label="30922" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="all_time_popular" type="boolean" label="30923" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_movie//,genre_action_movie,genre_adventure_movie,genre_comedy_movie,genre_drama_movie,genre_ecchi_movie,genre_fantasy_movie,genre_horror_movie,genre_shoujo_movie,genre_mecha_movie,genre_music_movie,genre_mystery_movie,genre_psychological_movie,genre_romance_movie,genre_sci_fi_movie,genre_slice_of_life_movie,genre_sports_movie,genre_supernatural_movie,genre_thriller_movie</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_movie//</option>
+                            <option label="30941">genre_action_movie</option>
+                            <option label="30942">genre_adventure_movie</option>
+                            <option label="30943">genre_comedy_movie</option>
+                            <option label="30944">genre_drama_movie</option>
+                            <option label="30945">genre_ecchi_movie</option>
+                            <option label="30946">genre_fantasy_movie</option>
+                            <option label="30947">genre_hentai_movie</option>
+                            <option label="30948">genre_horror_movie</option>
+                            <option label="30949">genre_shoujo_movie</option>
+                            <option label="30950">genre_mecha_movie</option>
+                            <option label="30951">genre_music_movie</option>
+                            <option label="30952">genre_mystery_movie</option>
+                            <option label="30953">genre_psychological_movie</option>
+                            <option label="30954">genre_romance_movie</option>
+                            <option label="30955">genre_sci_fi_movie</option>
+                            <option label="30956">genre_slice_of_life_movie</option>
+                            <option label="30957">genre_sports_movie</option>
+                            <option label="30958">genre_supernatural_movie</option>
+                            <option label="30959">genre_thriller_movie</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
             </group>
 
-            <!-- Sub Menu - Voted -->
-            <group id="4" label="30578" help="">
-                <setting id="voted_last_year" type="boolean" label="30924" help="">
+            <!-- TV Shows -->
+            <group id="3" label="30664" help="">
+                <setting id="tvshow.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_tv_show,airing_last_season_tv_show,airing_this_season_tv_show,airing_next_season_tv_show,trending_tv_show,popular_tv_show,voted_tv_show,favourites_tv_show,top_100_tv_show,genres_tv_show,search_history_tv_show</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_tv_show</option>
+                            <option label="30902">airing_last_season_tv_show</option>
+                            <option label="30903">airing_this_season_tv_show</option>
+                            <option label="30904">airing_next_season_tv_show</option>
+                            <option label="30912">trending_tv_show</option>
+                            <option label="30913">popular_tv_show</option>
+                            <option label="30914">voted_tv_show</option>
+                            <option label="30915">favourites_tv_show</option>
+                            <option label="30916">top_100_tv_show</option>
+                            <option label="30917">genres_tv_show</option>
+                            <option label="30918">search_history_tv_show</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="voted_this_year" type="boolean" label="30925" help="">
+                <setting id="tvshow.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_tv_show,trending_this_year_tv_show,trending_last_season_tv_show,trending_this_season_tv_show,all_time_trending_tv_show,popular_last_year_tv_show,popular_this_year_tv_show,popular_last_season_tv_show,popular_this_season_tv_show,all_time_popular_tv_show,voted_last_year_tv_show,voted_this_year_tv_show,voted_last_season_tv_show,voted_this_season_tv_show,all_time_voted_tv_show,favourites_last_year_tv_show,favourites_this_year_tv_show,favourites_last_season_tv_show,favourites_this_season_tv_show,all_time_favourites_tv_show</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_tv_show</option>
+                            <option label="30921">trending_this_year_tv_show</option>
+                            <option label="30922">trending_last_season_tv_show</option>
+                            <option label="30923">trending_this_season_tv_show</option>
+                            <option label="30924">all_time_trending_tv_show</option>
+                            <option label="30925">popular_last_year_tv_show</option>
+                            <option label="30926">popular_this_year_tv_show</option>
+                            <option label="30927">popular_last_season_tv_show</option>
+                            <option label="30928">popular_this_season_tv_show</option>
+                            <option label="30929">all_time_popular_tv_show</option>
+                            <option label="30930">voted_last_year_tv_show</option>
+                            <option label="30931">voted_this_year_tv_show</option>
+                            <option label="30932">voted_last_season_tv_show</option>
+                            <option label="30933">voted_this_season_tv_show</option>
+                            <option label="30934">all_time_voted_tv_show</option>
+                            <option label="30935">favourites_last_year_tv_show</option>
+                            <option label="30936">favourites_this_year_tv_show</option>
+                            <option label="30937">favourites_last_season_tv_show</option>
+                            <option label="30938">favourites_this_season_tv_show</option>
+                            <option label="30939">all_time_favourites_tv_show</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="voted_last_season" type="boolean" label="30926" help="">
+                <setting id="tvshow.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="voted_this_season" type="boolean" label="30927" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="all_time_voted" type="boolean" label="30928" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_tv_show//,genre_action_tv_show,genre_adventure_tv_show,genre_comedy_tv_show,genre_drama_tv_show,genre_ecchi_tv_show,genre_fantasy_tv_show,genre_horror_tv_show,genre_shoujo_tv_show,genre_mecha_tv_show,genre_music_tv_show,genre_mystery_tv_show,genre_psychological_tv_show,genre_romance_tv_show,genre_sci_fi_tv_show,genre_slice_of_life_tv_show,genre_sports_tv_show,genre_supernatural_tv_show,genre_thriller_tv_show</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_tv_show//</option>
+                            <option label="30941">genre_action_tv_show</option>
+                            <option label="30942">genre_adventure_tv_show</option>
+                            <option label="30943">genre_comedy_tv_show</option>
+                            <option label="30944">genre_drama_tv_show</option>
+                            <option label="30945">genre_ecchi_tv_show</option>
+                            <option label="30946">genre_fantasy_tv_show</option>
+                            <option label="30947">genre_hentai_tv_show</option>
+                            <option label="30948">genre_horror_tv_show</option>
+                            <option label="30949">genre_shoujo_tv_show</option>
+                            <option label="30950">genre_mecha_tv_show</option>
+                            <option label="30951">genre_music_tv_show</option>
+                            <option label="30952">genre_mystery_tv_show</option>
+                            <option label="30953">genre_psychological_tv_show</option>
+                            <option label="30954">genre_romance_tv_show</option>
+                            <option label="30955">genre_sci_fi_tv_show</option>
+                            <option label="30956">genre_slice_of_life_tv_show</option>
+                            <option label="30957">genre_sports_tv_show</option>
+                            <option label="30958">genre_supernatural_tv_show</option>
+                            <option label="30959">genre_thriller_tv_show</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
             </group>
 
-            <!-- Sub Menu - Favourites -->
-            <group id="5" label="30579" help="">
-                <setting id="favourites_last_year" type="boolean" label="30929" help="">
+            <!-- TV Shorts -->
+            <group id="4" label="30665" help="">
+                <setting id="tvshort.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_tv_short,airing_last_season_tv_short,airing_this_season_tv_short,airing_next_season_tv_short,trending_tv_short,popular_tv_short,voted_tv_short,favourites_tv_short,top_100_tv_short,genres_tv_short,search_history_tv_short</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_tv_short</option>
+                            <option label="30902">airing_last_season_tv_short</option>
+                            <option label="30903">airing_this_season_tv_short</option>
+                            <option label="30904">airing_next_season_tv_short</option>
+                            <option label="30912">trending_tv_short</option>
+                            <option label="30913">popular_tv_short</option>
+                            <option label="30914">voted_tv_short</option>
+                            <option label="30915">favourites_tv_short</option>
+                            <option label="30916">top_100_tv_short</option>
+                            <option label="30917">genres_tv_short</option>
+                            <option label="30918">search_history_tv_short</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="favourites_this_year" type="boolean" label="30930" help="">
+                <setting id="tvshorts.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_tv_short,trending_this_year_tv_short,trending_last_season_tv_short,trending_this_season_tv_short,all_time_trending_tv_short,popular_last_year_tv_short,popular_this_year_tv_short,popular_last_season_tv_short,popular_this_season_tv_short,all_time_popular_tv_short,voted_last_year_tv_short,voted_this_year_tv_short,voted_last_season_tv_short,voted_this_season_tv_short,all_time_voted_tv_short,favourites_last_year_tv_short,favourites_this_year_tv_short,favourites_last_season_tv_short,favourites_this_season_tv_short,all_time_favourites_tv_short</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_tv_short</option>
+                            <option label="30921">trending_this_year_tv_short</option>
+                            <option label="30922">trending_last_season_tv_short</option>
+                            <option label="30923">trending_this_season_tv_short</option>
+                            <option label="30924">all_time_trending_tv_short</option>
+                            <option label="30925">popular_last_year_tv_short</option>
+                            <option label="30926">popular_this_year_tv_short</option>
+                            <option label="30927">popular_last_season_tv_short</option>
+                            <option label="30928">popular_this_season_tv_short</option>
+                            <option label="30929">all_time_popular_tv_short</option>
+                            <option label="30930">voted_last_year_tv_short</option>
+                            <option label="30931">voted_this_year_tv_short</option>
+                            <option label="30932">voted_last_season_tv_short</option>
+                            <option label="30933">voted_this_season_tv_short</option>
+                            <option label="30934">all_time_voted_tv_short</option>
+                            <option label="30935">favourites_last_year_tv_short</option>
+                            <option label="30936">favourites_this_year_tv_short</option>
+                            <option label="30937">favourites_last_season_tv_short</option>
+                            <option label="30938">favourites_this_season_tv_short</option>
+                            <option label="30939">all_time_favourites_tv_short</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="favourites_last_season" type="boolean" label="30931" help="">
+                <setting id="tvshorts.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="favourites_this_season" type="boolean" label="30932" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="all_time_favourites" type="boolean" label="30933" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_tv_short//,genre_action_tv_short,genre_adventure_tv_short,genre_comedy_tv_short,genre_drama_tv_short,genre_ecchi_tv_short,genre_fantasy_tv_short,genre_horror_tv_short,genre_shoujo_tv_short,genre_mecha_tv_short,genre_music_tv_short,genre_mystery_tv_short,genre_psychological_tv_short,genre_romance_tv_short,genre_sci_fi_tv_short,genre_slice_of_life_tv_short,genre_sports_tv_short,genre_supernatural_tv_short,genre_thriller_tv_short</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_tv_short//</option>
+                            <option label="30941">genre_action_tv_short</option>
+                            <option label="30942">genre_adventure_tv_short</option>
+                            <option label="30943">genre_comedy_tv_short</option>
+                            <option label="30944">genre_drama_tv_short</option>
+                            <option label="30945">genre_ecchi_tv_short</option>
+                            <option label="30946">genre_fantasy_tv_short</option>
+                            <option label="30947">genre_hentai_tv_short</option>
+                            <option label="30948">genre_horror_tv_short</option>
+                            <option label="30949">genre_shoujo_tv_short</option>
+                            <option label="30950">genre_mecha_tv_short</option>
+                            <option label="30951">genre_music_tv_short</option>
+                            <option label="30952">genre_mystery_tv_short</option>
+                            <option label="30953">genre_psychological_tv_short</option>
+                            <option label="30954">genre_romance_tv_short</option>
+                            <option label="30955">genre_sci_fi_tv_short</option>
+                            <option label="30956">genre_slice_of_life_tv_short</option>
+                            <option label="30957">genre_sports_tv_short</option>
+                            <option label="30958">genre_supernatural_tv_short</option>
+                            <option label="30959">genre_thriller_tv_short</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
             </group>
 
-            <!-- Genres Menu -->
-            <group id="6" label="30580" help="">
-                <setting id="genres//" type="boolean" label="30934" help="">
+            <!-- Specials -->
+            <group id="5" label="30666" help="">
+                <setting id="special.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_special,airing_last_season_special,airing_this_season_special,airing_next_season_special,trending_special,popular_special,voted_special,favourites_special,top_100_special,genres_special,search_history_special</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_special</option>
+                            <option label="30902">airing_last_season_special</option>
+                            <option label="30903">airing_this_season_special</option>
+                            <option label="30904">airing_next_season_special</option>
+                            <option label="30912">trending_special</option>
+                            <option label="30913">popular_special</option>
+                            <option label="30914">voted_special</option>
+                            <option label="30915">favourites_special</option>
+                            <option label="30916">top_100_special</option>
+                            <option label="30917">genres_special</option>
+                            <option label="30918">search_history_special</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_action" type="boolean" label="30935" help="">
+                <setting id="specials.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_special,trending_this_year_special,trending_last_season_special,trending_this_season_special,all_time_trending_special,popular_last_year_special,popular_this_year_special,popular_last_season_special,popular_this_season_special,all_time_popular_special,voted_last_year_special,voted_this_year_special,voted_last_season_special,voted_this_season_special,all_time_voted_special,favourites_last_year_special,favourites_this_year_special,favourites_last_season_special,favourites_this_season_special,all_time_favourites_special</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_special</option>
+                            <option label="30921">trending_this_year_special</option>
+                            <option label="30922">trending_last_season_special</option>
+                            <option label="30923">trending_this_season_special</option>
+                            <option label="30924">all_time_trending_special</option>
+                            <option label="30925">popular_last_year_special</option>
+                            <option label="30926">popular_this_year_special</option>
+                            <option label="30927">popular_last_season_special</option>
+                            <option label="30928">popular_this_season_special</option>
+                            <option label="30929">all_time_popular_special</option>
+                            <option label="30930">voted_last_year_special</option>
+                            <option label="30931">voted_this_year_special</option>
+                            <option label="30932">voted_last_season_special</option>
+                            <option label="30933">voted_this_season_special</option>
+                            <option label="30934">all_time_voted_special</option>
+                            <option label="30935">favourites_last_year_special</option>
+                            <option label="30936">favourites_this_year_special</option>
+                            <option label="30937">favourites_last_season_special</option>
+                            <option label="30938">favourites_this_season_special</option>
+                            <option label="30939">all_time_favourites_special</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_adventure" type="boolean" label="30936" help="">
+                <setting id="specials.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_special//,genre_action_special,genre_adventure_special,genre_comedy_special,genre_drama_special,genre_ecchi_special,genre_fantasy_special,genre_horror_special,genre_shoujo_special,genre_mecha_special,genre_music_special,genre_mystery_special,genre_psychological_special,genre_romance_special,genre_sci_fi_special,genre_slice_of_life_special,genre_sports_special,genre_supernatural_special,genre_thriller_special</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_special//</option>
+                            <option label="30941">genre_action_special</option>
+                            <option label="30942">genre_adventure_special</option>
+                            <option label="30943">genre_comedy_special</option>
+                            <option label="30944">genre_drama_special</option>
+                            <option label="30945">genre_ecchi_special</option>
+                            <option label="30946">genre_fantasy_special</option>
+                            <option label="30947">genre_hentai_special</option>
+                            <option label="30948">genre_horror_special</option>
+                            <option label="30949">genre_shoujo_special</option>
+                            <option label="30950">genre_mecha_special</option>
+                            <option label="30951">genre_music_special</option>
+                            <option label="30952">genre_mystery_special</option>
+                            <option label="30953">genre_psychological_special</option>
+                            <option label="30954">genre_romance_special</option>
+                            <option label="30955">genre_sci_fi_special</option>
+                            <option label="30956">genre_slice_of_life_special</option>
+                            <option label="30957">genre_sports_special</option>
+                            <option label="30958">genre_supernatural_special</option>
+                            <option label="30959">genre_thriller_special</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_comedy" type="boolean" label="30937" help="">
+            </group>
+
+            <!-- OVA -->
+            <group id="6" label="30667" help="">
+                <setting id="ova.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_ova,airing_last_season_ova,airing_this_season_ova,airing_next_season_ova,trending_ova,popular_ova,voted_ova,favourites_ova,top_100_ova,genres_ova,search_history_ova</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_ova</option>
+                            <option label="30902">airing_last_season_ova</option>
+                            <option label="30903">airing_this_season_ova</option>
+                            <option label="30904">airing_next_season_ova</option>
+                            <option label="30912">trending_ova</option>
+                            <option label="30913">popular_ova</option>
+                            <option label="30914">voted_ova</option>
+                            <option label="30915">favourites_ova</option>
+                            <option label="30916">top_100_ova</option>
+                            <option label="30917">genres_ova</option>
+                            <option label="30918">search_history_ova</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_drama" type="boolean" label="30938" help="">
+                <setting id="ova.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_ova,trending_this_year_ova,trending_last_season_ova,trending_this_season_ova,all_time_trending_ova,popular_last_year_ova,popular_this_year_ova,popular_last_season_ova,popular_this_season_ova,all_time_popular_ova,voted_last_year_ova,voted_this_year_ova,voted_last_season_ova,voted_this_season_ova,all_time_voted_ova,favourites_last_year_ova,favourites_this_year_ova,favourites_last_season_ova,favourites_this_season_ova,all_time_favourites_ova</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_ova</option>
+                            <option label="30921">trending_this_year_ova</option>
+                            <option label="30922">trending_last_season_ova</option>
+                            <option label="30923">trending_this_season_ova</option>
+                            <option label="30924">all_time_trending_ova</option>
+                            <option label="30925">popular_last_year_ova</option>
+                            <option label="30926">popular_this_year_ova</option>
+                            <option label="30927">popular_last_season_ova</option>
+                            <option label="30928">popular_this_season_ova</option>
+                            <option label="30929">all_time_popular_ova</option>
+                            <option label="30930">voted_last_year_ova</option>
+                            <option label="30931">voted_this_year_ova</option>
+                            <option label="30932">voted_last_season_ova</option>
+                            <option label="30933">voted_this_season_ova</option>
+                            <option label="30934">all_time_voted_ova</option>
+                            <option label="30935">favourites_last_year_ova</option>
+                            <option label="30936">favourites_this_year_ova</option>
+                            <option label="30937">favourites_last_season_ova</option>
+                            <option label="30938">favourites_this_season_ova</option>
+                            <option label="30939">all_time_favourites_ova</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_ecchi" type="boolean" label="30939" help="">
+                <setting id="ova.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_ova//,genre_action_ova,genre_adventure_ova,genre_comedy_ova,genre_drama_ova,genre_ecchi_ova,genre_fantasy_ova,genre_horror_ova,genre_shoujo_ova,genre_mecha_ova,genre_music_ova,genre_mystery_ova,genre_psychological_ova,genre_romance_ova,genre_sci_fi_ova,genre_slice_of_life_ova,genre_sports_ova,genre_supernatural_ova,genre_thriller_ova</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_ova//</option>
+                            <option label="30941">genre_action_ova</option>
+                            <option label="30942">genre_adventure_ova</option>
+                            <option label="30943">genre_comedy_ova</option>
+                            <option label="30944">genre_drama_ova</option>
+                            <option label="30945">genre_ecchi_ova</option>
+                            <option label="30946">genre_fantasy_ova</option>
+                            <option label="30947">genre_hentai_ova</option>
+                            <option label="30948">genre_horror_ova</option>
+                            <option label="30949">genre_shoujo_ova</option>
+                            <option label="30950">genre_mecha_ova</option>
+                            <option label="30951">genre_music_ova</option>
+                            <option label="30952">genre_mystery_ova</option>
+                            <option label="30953">genre_psychological_ova</option>
+                            <option label="30954">genre_romance_ova</option>
+                            <option label="30955">genre_sci_fi_ova</option>
+                            <option label="30956">genre_slice_of_life_ova</option>
+                            <option label="30957">genre_sports_ova</option>
+                            <option label="30958">genre_supernatural_ova</option>
+                            <option label="30959">genre_thriller_ova</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_fantasy" type="boolean" label="30940" help="">
+            </group>
+
+            <!-- ONA -->
+            <group id="7" label="30668" help="">
+                <setting id="ona.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_ona,airing_last_season_ona,airing_this_season_ona,airing_next_season_ona,trending_ona,popular_ona,voted_ona,favourites_ona,top_100_ona,genres_ona,search_history_ona</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_ona</option>
+                            <option label="30902">airing_last_season_ona</option>
+                            <option label="30903">airing_this_season_ona</option>
+                            <option label="30904">airing_next_season_ona</option>
+                            <option label="30912">trending_ona</option>
+                            <option label="30913">popular_ona</option>
+                            <option label="30914">voted_ona</option>
+                            <option label="30915">favourites_ona</option>
+                            <option label="30916">top_100_ona</option>
+                            <option label="30917">genres_ona</option>
+                            <option label="30918">search_history_ona</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_hentai" type="boolean" label="30941" help="">
+                <setting id="ona.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_ona,trending_this_year_ona,trending_last_season_ona,trending_this_season_ona,all_time_trending_ona,popular_last_year_ona,popular_this_year_ona,popular_last_season_ona,popular_this_season_ona,all_time_popular_ona,voted_last_year_ona,voted_this_year_ona,voted_last_season_ona,voted_this_season_ona,all_time_voted_ona,favourites_last_year_ona,favourites_this_year_ona,favourites_last_season_ona,favourites_this_season_ona,all_time_favourites_ona</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_ona</option>
+                            <option label="30921">trending_this_year_ona</option>
+                            <option label="30922">trending_last_season_ona</option>
+                            <option label="30923">trending_this_season_ona</option>
+                            <option label="30924">all_time_trending_ona</option>
+                            <option label="30925">popular_last_year_ona</option>
+                            <option label="30926">popular_this_year_ona</option>
+                            <option label="30927">popular_last_season_ona</option>
+                            <option label="30928">popular_this_season_ona</option>
+                            <option label="30929">all_time_popular_ona</option>
+                            <option label="30930">voted_last_year_ona</option>
+                            <option label="30931">voted_this_year_ona</option>
+                            <option label="30932">voted_last_season_ona</option>
+                            <option label="30933">voted_this_season_ona</option>
+                            <option label="30934">all_time_voted_ona</option>
+                            <option label="30935">favourites_last_year_ona</option>
+                            <option label="30936">favourites_this_year_ona</option>
+                            <option label="30937">favourites_last_season_ona</option>
+                            <option label="30938">favourites_this_season_ona</option>
+                            <option label="30939">all_time_favourites_ona</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_horror" type="boolean" label="30942" help="">
+                <setting id="ona.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_ona//,genre_action_ona,genre_adventure_ona,genre_comedy_ona,genre_drama_ona,genre_ecchi_ona,genre_fantasy_ona,genre_horror_ona,genre_shoujo_ona,genre_mecha_ona,genre_music_ona,genre_mystery_ona,genre_psychological_ona,genre_romance_ona,genre_sci_fi_ona,genre_slice_of_life_ona,genre_sports_ona,genre_supernatural_ona,genre_thriller_ona</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_ona//</option>
+                            <option label="30941">genre_action_ona</option>
+                            <option label="30942">genre_adventure_ona</option>
+                            <option label="30943">genre_comedy_ona</option>
+                            <option label="30944">genre_drama_ona</option>
+                            <option label="30945">genre_ecchi_ona</option>
+                            <option label="30946">genre_fantasy_ona</option>
+                            <option label="30947">genre_hentai_ona</option>
+                            <option label="30948">genre_horror_ona</option>
+                            <option label="30949">genre_shoujo_ona</option>
+                            <option label="30950">genre_mecha_ona</option>
+                            <option label="30951">genre_music_ona</option>
+                            <option label="30952">genre_mystery_ona</option>
+                            <option label="30953">genre_psychological_ona</option>
+                            <option label="30954">genre_romance_ona</option>
+                            <option label="30955">genre_sci_fi_ona</option>
+                            <option label="30956">genre_slice_of_life_ona</option>
+                            <option label="30957">genre_sports_ona</option>
+                            <option label="30958">genre_supernatural_ona</option>
+                            <option label="30959">genre_thriller_ona</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_shoujo" type="boolean" label="30943" help="">
+            </group>
+
+            <!-- Music -->
+            <group id="8" label="30669" help="">
+                <setting id="music.mainmenu.config" type="list[string]" label="30659" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>last_watched_music,airing_last_season_music,airing_this_season_music,airing_next_season_music,trending_music,popular_music,voted_music,favourites_music,top_100_music,genres_music,search_history_music</default>
+                    <constraints>
+                        <options>
+                            <option label="30900">last_watched_music</option>
+                            <option label="30902">airing_last_season_music</option>
+                            <option label="30903">airing_this_season_music</option>
+                            <option label="30904">airing_next_season_music</option>
+                            <option label="30912">trending_music</option>
+                            <option label="30913">popular_music</option>
+                            <option label="30914">voted_music</option>
+                            <option label="30915">favourites_music</option>
+                            <option label="30916">top_100_music</option>
+                            <option label="30917">genres_music</option>
+                            <option label="30918">search_history_music</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30659</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_mecha" type="boolean" label="30944" help="">
+                <setting id="music.submenu.config" type="list[string]" label="30660" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>trending_last_year_music,trending_this_year_music,trending_last_season_music,trending_this_season_music,all_time_trending_music,popular_last_year_music,popular_this_year_music,popular_last_season_music,popular_this_season_music,all_time_popular_music,voted_last_year_music,voted_this_year_music,voted_last_season_music,voted_this_season_music,all_time_voted_music,favourites_last_year_music,favourites_this_year_music,favourites_last_season_music,favourites_this_season_music,all_time_favourites_music</default>
+                    <constraints>
+                        <options>
+                            <option label="30920">trending_last_year_music</option>
+                            <option label="30921">trending_this_year_music</option>
+                            <option label="30922">trending_last_season_music</option>
+                            <option label="30923">trending_this_season_music</option>
+                            <option label="30924">all_time_trending_music</option>
+                            <option label="30925">popular_last_year_music</option>
+                            <option label="30926">popular_this_year_music</option>
+                            <option label="30927">popular_last_season_music</option>
+                            <option label="30928">popular_this_season_music</option>
+                            <option label="30929">all_time_popular_music</option>
+                            <option label="30930">voted_last_year_music</option>
+                            <option label="30931">voted_this_year_music</option>
+                            <option label="30932">voted_last_season_music</option>
+                            <option label="30933">voted_this_season_music</option>
+                            <option label="30934">all_time_voted_music</option>
+                            <option label="30935">favourites_last_year_music</option>
+                            <option label="30936">favourites_this_year_music</option>
+                            <option label="30937">favourites_last_season_music</option>
+                            <option label="30938">favourites_this_season_music</option>
+                            <option label="30939">all_time_favourites_music</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30660</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
-                <setting id="genre_music" type="boolean" label="30945" help="">
+                <setting id="music.genres.config" type="list[string]" label="30661" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_mystery" type="boolean" label="30946" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_psychological" type="boolean" label="30947" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_romance" type="boolean" label="30948" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_sci_fi" type="boolean" label="30949" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_slice_of_life" type="boolean" label="30950" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_sports" type="boolean" label="30951" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_supernatural" type="boolean" label="30952" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="genre_thriller" type="boolean" label="30953" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
+                    <default>genres_music//,genre_action_music,genre_adventure_music,genre_comedy_music,genre_drama_music,genre_ecchi_music,genre_fantasy_music,genre_horror_music,genre_shoujo_music,genre_mecha_music,genre_music_music,genre_mystery_music,genre_psychological_music,genre_romance_music,genre_sci_fi_music,genre_slice_of_life_music,genre_sports_music,genre_supernatural_music,genre_thriller_music</default>
+                    <constraints>
+                        <options>
+                            <option label="30940">genres_music//</option>
+                            <option label="30941">genre_action_music</option>
+                            <option label="30942">genre_adventure_music</option>
+                            <option label="30943">genre_comedy_music</option>
+                            <option label="30944">genre_drama_music</option>
+                            <option label="30945">genre_ecchi_music</option>
+                            <option label="30946">genre_fantasy_music</option>
+                            <option label="30947">genre_hentai_music</option>
+                            <option label="30948">genre_horror_music</option>
+                            <option label="30949">genre_shoujo_music</option>
+                            <option label="30950">genre_mecha_music</option>
+                            <option label="30951">genre_music_music</option>
+                            <option label="30952">genre_mystery_music</option>
+                            <option label="30953">genre_psychological_music</option>
+                            <option label="30954">genre_romance_music</option>
+                            <option label="30955">genre_sci_fi_music</option>
+                            <option label="30956">genre_slice_of_life_music</option>
+                            <option label="30957">genre_sports_music</option>
+                            <option label="30958">genre_supernatural_music</option>
+                            <option label="30959">genre_thriller_music</option>
+                        </options>
+                        <allowempty>true</allowempty>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30661</heading>
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
             </group>
         </category>

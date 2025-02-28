@@ -237,6 +237,8 @@ def get_best_match(dict_key, dictionary_list, episode, pack_select=False):
     files = []
     for i in dictionary_list:
         path = re.sub(r'\[.*?]', '', i[dict_key].split('/')[-1])
+        if not is_file_ext_valid(path):
+            continue
         i['regex_matches'] = regex.findall(path)
         files.append(i)
     if pack_select:

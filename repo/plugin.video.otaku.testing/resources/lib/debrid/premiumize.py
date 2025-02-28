@@ -80,7 +80,7 @@ class Premiumize:
         r = client.request(f'{self.base_url}/folder/search', headers=self.headers(), params=params)
         return json.loads(r)['content'] if r else None
 
-    def list_folder(self, folderid):
+    def list_folder(self, folderid=None):
         params = {'id': folderid} if folderid else None
         r = client.request(f"{self.base_url}/folder/list", headers=self.headers(), params=params)
         return json.loads(r)['content'] if r else None
@@ -174,12 +174,22 @@ class Premiumize:
         return stream_link
 
     def resolve_cloud(self, source, pack_select):
+        def get_all_files(folder_id):
+            items = self.list_folder(folder_id)
+            files = []
+            for item in items:
+                if item['type'] == 'folder':
+                    files.extend(get_all_files(item['id']))
+                else:
+                    files.append(item)
+            return files
+
         link = None
         if source['torrent_type'] == 'file':
             link = source['hash']
         elif source['torrent_type'] == 'folder':
-            torrent_folder = self.list_folder(source['id'])
-            best_match = source_utils.get_best_match('name', torrent_folder, source['episode'], pack_select)
+            all_files = get_all_files(source['id'])
+            best_match = source_utils.get_best_match('name', all_files, source['episode'], pack_select)
             if best_match and best_match.get('link'):
                 link = best_match['link']
         return link

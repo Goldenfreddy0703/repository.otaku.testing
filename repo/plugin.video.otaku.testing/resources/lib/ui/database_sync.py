@@ -19,7 +19,7 @@ class SyncDatabase:
         # You will need to update the below version number to match the new addon version
         # This will ensure that the metadata required for operations is available
         # You may also update this version number to force a rebuild of the database after updating Otaku
-        self.last_meta_update = '1.0.3'
+        self.last_meta_update = '1.0.4'
         self.refresh_activites()
         self.check_database_version()
 
@@ -36,7 +36,8 @@ class SyncDatabase:
     def check_database_version(self):
         import xbmcvfs
         if not self.activites or self.activites.get('otaku_version') != self.last_meta_update:
-            xbmcvfs.delete(control.sort_options_json)
+            # xbmcvfs.delete(control.sort_options_json)
+            xbmcvfs.delete(control.searchHistoryDB)
             self.re_build_database(True)
 
     @staticmethod

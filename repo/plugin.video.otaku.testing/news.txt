@@ -15,12 +15,6 @@ New in this version:
     - Reuse Language Invoker support for faster, more efficient performance
     - New menu settings for more customization
 
-However, you may notice some missing features, such as:
-
-    - TV and Movie menus
-
-Some of these will be added in future updates as we continue to improve the addon.
-
 You might also notice some anime missing; this is because we're primarily using MAL IDs to streamline episode metadata, ensuring fewer issues for users.
 
 A huge thank you to the entire Otaku development team and everyone who contributed to this release! Special shoutout to Joezito129, who led the recode and added many of these awesome features. We couldn’t have done it without the team's hard work and dedication!

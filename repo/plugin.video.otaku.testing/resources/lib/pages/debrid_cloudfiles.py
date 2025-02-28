@@ -77,15 +77,15 @@ class Sources(BrowserBase):
             )
 
     def premiumize_cloud_inspection(self, query, episode, season):
-        query1, query2 = query.replace('(', '').replace(')', '').rsplit('|', 1)
-        cloud_items = premiumize.Premiumize().search_folder(query1)
-        cloud_items += premiumize.Premiumize().search_folder(query2)
-        unique_cloud_items = []
-        [unique_cloud_items.append(i) for i in cloud_items if i not in unique_cloud_items]
+        cloud_items = premiumize.Premiumize().list_folder()
+        cloud_items = source_utils.filter_sources('premiumize', cloud_items, season, episode)
+        filenames = [re.sub(r'\[.*?]\s*', '', i['name'].replace(',', '')) for i in cloud_items]
+        filenames_query = ','.join(filenames)
+        response = client.request('https://armkai.vercel.app/api/fuzzypacks', params={"dict": filenames_query, "match": query})
+        resp = json.loads(response) if response else []
 
-        filtered_items = source_utils.filter_sources('premiumize', unique_cloud_items, season, episode)
-
-        for torrent in filtered_items:
+        for i in resp:
+            torrent = cloud_items[i]
             filename = re.sub(r'\[.*?]', '', torrent['name']).lower()
 
             if torrent['type'] == 'file':
