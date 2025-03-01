@@ -1,3 +1,7 @@
+Changelog v5.1.73 (2024-03-01):
+- Optimized Player for Embeds
+- Fixed Freezing and hopefully Cache with Player
+
 Changelog v5.1.72 (2024-02-28):
 - Added Movies, TV shows, TV Shorts Menus
 - Added Specials, OVAs, ONAs Menus

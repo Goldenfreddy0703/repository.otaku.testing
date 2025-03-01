@@ -3,6 +3,8 @@ import xbmcgui
 import pickle
 import service
 import json
+import threading
+import time
 
 from resources.lib.ui import control, database
 from resources.lib.endpoints import aniskip, anime_skip, simkl
@@ -44,6 +46,11 @@ class WatchlistPlayer(player):
         self.skipintro_offset = control.getInt('skipintro.aniskip.offset')
         self.skipoutro_offset = control.getInt('skipoutro.aniskip.offset')
 
+        # Add these for async processing
+        self.skip_times_thread = None
+        self.skip_times_processed = False
+
+
     def handle_player(self, mal_id, watchlist_update, episode, path, context):
         self.mal_id = mal_id
         self._watchlist_update = watchlist_update
@@ -51,19 +58,13 @@ class WatchlistPlayer(player):
         self.path = path
         self.context = context
 
-        # process skip times
-        self.process_hianime()
-        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
-            self.process_aniwave()
-        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
-            self.process_aniskip()
-        if not self.skipintro_aniskip or not self.skipoutro_aniskip:
-            self.process_animeskip()
+        # Start processing skip times immediately before playback starts
+        self.skip_times_thread = threading.Thread(target=self.process_skip_times)
+        self.skip_times_thread.daemon = True
+        self.skip_times_thread.start()
 
+        # Continue with playback initialization
         self.keepAlive()
-
-    # def onPlayBackStarted(self):
-    #     pass
 
     def onPlayBackStopped(self):
         control.closeAllDialogs()
@@ -88,9 +89,11 @@ class WatchlistPlayer(player):
     def onPlayBackEnded(self):
         control.closeAllDialogs()
 
+
     def onPlayBackError(self):
         control.closeAllDialogs()
         playList.clear()
+
 
     def build_playlist(self):
         episodes = database.get_episode_list(self.mal_id)
@@ -109,8 +112,10 @@ class WatchlistPlayer(player):
         for i in playlist:
             control.playList.add(url=i[0], listitem=i[1])
 
+
     def getWatchedPercent(self):
         return (self.current_time / self.total_time) * 100 if self.total_time != 0 else 0
+
 
     def onWatchedPercent(self):
         if not self._watchlist_update:
@@ -141,10 +146,29 @@ class WatchlistPlayer(player):
                 break
             xbmc.sleep(5000)
 
+
     def keepAlive(self):
-        self.vtag = self.getVideoInfoTag()
-        self.media_type = self.vtag.getMediaType()
-        self.total_time = int(self.getTotalTime())
+        # Don't try to get video info until we're sure playback has started
+        playback_started = False
+        for _ in range(30):  # Increase timeout for slower systems
+            try:
+                if self.isPlayingVideo():
+                    self.vtag = self.getVideoInfoTag()
+                    self.media_type = self.vtag.getMediaType()
+                    self.total_time = int(self.getTotalTime())
+                    if self.total_time > 0:
+                        playback_started = True
+                        break
+            except RuntimeError:
+                # Handle the "not playing" error gracefully
+                pass
+            xbmc.sleep(250)  # Wait longer between checks
+
+        if not playback_started:
+            control.log('Failed to start video playback', 'warning')
+            return
+
+        # Continue with the rest of the method after playback is confirmed
         unique_ids = database.get_mapping_ids(self.mal_id, 'mal_id')
         source_type = control.getSetting('source_type')
 
@@ -156,15 +180,45 @@ class WatchlistPlayer(player):
         # Set the last watched episode
         control.setSetting('addon.last_watched', self.mal_id)
 
-        for _ in range(20):
-            if self.isPlayingVideo() and self.total_time != 0:
-                break
-            xbmc.sleep(250)
+        # Continue with audio/subtitle setup which is needed immediately
+        self.setup_audio_and_subtitles(source_type)
 
-        if not self.isPlayingVideo():
-            control.log('Not playing Video', 'warning')
-            return
+        # Handle playlist building if needed
+        if self.media_type == 'episode' and playList.size() == 1:
+            self.build_playlist()
 
+        # Handle different media types
+        if self.media_type == 'movie':
+            self.onWatchedPercent()
+        else:
+            # Start monitoring for watchlist updates in background
+            watchlist_thread = threading.Thread(target=self.onWatchedPercent)
+            watchlist_thread.daemon = True
+            watchlist_thread.start()
+
+            # Start montoring for skip intro/outro
+            self.monitor_playback()
+
+        control.closeAllDialogs()
+
+    def process_skip_times(self):
+        """Process all skip time sources in background thread"""
+        if self.skipintro_aniskip_enable or self.skipoutro_aniskip_enable:
+            # Process in order of efficiency (local settings first, then API calls)
+            self.process_hianime()
+            if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+                self.process_aniwave()
+            if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+                self.process_aniskip()
+            if not self.skipintro_aniskip or not self.skipoutro_aniskip:
+                self.process_animeskip()
+
+        self.skip_times_processed = True
+
+
+    def setup_audio_and_subtitles(self, source_type):
+        """Handle audio and subtitle setup"""
+        # This contains your existing audio/subtitle setup code from keepAlive
         if not control.getBool('general.kodi_language') or source_type not in ['embed', 'direct']:
             query = {
                 'jsonrpc': '2.0',
@@ -322,34 +376,99 @@ class WatchlistPlayer(player):
             else:
                 self.showSubtitles(True)
 
-        if self.media_type == 'movie':
-            self.onWatchedPercent()
-        else:
-            if self.media_type == 'episode' and playList.size() == 1:
-                self.build_playlist()
 
-            if control.getBool('smartplay.skipintrodialog'):
-                if self.skipintro_start < 1:
-                    self.skipintro_start = 1
-                while self.isPlaying():
-                    self.current_time = int(self.getTime())
-                    if self.current_time > self.skipintro_end:
-                        break
-                    elif self.current_time > self.skipintro_start:
-                        PlayerDialogs().show_skip_intro(self.skipintro_aniskip, self.skipintro_end)
-                        break
-                    xbmc.sleep(1000)
-            self.onWatchedPercent()
-
+    def monitor_playback(self):
+        """Monitor playback for skip intro/outro points with improved performance"""
+        try:
+            intro_shown = False
+            outro_shown = False
             endpoint = control.getInt('playingnext.time') if control.getBool('smartplay.playingnextdialog') else 0
-            if endpoint != 0:
-                while self.isPlaying():
+
+            # Use a shorter maximum wait time for skip times processing
+            max_wait_time = 5  # seconds
+            start_time = time.time()  # Use Python's time module instead of Kodi infoLabel
+
+            # More efficient wait with better timeout handling
+            while not self.skip_times_processed and self.isPlaying():
+                # Check if we've waited long enough
+                if time.time() - start_time > max_wait_time:
+                    control.log('Skip times processing timeout reached', 'info')
+                    break
+
+                # Use a shorter sleep to be more responsive
+                xbmc.sleep(100)
+
+            # Avoid busy-waiting loop by using a state machine approach
+            check_delay = 1000  # milliseconds between checks
+            last_check = time.time()
+
+            while self.isPlaying():
+                # Only perform checks on intervals to reduce CPU load
+                current_time = time.time()
+                if (current_time - last_check) * 1000 < check_delay:
+                    xbmc.sleep(50)  # Small sleep to prevent CPU hogging
+                    continue
+
+                last_check = current_time
+
+                try:
+                    # Get current playback position
                     self.current_time = int(self.getTime())
-                    if (not self.skipoutro_aniskip and self.total_time - self.current_time <= endpoint) or self.current_time > self.skipoutro_start != 0:
-                        PlayerDialogs().display_dialog(self.skipoutro_aniskip, self.skipoutro_end)
+
+                    # Adjust check frequency based on proximity to skip points
+                    if not intro_shown and self.skipintro_aniskip:
+                        time_to_intro = self.skipintro_start - self.current_time
+                        if 0 < time_to_intro < 5:  # Within 5 seconds of intro
+                            check_delay = 200  # Check more frequently near intro time
+                        else:
+                            check_delay = 1000  # Normal check interval
+
+                    # Skip intro logic with error handling
+                    if not intro_shown and control.getBool('smartplay.skipintrodialog'):
+                        # Ensure we have valid intro points
+                        if self.skipintro_start < 1:
+                            self.skipintro_start = 1
+
+                        # Check if we're in the intro range
+                        if self.skipintro_start <= self.current_time <= self.skipintro_end:
+                            try:
+                                PlayerDialogs().show_skip_intro(self.skipintro_aniskip, self.skipintro_end)
+                            except Exception as e:
+                                control.log(f"Error showing skip intro dialog: {str(e)}", "error")
+                            intro_shown = True
+                        elif self.current_time > self.skipintro_end:
+                            intro_shown = True
+
+                    # Skip outro/Playing next logic with error handling
+                    if not outro_shown and endpoint != 0:
+                        outro_condition = False
+
+                        # Check if we're in outro range
+                        if not self.skipoutro_aniskip:
+                            outro_condition = (self.total_time - self.current_time <= endpoint)
+                        else:
+                            outro_condition = (self.skipoutro_start != 0 and self.current_time >= self.skipoutro_start)
+
+                        if outro_condition:
+                            try:
+                                PlayerDialogs().display_dialog(self.skipoutro_aniskip, self.skipoutro_end)
+                            except Exception as e:
+                                control.log(f"Error showing outro dialog: {str(e)}", "error")
+                            outro_shown = True
+
+                    # Exit conditions to prevent unnecessary looping
+                    if intro_shown and (outro_shown or endpoint == 0):
                         break
-                    xbmc.sleep(5000)
-        control.closeAllDialogs()
+
+                except Exception as e:
+                    # Log errors but continue monitoring
+                    control.log(f"Error in monitor_playback loop: {str(e)}", "error")
+                    check_delay = 1000  # Reset to normal interval after error
+
+        except Exception as e:
+            # Catch-all error handler to prevent complete freezes
+            control.log(f"Critical error in monitor_playback: {str(e)}", "error")
+
 
     def process_aniskip(self):
         if self.skipintro_aniskip_enable:
@@ -367,6 +486,7 @@ class WatchlistPlayer(player):
                 self.skipoutro_start = int(skip_times['startTime']) + self.skipoutro_offset
                 self.skipoutro_end = int(skip_times['endTime']) + self.skipoutro_offset
                 self.skipoutro_aniskip = True
+
 
     def process_animeskip(self):
         show_meta = database.get_show_meta(self.mal_id)
@@ -400,6 +520,7 @@ class WatchlistPlayer(player):
                 self.skipoutro_end = int(outro_end) + self.skipoutro_offset
                 self.skipoutro_aniskip = True
 
+
     def process_aniwave(self):
         if self.skipintro_aniskip_enable:
             aniwave_skipintro_start = control.getInt('aniwave.skipintro.start')
@@ -413,6 +534,7 @@ class WatchlistPlayer(player):
                 self.skipoutro_start = aniwave_skipoutro_start + self.skipoutro_offset
                 self.skipoutro_end = control.getInt('aniwave.skipoutro.end') + self.skipoutro_offset
                 self.skipoutro_aniskip = True
+
 
     def process_hianime(self):
         if self.skipintro_aniskip_enable:
