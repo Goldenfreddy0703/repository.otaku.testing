@@ -54,16 +54,12 @@ class Sources(GetSources):
         # set skipintro times to -1 before scraping
         control.setInt('hianime.skipintro.start', -1)
         control.setInt('hianime.skipintro.end', -1)
-
-        # set skipoutro times to -1 before scraping
-        control.setInt('hianime.skipoutro.start', -1)
-        control.setInt('hianime.skipoutro.end', -1)
-
-        # set skipintro times to -1 before scraping
         control.setInt('aniwave.skipintro.start', -1)
         control.setInt('aniwave.skipintro.end', -1)
 
         # set skipoutro times to -1 before scraping
+        control.setInt('hianime.skipoutro.start', -1)
+        control.setInt('hianime.skipoutro.end', -1)
         control.setInt('aniwave.skipoutro.start', -1)
         control.setInt('aniwave.skipoutro.end', -1)
 

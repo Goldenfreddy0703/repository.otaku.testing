@@ -1,3 +1,6 @@
+Changelog v5.1.74 (2024-03-04):
+- Fixed Freezing and Cache this time
+
 Changelog v5.1.73 (2024-03-01):
 - Optimized Player for Embeds
 - Fixed Freezing and hopefully Cache with Player

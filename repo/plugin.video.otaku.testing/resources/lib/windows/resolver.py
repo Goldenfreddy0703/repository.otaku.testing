@@ -11,7 +11,7 @@ from resources.lib.windows.base_window import BaseWindow
 control.sys.path.append(control.dataPath)
 
 
-class HookMimetype:
+class hook_mimetype:
     __MIME_HOOKS = {}
 
     @classmethod
@@ -134,8 +134,6 @@ class Resolver(BaseWindow):
             self.setProperty('source_resolution', source_utils.res[i['quality']])
             self.setProperty('source_info', " ".join(i['info']))
             self.setProperty('source_type', i['type'])
-            # Here we add a persistent setting for the source type
-            control.setSetting('source_type', str(self.sources[0]['type']))
 
             if 'uncached' in i['type']:
                 if not self.autoskipuncached:
@@ -205,7 +203,7 @@ class Resolver(BaseWindow):
             if linkInfo['headers'].get('Content-Type'):
                 item.setProperty('MimeType', linkInfo['headers']['Content-Type'])
                 # Run any mimetype hook
-                item = HookMimetype.trigger(linkInfo['headers']['Content-Type'], item)
+                item = hook_mimetype.trigger(linkInfo['headers']['Content-Type'], item)
 
             if self.context:
                 control.set_videotags(item, self.params)
@@ -390,44 +388,57 @@ class Monitor(xbmc.Monitor):
         #     control.log(f'{method} | {data}')
 
 
-@HookMimetype('application/dash+xml')
+@hook_mimetype('application/dash+xml')
 def _DASH_HOOK(item):
-    if control.getBool('inputstreamadaptive.embeds'):
+    if control.getBool('inputstreamadaptive.enabled'):
+        stream_url = item.getPath()
         import inputstreamhelper
         is_helper = inputstreamhelper.Helper('mpd')
         if is_helper.check_inputstream():
             item.setProperty('inputstream', is_helper.inputstream_addon)
             item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            if '|' in stream_url:
+                stream_url, headers = stream_url.split('|')
+                item.setProperty('inputstream.adaptive.stream_headers', headers)
+                item.setProperty('inputstream.adaptive.manifest_headers', headers)
             item.setContentLookup(False)
         else:
             raise Exception("InputStream Adaptive is not supported.")
     return item
 
 
-@HookMimetype('application/vnd.apple.mpegurl')
+@hook_mimetype('application/vnd.apple.mpegurl')
 def _HLS_HOOK(item):
     if control.getBool('inputstreamadaptive.enabled'):
         stream_url = item.getPath()
         import inputstreamhelper
         is_helper = inputstreamhelper.Helper('hls')
-        if '|' not in stream_url and is_helper.check_inputstream():
+        if is_helper.check_inputstream():
             item.setProperty('inputstream', is_helper.inputstream_addon)
             item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+            if '|' in stream_url:
+                stream_url, headers = stream_url.split('|')
+                item.setProperty('inputstream.adaptive.stream_headers', headers)
+                item.setProperty('inputstream.adaptive.manifest_headers', headers)
         item.setProperty('MimeType', 'application/vnd.apple.mpegurl')
         item.setMimeType('application/vnd.apple.mpegstream_url')
         item.setContentLookup(False)
     return item
 
 
-@HookMimetype('video/MP2T')
-def _HLS_HOOK(item):
+@hook_mimetype('video/MP2T')
+def _HLS2_HOOK(item):
     if control.getBool('inputstreamadaptive.enabled'):
         stream_url = item.getPath()
         import inputstreamhelper
         is_helper = inputstreamhelper.Helper('hls')
-        if '|' not in stream_url and is_helper.check_inputstream():
+        if is_helper.check_inputstream():
             item.setProperty('inputstream', is_helper.inputstream_addon)
             item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+            if '|' in stream_url:
+                stream_url, headers = stream_url.split('|')
+                item.setProperty('inputstream.adaptive.stream_headers', headers)
+                item.setProperty('inputstream.adaptive.manifest_headers', headers)
         item.setProperty('MimeType', 'application/vnd.apple.mpegurl')
         item.setMimeType('application/vnd.apple.mpegstream_url')
         item.setContentLookup(False)
