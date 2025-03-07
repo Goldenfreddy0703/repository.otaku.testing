@@ -3,7 +3,6 @@ import xbmcgui
 import pickle
 import service
 import json
-import threading
 
 from resources.lib.ui import control, database
 from resources.lib.endpoints import aniskip, anime_skip, simkl
@@ -50,10 +49,6 @@ class WatchlistPlayer(player):
         self.preferred_subtitle_setting = control.getInt('general.subtitles')
         self.preferred_subtitle_keyword = control.getInt('subtitles.keywords')
 
-        # Add these for async processing
-        self.skip_times_thread = None
-        self.skip_times_processed = False
-
 
     def handle_player(self, mal_id, watchlist_update, episode, path, context):
         self.mal_id = mal_id
@@ -63,9 +58,10 @@ class WatchlistPlayer(player):
         self.context = context
 
         # Start processing skip times immediately before playback starts
-        self.skip_times_thread = threading.Thread(target=self.process_skip_times)
-        self.skip_times_thread.daemon = True
-        self.skip_times_thread.start()
+        self.process_embed('aniwave')
+        self.process_embed('hianime')
+        self.process_aniskip()
+        self.process_animeskip()
 
         # Continue with playback initialization
         self.keepAlive()
@@ -154,6 +150,16 @@ class WatchlistPlayer(player):
 
 
     def keepAlive(self):
+        # Use xbmc.Monitor to handle aborts and playback errors
+        monitor = Monitor()
+        for _ in range(20):
+            if monitor.playbackerror:
+                return control.log('playbackerror', 'warning')
+            if self.isPlayingVideo() and self.getTotalTime() != 0:
+                break
+            monitor.waitForAbort(0.25)
+        del monitor
+
         # Don't try to get video info until we're sure playback has started
         playback_started = False
         for _ in range(30):  # Increase timeout for slower systems
@@ -222,21 +228,11 @@ class WatchlistPlayer(player):
                     break
                 xbmc.sleep(5000)
 
-        # while self.isPlaying():
-        #     self.current_time = int(self.getTime())
-        #     xbmc.sleep(5000)
+        while self.isPlaying():
+            self.current_time = int(self.getTime())
+            xbmc.sleep(5000)
 
         control.closeAllDialogs()
-
-
-    def process_skip_times(self):
-        """Process all skip time sources in background thread"""
-        self.process_embed('aniwave')
-        self.process_embed('hianime')
-        self.process_aniskip()
-        self.process_animeskip()
-
-        self.skip_times_processed = True
 
 
     def setup_audio_and_subtitles(self):
@@ -367,24 +363,6 @@ class WatchlistPlayer(player):
                         self.showSubtitles(False)
                     else:
                         self.showSubtitles(True)
-
-
-    def process_aniskip(self):
-        if self.skipintro_aniskip_enable:
-            skipintro_aniskip_res = aniskip.get_skip_times(self.mal_id, self.episode, 'op')
-            if skipintro_aniskip_res:
-                skip_times = skipintro_aniskip_res['results'][0]['interval']
-                self.skipintro_start = int(skip_times['startTime']) + self.skipintro_offset
-                self.skipintro_end = int(skip_times['endTime']) + self.skipintro_offset
-                self.skipintro_aniskip = True
-
-        if self.skipoutro_aniskip_enable:
-            skipoutro_aniskip_res = aniskip.get_skip_times(self.mal_id, self.episode, 'ed')
-            if skipoutro_aniskip_res:
-                skip_times = skipoutro_aniskip_res['results'][0]['interval']
-                self.skipoutro_start = int(skip_times['startTime']) + self.skipoutro_offset
-                self.skipoutro_end = int(skip_times['endTime']) + self.skipoutro_offset
-                self.skipoutro_aniskip = True
 
 
     def process_aniskip(self):
@@ -541,3 +519,13 @@ class PlayerDialogs(xbmc.Player):
     @staticmethod
     def _is_video_window_open():
         return False if xbmcgui.getCurrentWindowId() != 12005 else True
+
+
+class Monitor(xbmc.Monitor):
+    def __init__(self):
+        super().__init__()
+        self.playbackerror = False
+
+    def onNotification(self, sender, method, data):
+        if method == 'Player.OnStop':
+            self.playbackerror = True

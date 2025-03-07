@@ -4,7 +4,7 @@ import json
 import urllib.request
 import urllib.error
 
-from resources.lib.ui import control, client, database_sync, monitor
+from resources.lib.ui import control, client, database_sync
 
 
 def refresh_apis():
@@ -165,7 +165,6 @@ def version_check():
 
 if __name__ == "__main__":
     control.log('##################  RUNNING MAINTENANCE  ######################')
-    monitor.SettingsMonitor()
     version_check()
     database_sync.SyncDatabase()
     refresh_apis()
