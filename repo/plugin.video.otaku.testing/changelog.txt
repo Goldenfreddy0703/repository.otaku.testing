@@ -1,3 +1,6 @@
+Changelog v5.1.76 (2024-03-08):
+- Added FlareSolverr Support to AnimePahe
+
 Changelog v5.1.75 (2024-03-06):
 - Fixed monitor bug
 

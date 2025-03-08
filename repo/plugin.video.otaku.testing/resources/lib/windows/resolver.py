@@ -257,10 +257,19 @@ class Resolver(BaseWindow):
         url = link
         headers = {}
         if '|' in url:
-            url, hdrs = link.split('|')
+            url, hdrs = url.split('|')
             headers = dict([item.split('=') for item in hdrs.split('&')])
             for header in headers:
                 headers[header] = urllib.parse.unquote_plus(headers[header])
+
+        # If flaresolverr is enabled, fetch cookies to bypass Cloudflare
+        if control.getBool('fs_enable'):
+            from resources.lib.ui.client import cfcookie
+            cookie_obj = cfcookie()
+            cookie, ua = cookie_obj.get(url, control.getInt('fs_timeout'))
+            if cookie:
+                headers["Cookie"] = cookie
+                headers["User-Agent"] = ua
 
         limit = None if '.m3u8' in url else '0'
         linkInfo = client.request(url, headers=headers, limit=limit, output='extended', error=True)
@@ -268,8 +277,8 @@ class Resolver(BaseWindow):
             raise Exception('could not resolve %s. status_code=%s' %
                             (link, linkInfo[1]))
         return {
-            "url": link if '|' in link else linkInfo[5],
-            "headers": linkInfo[2],
+            "url": url if '|' in link else linkInfo[5],
+            "headers": headers,
         }
 
     def resolve_uncache(self, source):
