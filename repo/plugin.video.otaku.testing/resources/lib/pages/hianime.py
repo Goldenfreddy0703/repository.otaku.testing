@@ -157,7 +157,7 @@ class Sources(BrowserBase):
                             if not srclink:
                                 continue
                             res = self._get_request(srclink, headers=headers)
-                            quals = re.findall(r'#EXT.+?RESOLUTION=\d+x(\d+).+\n(?!#)(.+)', res)
+                            quals = re.findall(r'#EXT.+?RESOLUTION=\d+x(\d+).*\n(?!#)(.+)', res)
 
                             for qual, qlink in quals:
                                 qual = int(qual)
