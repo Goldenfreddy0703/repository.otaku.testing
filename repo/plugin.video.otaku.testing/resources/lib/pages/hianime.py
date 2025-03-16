@@ -161,12 +161,12 @@ class Sources(BrowserBase):
 
                             for qual, qlink in quals:
                                 qual = int(qual)
-                                if qual > 1080:
-                                    quality = 3
-                                elif qual > 720:
-                                    quality = 2
-                                elif qual > 480:
+                                if qual <= 480:
                                     quality = 1
+                                elif qual <= 720:
+                                    quality = 2
+                                elif qual <= 1080:
+                                    quality = 3
                                 else:
                                     quality = 0
 
