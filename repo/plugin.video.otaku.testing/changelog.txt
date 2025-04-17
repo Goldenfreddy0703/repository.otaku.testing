@@ -1,3 +1,6 @@
+Changelog v5.2.4 (2025-04-17):
+- Added hd-1 for testing
+
 Changelog v5.2.3 (2025-04-16):
 - Fixed Bugs with Best Match
 
