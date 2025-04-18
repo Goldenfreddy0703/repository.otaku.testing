@@ -777,10 +777,10 @@
                 </setting>
                 <setting id="general.timeout" type="integer" label="30187" help="">
                     <level>0</level>
-                    <default>10</default>
+                    <default>20</default>
                     <constraints>
-                        <minimum>2</minimum>
-                        <step>1</step>
+                        <minimum>5</minimum>
+                        <step>5</step>
                         <maximum>60</maximum>
                     </constraints>
                     <control type="slider" format="integer">
