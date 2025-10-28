@@ -1,83 +1,135 @@
-from resources.lib.ui import client, database
+from resources.lib.ui import client, control, database
 
 api_info = database.get_info('TVDB')
-api_key = api_info['api_key']
+api_key = api_info.get('api_key') if api_info else None
 baseUrl = "https://api4.thetvdb.com/v4"
-_token_cache = {'token': None, 'timestamp': 0}
+lang = ['eng', 'jpn']
+language = ["jpn", 'eng'][control.getInt("titlelanguage")]
 
 
-def _get_auth_token():
-    """Get or refresh TVDB API token"""
-    import time
-    # Token valid for 30 days, but refresh after 7 days to be safe
-    if _token_cache['token'] and (time.time() - _token_cache['timestamp']) < 604800:
-        return _token_cache['token']
+def get_auth_token():
+    """Get authentication token for TVDB API v4"""
+    if not api_key:
+        return None
 
-    # Get new token
     headers = {'Content-Type': 'application/json'}
     data = {'apikey': api_key}
-    response = client.post(f'{baseUrl}/login', json=data, headers=headers)
+    response = client.post(f'{baseUrl}/login', json_data=data, headers=headers)
 
     if response:
         res = response.json()
-        token = res.get('data', {}).get('token')
-        if token:
-            _token_cache['token'] = token
-            _token_cache['timestamp'] = time.time()
-            return token
+        return res.get('data', {}).get('token')
     return None
 
 
 def getArt(meta_ids, mtype):
+    """Get artwork from TVDB API v4"""
     art = {}
     tvdb_id = meta_ids.get('thetvdb_id')
 
     if not tvdb_id:
         return art
 
-    token = _get_auth_token()
+    # Get authentication token
+    token = get_auth_token()
     if not token:
+        control.log("TVDB: Failed to authenticate")
         return art
 
     headers = {'Authorization': f'Bearer {token}'}
 
-    # TVDB uses 'series' for TV shows and 'movies' for movies
-    endpoint_type = 'series' if mtype != 'movies' else 'movies'
+    # TVDB v4 uses different endpoints for series and movies
+    if mtype == 'movies':
+        # For movies, use the movies endpoint
+        response = client.get(f'{baseUrl}/movies/{tvdb_id}/extended', headers=headers)
+    else:
+        # For TV shows, use the series endpoint with artworks
+        response = client.get(f'{baseUrl}/series/{tvdb_id}/extended', headers=headers)
 
-    # Get artwork for the series/movie
-    response = client.get(f'{baseUrl}/{endpoint_type}/{tvdb_id}/artworks', headers=headers)
-    res = response.json() if response else {}
+    if not response:
+        return art
 
-    if res and res.get('data'):
-        artworks = res['data']
+    res = response.json()
+    data = res.get('data', {})
 
-        # Collect fanart (backgrounds)
-        backgrounds = [item for item in artworks if item.get('type') == 3]  # Type 3 is backgrounds
-        if backgrounds:
-            items = [item.get('image') for item in backgrounds if item.get('image')]
-            if items:
-                # Prepend TVDB image base URL
-                art['fanart'] = [f"https://artworks.thetvdb.com{img}" for img in items]
+    if not data:
+        return art
 
-        # Collect thumbnails
-        banners = [item for item in artworks if item.get('type') in [1, 2]]  # Type 1 is series banners, 2 is season banners
-        if banners:
-            items = [item.get('image') for item in banners if item.get('image')]
-            if items:
-                art['thumb'] = [f"https://artworks.thetvdb.com{img}" for img in items]
+    # Process artworks
+    artworks = data.get('artworks', [])
 
-        # Collect clearlogo
-        clearlogos = [item for item in artworks if item.get('type') == 22]  # Type 22 is clearlogo
-        if clearlogos:
-            items = [item.get('image') for item in clearlogos if item.get('image')]
-            if items:
-                art['clearlogo'] = [f"https://artworks.thetvdb.com{img}" for img in items]
+    if artworks:
+        fanart_images = []
+        thumb_images = []
+        clearart_images = []
+        clearlogo_images = []
 
-        # Collect clearart
-        cleararts = [item for item in artworks if item.get('type') == 23]  # Type 23 is clearart
-        if cleararts:
-            items = [item.get('image') for item in cleararts if item.get('image')]
-            if items:
-                art['clearart'] = [f"https://artworks.thetvdb.com{img}" for img in items]
+        for artwork in artworks:
+            artwork_type = artwork.get('type')
+            image_url = artwork.get('image')
+            artwork_lang = artwork.get('language')
+
+            if not image_url:
+                continue
+
+            # Prepend base URL if needed
+            if not image_url.startswith('http'):
+                image_url = f'https://artworks.thetvdb.com{image_url}'
+
+            # Fanart/Background
+            if artwork_type in [3, 15]:  # 3=Series Background, 15=Movie Background
+                if artwork_lang in lang or not artwork_lang:
+                    fanart_images.append(image_url)
+
+            # Thumbnails/Posters
+            elif artwork_type in [2, 14]:  # 2=Series Poster, 14=Movie Poster
+                if artwork_lang in lang or not artwork_lang:
+                    thumb_images.append(image_url)
+
+            # Clear Art
+            elif artwork_type in [22, 23]:  # 22=Clear Art, 23=HD Clear Art
+                if artwork_lang in lang or not artwork_lang:
+                    clearart_images.append(image_url)
+
+            # Clear Logo (language-specific)
+            elif artwork_type in [5, 6]:  # 5=Clear Logo, 6=HD Clear Logo
+                clearlogo_images.append({
+                    'url': image_url,
+                    'lang': artwork_lang
+                })
+
+        # Add to art dict
+        if fanart_images:
+            art['fanart'] = fanart_images
+        if thumb_images:
+            art['thumb'] = thumb_images
+        if clearart_images:
+            art['clearart'] = clearart_images
+
+        # Process clearlogo with language preference
+        if clearlogo_images:
+            logos = []
+            # Try to get logo in preferred language
+            try:
+                logos.append(next(x['url'] for x in clearlogo_images if x['lang'] == language))
+            except StopIteration:
+                pass
+
+            # If no preferred language logo, try any language in our list
+            if not logos:
+                try:
+                    logos.append(next(x['url'] for x in clearlogo_images if x['lang'] in lang))
+                except StopIteration:
+                    pass
+
+            # If still no logo, take first available
+            if not logos and clearlogo_images:
+                try:
+                    logos.append(clearlogo_images[0]['url'])
+                except (IndexError, KeyError):
+                    pass
+
+            if logos:
+                art['clearlogo'] = logos
 
     return art
