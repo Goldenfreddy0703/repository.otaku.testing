@@ -11,7 +11,7 @@ class WatchlistFlavor:
         'on_hold':       {'anilist': 'PAUSED',    'mal': 'on_hold',       'kitsu': 'on_hold',   'simkl': 'hold'},
         'dropped':       {'anilist': 'DROPPED',   'mal': 'dropped',       'kitsu': 'dropped',   'simkl': 'dropped'},
         'plan_to_watch': {'anilist': 'PLANNING',  'mal': 'plan_to_watch', 'kitsu': 'planned',   'simkl': 'plantowatch'},
-        'rewatching':    {'anilist': 'REPEATING',  'mal': 'watching',      'kitsu': 'current',   'simkl': 'watching'},
+        'rewatching':    {'anilist': 'REPEATING', 'mal': 'watching',      'kitsu': 'current',   'simkl': 'watching'},
     }
 
     def __init__(self):
@@ -166,7 +166,10 @@ class WatchlistFlavor:
 
         for flavor in flavors:
             try:
-                flavor.update_num_episodes(mal_id, episode)
+                updated = flavor.update_num_episodes(mal_id, episode)
+                if not updated:
+                    control.log(f'Failed to update episode {episode} on {flavor.flavor_name} (returned False)', 'warning')
+                    continue
                 control.log(f'Updated episode {episode} on {flavor.flavor_name}')
 
                 # Per-flavor completion detection using each service's own total episode count
